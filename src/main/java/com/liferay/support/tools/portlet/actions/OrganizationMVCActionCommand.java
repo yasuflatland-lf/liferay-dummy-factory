@@ -8,7 +8,6 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
-import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -86,12 +85,11 @@ public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 
 			//Create Organization
 			createOrganizations(actionRequest, actionResponse);
-		} catch (PortalException e) {
-			SessionErrors.add(actionRequest,"error");
-			e.printStackTrace();
 		} catch (Throwable e) {
+			hideDefaultSuccessMessage(actionRequest);
 			e.printStackTrace();
 		}
+	
 	}
 	
 	@Reference(unbind = "-")

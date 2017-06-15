@@ -22,6 +22,7 @@ import org.osgi.service.component.annotations.Reference;
     property = { 
         "javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
         "mvc.command.name=" + LDFPortletKeys.ORGANIZAION,
+        "mvc.command.name=" + LDFPortletKeys.SITES,
         "mvc.command.name=" + LDFPortletKeys.COMMON
     }, 
     service = MVCRenderCommand.class
@@ -42,7 +43,10 @@ public class CommonMVCRenderCommand implements MVCRenderCommand {
 			.getPageFromMode()
 			.getOrDefault(mode, LDFPortletKeys.JSP_ORGANIZAION) + ">");
 		}
-
+		
+		// Carry around mode
+		renderRequest.setAttribute(LDFPortletKeys.MODE, mode);
+		
 		return _commonUtil
 				.getPageFromMode()
 				.getOrDefault(mode, LDFPortletKeys.JSP_ORGANIZAION);

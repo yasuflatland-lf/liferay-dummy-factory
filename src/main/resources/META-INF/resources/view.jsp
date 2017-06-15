@@ -9,7 +9,6 @@
 
 	<aui:fieldset-group markupView="lexicon">	
 		<aui:fieldset>
-			<liferay-ui:error key="error" message="Error occured" />		
 			<div class="entry-title form-group">
 				<h1>Create organizations&nbsp;&nbsp;
 					<a aria-expanded="false" class="collapse-icon collapsed icon-question-sign" data-toggle="collapse" href="#navPillsCollapse0">

@@ -31,4 +31,7 @@ public class LDFPortletKeys {
     public static final String ALLOWED_ORG_NAME =
 			"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz#:@./_-";    
 
+    //Validations
+    public static final String ALLOWED_SITE_NAME =
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz#:@./_-";        
 }
