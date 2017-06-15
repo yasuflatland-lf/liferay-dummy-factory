@@ -16,6 +16,7 @@
 <%@ page import="javax.portlet.PortletURL" %>
 <%@ page import="com.liferay.portal.kernel.util.*" %>
 <%@ page import="com.liferay.portal.kernel.portlet.*" %>
+<%@ page import="com.liferay.support.tools.constants.*" %>
 
 <liferay-frontend:defineObjects/>
 <liferay-theme:defineObjects/>

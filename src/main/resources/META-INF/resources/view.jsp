@@ -16,17 +16,14 @@
 		<option>Documents</option>				
 	</aui:select>
 	
-	<portlet:actionURL name="/samplesb/crud" var="samplesbEditURL">
+	<portlet:actionURL name="<%= LiferayDummyFactoryPortletKeys.ORGANIZAION %>" var="organizationEditURL">
 		<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
 	</portlet:actionURL>
 
 
-	<%
-	String numberOfOrganizationsLabel = "Enter the number of organizations you would like to create";
-	String baseOrganizationNameLabel = "Enter the base name for the organizations";
-	%>
 	<aui:fieldset-group markupView="lexicon">	
 		<aui:fieldset>
+			<liferay-ui:error key="error" message="Error occured" />		
 			<div class="entry-title form-group">
 				<h1>Create organizations&nbsp;&nbsp;
 					<a aria-expanded="false" class="collapse-icon collapsed icon-question-sign" data-toggle="collapse" href="#navPillsCollapse0">
@@ -53,10 +50,14 @@
 				</ul>
 			</div>
 
-			<aui:form action="<%= samplesbEditURL %>" method="post" >
-				<aui:input name="companyId" type="hidden" value="<%= company.getCompanyId() %>" />
-				<aui:input name="numberOfOrganizations" label="<%= numberOfOrganizationsLabel %>" /><br />
-				<aui:input name="baseOrganizationName" label="<%= baseOrganizationNameLabel %>" /><br />
+			<%
+			String numberOfOrganizationsLabel = "Enter the number of organizations you would like to create";
+			String baseOrganizationNameLabel = "Enter the base name for the organizations";
+			%>
+
+			<aui:form action="<%= organizationEditURL %>" method="post" >
+				<aui:input name="numberOfOrganizations" label="<%= numberOfOrganizationsLabel %>" />
+				<aui:input name="baseOrganizationName" label="<%= baseOrganizationNameLabel %>" />
 		
 				<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary"/>
 			</aui:form>	
