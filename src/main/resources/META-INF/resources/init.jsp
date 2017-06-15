@@ -21,3 +21,10 @@
 <liferay-frontend:defineObjects/>
 <liferay-theme:defineObjects/>
 <portlet:defineObjects/>
+
+<%
+	PortletURL portletURL = PortletURLUtil.clone(renderResponse.createRenderURL(), liferayPortletResponse);
+	String redirect = ParamUtil.getString(request, "redirect");
+	//Mode
+	String mode = ParamUtil.getString(request, LDFPortletKeys.MODE, LDFPortletKeys.MODE_ORGANIZAION);
+%>

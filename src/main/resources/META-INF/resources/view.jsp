@@ -1,25 +1,11 @@
 <%@ include file="/init.jsp"%>
 
-<%
-	PortletURL portletURL = PortletURLUtil.clone(renderResponse.createRenderURL(), liferayPortletResponse);
-	String redirect = ParamUtil.getString(request, "redirect");
-%>
-
 <div class="container-fluid-1280">
-	<h2>What kind of data do you want to create?</h2>
-	<aui:select name="command" label=""> 
-		<option>Organizations</option>
-		<option>Sites</option>
-		<option>Pages</option>
-		<option>Users</option>
-		<option>Web Content Articles</option>
-		<option>Documents</option>				
-	</aui:select>
-	
-	<portlet:actionURL name="<%= LiferayDummyFactoryPortletKeys.ORGANIZAION %>" var="organizationEditURL">
+	<%@ include file="/command_select.jspf"%>
+
+	<portlet:actionURL name="<%= LDFPortletKeys.ORGANIZAION %>" var="organizationEditURL">
 		<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
 	</portlet:actionURL>
-
 
 	<aui:fieldset-group markupView="lexicon">	
 		<aui:fieldset>

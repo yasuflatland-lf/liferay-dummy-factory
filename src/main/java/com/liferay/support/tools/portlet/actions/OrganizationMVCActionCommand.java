@@ -1,8 +1,6 @@
 package com.liferay.support.tools.portlet.actions;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.OrganizationConstants;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -14,9 +12,7 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.support.tools.constants.LiferayDummyFactoryPortletKeys;
+import com.liferay.support.tools.constants.LDFPortletKeys;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -32,8 +28,8 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true, 
 	property = { 
-		"javax.portlet.name=" + LiferayDummyFactoryPortletKeys.LIFERAY_DUMMY_FACTORY,
-		"mvc.command.name=" + LiferayDummyFactoryPortletKeys.ORGANIZAION
+		"javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
+		"mvc.command.name=" + LDFPortletKeys.ORGANIZAION
 	}, 
 	service = MVCActionCommand.class
 )
