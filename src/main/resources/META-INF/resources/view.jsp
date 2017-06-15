@@ -42,8 +42,22 @@
 			%>
 
 			<aui:form action="<%= organizationEditURL %>" method="post" >
-				<aui:input name="numberOfOrganizations" label="<%= numberOfOrganizationsLabel %>" />
-				<aui:input name="baseOrganizationName" label="<%= baseOrganizationNameLabel %>" />
+				<aui:input name="numberOfOrganizations" label="<%= numberOfOrganizationsLabel %>" >
+					<aui:validator name="digits" />
+					<aui:validator name="min">1</aui:validator>
+					<aui:validator name="required" />				
+				</aui:input>
+				<aui:input name="baseOrganizationName" label="<%= baseOrganizationNameLabel %>" >
+					<aui:validator errorMessage="this-field-is-required-and-must-contain-only-following-characters" name="custom">
+						function(val, fieldNode, ruleValue) {
+							var allowedCharacters = '<%= HtmlUtil.escapeJS(LDFPortletKeys.ALLOWED_ORG_NAME) %>';
+							val = val.trim();
+							var regex = new RegExp('[^' + allowedCharacters + ']');
+							return !regex.test(val);
+						}
+					</aui:validator>				
+					<aui:validator name="required" />				
+				</aui:input>
 		
 				<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary"/>
 			</aui:form>	

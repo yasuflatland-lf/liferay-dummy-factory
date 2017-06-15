@@ -1,5 +1,7 @@
 package com.liferay.support.tools.portlet.actions;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.support.tools.constants.LDFPortletKeys;
@@ -33,9 +35,13 @@ public class CommonMVCRenderCommand implements MVCRenderCommand {
 		String mode = ParamUtil.getString(renderRequest, LDFPortletKeys.MODE,
 				LDFPortletKeys.MODE_ORGANIZAION);
 		renderRequest.setAttribute(LDFPortletKeys.MODE, mode);
-System.out.println("@@@@@@@@@@ mode <" + mode + ">");
-System.out.println("<<<<<<<< JSP <" + _commonUtil
-				.getPageFromMode().toString() + ">");
+		
+		if(_log.isDebugEnabled()) {
+			_log.debug("mode <" + mode + ">");
+			_log.debug("jsp  <" + _commonUtil
+			.getPageFromMode()
+			.getOrDefault(mode, LDFPortletKeys.JSP_ORGANIZAION) + ">");
+		}
 
 		return _commonUtil
 				.getPageFromMode()
@@ -48,4 +54,7 @@ System.out.println("<<<<<<<< JSP <" + _commonUtil
 	}
 
 	private CommonUtil _commonUtil;
+	
+	private static Log _log = LogFactoryUtil
+			.getLog(CommonMVCRenderCommand.class);	
 }

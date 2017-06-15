@@ -26,5 +26,9 @@ public class LDFPortletKeys {
     public static final String JSP_USERS = "/users.jsp";
     public static final String JSP_WCM = "/wcm.jsp";
     public static final String JSP_DOCUMENTS = "/documents.jsp";	
+    
+    //Validations
+    public static final String ALLOWED_ORG_NAME =
+			"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz#:@./_-";    
 
 }
