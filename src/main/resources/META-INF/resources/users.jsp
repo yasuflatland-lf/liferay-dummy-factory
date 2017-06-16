@@ -61,13 +61,17 @@
 				List<Organization> organizations = OrganizationLocalServiceUtil.getOrganizations(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 				List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 				List<Role> roles = RoleLocalServiceUtil.getRoles(company.getCompanyId());
+				List<UserGroup> userGroups = UserGroupLocalServiceUtil.getUserGroups(company.getCompanyId());
 				Role defaultRole = RoleLocalServiceUtil.getRole(company.getCompanyId(), RoleConstants.USER);	
 				String scopeGroupdId = String.valueOf(themeDisplay.getScopeGroupId());
 
-				String organizationLabel = "Select an organization to assign the users to";
-				String groupLabel = "Select a site to assign the users to";
-				String roleLabel = "Select a role to assign the users to";
+				String organizationLabel = "Select organizations to assign the users to";
+				String groupLabel = "Select sites to assign the users to";
+				String roleLabel = "Select roles to assign the users to";
 				String roleHelpMessage = "Organization and site roles cannot be assigned unless users are assigned to an organization or site.";
+				String userGroupsLabel = "Select user groups to assign the users to";
+				String passwordLabel = "Enter password";
+				String maleLabel = "Genger (checked is male)";
 
 				%>
 		
@@ -75,8 +79,7 @@
 				<div class="collapsed collapse" id="inputOptions" aria-expanded="false" >
 					<div class="row">
 						<aui:fieldset cssClass="col-md-6">
-							<aui:select name="organization" label="<%= organizationLabel %>" >
-								<aui:option label="<%= defaultOption %>" value="<%= OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID %>" />
+							<aui:select name="organizations" label="<%= organizationLabel %>" multiple="<%= true %>">
 								<%
 								for (Organization organization : organizations) {
 								%>
@@ -85,8 +88,7 @@
 								}
 								%>
 							</aui:select>	
-							<aui:select name="group" label="<%= groupLabel %>" >
-								<aui:option label="<%= defaultOption %>" value="<%= scopeGroupdId %>" />
+							<aui:select name="groups" label="<%= groupLabel %>"  multiple="<%= true %>" >
 								<%
 								for (Group group : groups) {
 									if (group.isSite() && !group.getDescriptiveName().equals("Control Panel")) {
@@ -97,8 +99,7 @@
 								}
 								%>
 							</aui:select>		
-							<aui:select name="role" label="<%= roleLabel %>" helpMessage="<%= roleHelpMessage %>" >
-								<aui:option label="<%= defaultOption %>" value="<%= String.valueOf(defaultRole.getRoleId()) %>" />
+							<aui:select name="roles" label="<%= roleLabel %>" helpMessage="<%= roleHelpMessage %>"  multiple="<%= true %>" >
 								<%
 								for (Role role : roles) {
 								%>
@@ -107,12 +108,21 @@
 								}
 								%>
 							</aui:select>
-													
+											
 						</aui:fieldset>
 						<aui:fieldset cssClass="col-md-6">
-<%-- 							<aui:input type="checkbox" name="privateLayout" label="<%= privateLayoutLabel %>" value="false" />
-							<aui:input type="checkbox" name="hidden" label="<%= hiddenLabel %>" value="false" />
- --%>						</aui:fieldset>
+							<aui:input name="password" label="<%= passwordLabel %>" value="test"/>
+							<aui:input name="male" label="<%= maleLabel %>" value="<%= true %>"/>		
+							<aui:select name="userGroups" label="<%= userGroupsLabel %>"  multiple="<%= true %>" >
+								<%
+								for (UserGroup userGroup : userGroups) {
+								%>
+									<aui:option label="<%= userGroup.getName() %>" value="<%= userGroup.getUserGroupId() %>"/>
+								<%
+								}
+								%>
+							</aui:select>
+ 						</aui:fieldset>
 					</div>
 				</div>	
 				<aui:button-row>

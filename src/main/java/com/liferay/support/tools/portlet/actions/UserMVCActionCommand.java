@@ -2,15 +2,19 @@ package com.liferay.support.tools.portlet.actions;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
-import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.service.UserService;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.support.tools.constants.LDFPortletKeys;
+
+import java.util.Arrays;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -24,12 +28,12 @@ import org.osgi.service.component.annotations.Reference;
  * @author Yasuyuki Takeo
  */
 @Component(
-	immediate = true, 
-	property = { 
-		"javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
-		"mvc.command.name=" + LDFPortletKeys.USERS
-	}, 
-	service = MVCActionCommand.class
+    immediate = true, 
+    property = { 
+        "javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
+        "mvc.command.name=" + LDFPortletKeys.USERS
+    }, 
+    service = MVCActionCommand.class
 )
 public class UserMVCActionCommand extends BaseMVCActionCommand {
 
@@ -57,6 +61,44 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 				}
 			}
 			
+			StringBundler screenName = new StringBundler(2);
+			screenName.append(baseScreenName);
+			screenName.append(i);
+
+			StringBundler emailAddress = new StringBundler(2);
+			emailAddress.append(screenName);
+			emailAddress.append("@liferay.com");	
+			
+			//Create User
+			_userService.addUserWithWorkflow(
+					serviceContext.getCompanyId(), //companyId,
+					false, //autoPassword,
+					password, //password1, 
+					password, //password2, 
+					false, //autoScreenName, 
+					screenName.toString(),
+					emailAddress.toString(),
+					0, //facebookId, 
+					StringPool.BLANK, //openId, 
+					LocaleUtil.getDefault(), //locale, 
+					baseScreenName, //firstName, 
+					StringPool.BLANK, //middleName, 
+					String.valueOf(i), //lastName, 
+					0, //prefixId, 
+					0, //suffixId, 
+					male, // male
+					1, //birthdayMonth, 
+					1, //birthdayDay, 
+					1970, //birthdayYear, 
+					StringPool.BLANK,//jobTitle, 
+					groupIds, 
+					organizationIds, 
+					roleIds, 
+					userGroupIds, //userGroupIds, 
+					false, //sendEmail
+					serviceContext // serviceContext
+					);
+			
 		}
 
 		SessionMessages.add(actionRequest, "success");
@@ -68,27 +110,64 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 	protected void doProcessAction(ActionRequest actionRequest, ActionResponse actionResponse) {
 
 		try {
-			//Fetch data
-			numberOfusers = ParamUtil.getLong(actionRequest, "numberOfusers",1);
-			baseUserName = ParamUtil.getString(actionRequest, "baseUserName","");
+			// Fetch data
+			numberOfusers = ParamUtil.getLong(actionRequest, "numberOfusers", 1);
+			baseScreenName = ParamUtil.getString(actionRequest, "baseScreenName", "");
+			male = ParamUtil.getBoolean(actionRequest, "male", true);
+			password = ParamUtil.getString(actionRequest, "password", "test");
 
-			//Create users
+			// Organization
+			String[] organizations = ParamUtil.getStringValues(actionRequest, "organizations", null);
+			organizationIds = convertStringToLongArray(organizations);
+
+			// Sites
+			String[] groups = ParamUtil.getStringValues(actionRequest, "groups", null);
+			groupIds = convertStringToLongArray(groups);
+
+			// Roles
+			String[] roles = ParamUtil.getStringValues(actionRequest, "roles", null);
+			roleIds = convertStringToLongArray(roles);
+
+			// User Group
+			String[] userGroups = ParamUtil.getStringValues(actionRequest, "userGroups", null);
+			userGroupIds = convertStringToLongArray(userGroups);
+			
+			// Create users
 			createUsers(actionRequest, actionResponse);
 		} catch (Throwable e) {
 			hideDefaultSuccessMessage(actionRequest);
 			e.printStackTrace();
 		}
-	
-	}
-	
-	@Reference(unbind = "-")
-	protected void setUserLocalService(
-			UserLocalService userLocalService) {
-		_userLocalService = userLocalService;
+
 	}
 
-	private UserLocalService _userLocalService;	
+	/**
+	 * Convert string array to long array
+	 * 
+	 * @param source String array of ids
+	 * @return long array of ids
+	 */
+	protected long[] convertStringToLongArray(String[] source) {
+		if(null == source || source.length <= 0) {
+			return null;
+		}
+		
+		return Arrays.stream(source).mapToLong(Long::parseLong).toArray();
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserService(UserService userService) {
+		_userService = userService;
+	}
+
+	private UserService _userService;
 
 	private long numberOfusers = 0;
-	private String baseUserName = "";
+	private String baseScreenName = "";
+	private long[] organizationIds = null;
+	private long[] groupIds = null;
+	private long[] roleIds = null;
+	private long[] userGroupIds = null;
+	private boolean male;
+	private String password;
 }
