@@ -23,6 +23,7 @@ import org.osgi.service.component.annotations.Reference;
         "javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
         "mvc.command.name=" + LDFPortletKeys.ORGANIZAION,
         "mvc.command.name=" + LDFPortletKeys.SITES,
+        "mvc.command.name=" + LDFPortletKeys.PAGES,
         "mvc.command.name=" + LDFPortletKeys.COMMON
     }, 
     service = MVCRenderCommand.class
