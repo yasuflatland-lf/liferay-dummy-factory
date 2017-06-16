@@ -53,14 +53,31 @@
 					<aui:validator name="required" />				
 				</aui:input>
 		
+				<%
+					//Organization
+					List<Organization> organizations = OrganizationLocalServiceUtil.getOrganizations(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+					String defaultOption = "(None)";
+				%>
 				<aui:a href="#inputOptions" cssClass="collapse-icon collapsed icon-angle-down" title="Option" aria-expanded="false" data-toggle="collapse" >&nbsp;&nbsp;option</aui:a>
 				<div class="collapsed collapse" id="inputOptions" aria-expanded="false" >
 					<div class="row">
 						<aui:fieldset cssClass="col-md-6">
+							<aui:select name="parentOrganizationId" label="<%= parentOrganizationIdLabel %>" >
+								<aui:option label="<%= defaultOption %>" value="<%= OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID %>" />
+								<%
+								for (Organization organization : organizations) {
+								%>
+									<aui:option label="<%= organization.getName() %>" value="<%= organization.getOrganizationId() %>"/>
+								<%
+								}
+								%>
+							</aui:select>						
+<%-- 
 							<aui:input name="parentOrganizationId" label="<%= parentOrganizationIdLabel %>" >
 								<aui:validator name="digits" />
 							</aui:input>				
-						</aui:fieldset>
+ --%>
+ 						</aui:fieldset>
 					</div>
 				</div>	
 				<aui:button-row>
