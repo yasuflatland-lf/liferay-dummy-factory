@@ -61,6 +61,7 @@
 				List<Organization> organizations = OrganizationLocalServiceUtil.getOrganizations(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 				List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 				List<Role> roles = RoleLocalServiceUtil.getRoles(company.getCompanyId());
+				Role defaultRole = RoleLocalServiceUtil.getRole(company.getCompanyId(), RoleConstants.USER);	
 				String scopeGroupdId = String.valueOf(themeDisplay.getScopeGroupId());
 
 				String organizationLabel = "Select an organization to assign the users to";
@@ -75,6 +76,7 @@
 					<div class="row">
 						<aui:fieldset cssClass="col-md-6">
 							<aui:select name="organization" label="<%= organizationLabel %>" >
+								<aui:option label="<%= defaultOption %>" value="<%= OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID %>" />
 								<%
 								for (Organization organization : organizations) {
 								%>
@@ -96,6 +98,7 @@
 								%>
 							</aui:select>		
 							<aui:select name="role" label="<%= roleLabel %>" helpMessage="<%= roleHelpMessage %>" >
+								<aui:option label="<%= defaultOption %>" value="<%= String.valueOf(defaultRole.getRoleId()) %>" />
 								<%
 								for (Role role : roles) {
 								%>
