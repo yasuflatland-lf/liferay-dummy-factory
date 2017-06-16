@@ -65,16 +65,34 @@
 				String siteLabel = "Enable site";
 				String inheritContentLabel = "Enable inherit content";
 				String activeLabel = "Activate site";
+				
+				List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+				String scopeGroupdId = String.valueOf(themeDisplay.getScopeGroupId());
+				String defaultOption = "(None)";
 				%>
 		
 				<aui:a href="#inputOptions" cssClass="collapse-icon collapsed icon-angle-down" title="Option" aria-expanded="false" data-toggle="collapse" >&nbsp;&nbsp;option</aui:a>
 				<div class="collapsed collapse" id="inputOptions" aria-expanded="false" >
 					<div class="row">
 						<aui:fieldset cssClass="col-md-6">
-							<aui:input name="parentGroupId" label="<%= parentGroupIdLabel %>" value="<%=GroupConstants.DEFAULT_PARENT_GROUP_ID %>">
+							<aui:select name="parentGroupId" label="<%= parentGroupIdLabel %>" >
+								<aui:option label="<%= defaultOption %>" value="<%= scopeGroupdId %>" />
+								<%
+								for (Group group : groups) {
+									if (group.isSite()) {
+								%>
+										<aui:option label="<%= group.getDescriptiveName() %>" value="<%= group.getGroupId() %>"/>
+								<%
+									}
+								}
+								%>
+							</aui:select>							
+<%--
+ 							<aui:input name="parentGroupId" label="<%= parentGroupIdLabel %>" value="<%=GroupConstants.DEFAULT_PARENT_GROUP_ID %>">
 								<aui:validator name="digits" />
 							</aui:input>				
-							<aui:input name="liveGroupId" label="<%= liveGroupIdLabel %>" value="<%=GroupConstants.DEFAULT_LIVE_GROUP_ID %>">
+ --%>
+ 							<aui:input name="liveGroupId" label="<%= liveGroupIdLabel %>" value="<%=GroupConstants.DEFAULT_LIVE_GROUP_ID %>">
 								<aui:validator name="digits" />
 							</aui:input>				
 						</aui:fieldset>
