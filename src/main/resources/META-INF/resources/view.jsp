@@ -1,6 +1,8 @@
 <%@ include file="/init.jsp"%>
 
 <div class="container-fluid-1280">
+	<liferay-ui:success key="success" message="Organizations created successfully" />
+		
 	<%@ include file="/command_select.jspf"%>
 
 	<portlet:actionURL name="<%= LDFPortletKeys.ORGANIZAION %>" var="organizationEditURL">
@@ -42,28 +44,28 @@
 			%>
 
 			<aui:form action="<%= organizationEditURL %>" method="post" >
-				<aui:input name="parentOrganizationId" label="<%= parentOrganizationIdLabel %>" >
-					<aui:validator name="digits" />
-					<aui:validator name="min">1</aui:validator>
-				</aui:input>				
 				<aui:input name="numberOfOrganizations" label="<%= numberOfOrganizationsLabel %>" >
 					<aui:validator name="digits" />
 					<aui:validator name="min">1</aui:validator>
 					<aui:validator name="required" />				
 				</aui:input>
 				<aui:input name="baseOrganizationName" label="<%= baseOrganizationNameLabel %>" >
-					<aui:validator errorMessage="this-field-is-required-and-must-contain-only-following-characters" name="custom">
-						function(val, fieldNode, ruleValue) {
-							var allowedCharacters = '<%= HtmlUtil.escapeJS(LDFPortletKeys.ALLOWED_ORG_NAME) %>';
-							val = val.trim();
-							var regex = new RegExp('[^' + allowedCharacters + ']');
-							return !regex.test(val);
-						}
-					</aui:validator>				
 					<aui:validator name="required" />				
 				</aui:input>
 		
-				<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary"/>
+				<aui:a href="#inputOptions" cssClass="collapse-icon collapsed icon-angle-down" title="Option" aria-expanded="false" data-toggle="collapse" >&nbsp;&nbsp;option</aui:a>
+				<div class="collapsed collapse" id="inputOptions" aria-expanded="false" >
+					<div class="row">
+						<aui:fieldset cssClass="col-md-6">
+							<aui:input name="parentOrganizationId" label="<%= parentOrganizationIdLabel %>" >
+								<aui:validator name="digits" />
+							</aui:input>				
+						</aui:fieldset>
+					</div>
+				</div>	
+				<aui:button-row>
+					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary"/>
+				</aui:button-row>	
 			</aui:form>	
 		</aui:fieldset>
 	</aui:fieldset-group>

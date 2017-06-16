@@ -1,6 +1,7 @@
 <%@ include file="/init.jsp"%>
 
 <div class="container-fluid-1280">
+	<liferay-ui:success key="success" message="Sites created successfully" />
 	<%@ include file="/command_select.jspf"%>
 
 	<portlet:actionURL name="<%= LDFPortletKeys.SITES %>" var="siteEditURL">
