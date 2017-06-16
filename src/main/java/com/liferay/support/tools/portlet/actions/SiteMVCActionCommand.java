@@ -11,7 +11,6 @@ import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.support.tools.constants.LDFPortletKeys;
@@ -22,9 +21,6 @@ import java.util.Map;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
-import javax.portlet.PortletRequest;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;

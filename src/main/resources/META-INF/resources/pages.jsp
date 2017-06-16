@@ -38,10 +38,16 @@
 			<%
 			String numberOfPagesLabel= "Enter the number of pages you would like to create";
 			String basePageNameLabel= "Enter the base page name (i.e. newPage, page, testPage)";
+			List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			String defaultOption = "(None)";
+			
+			String scopeGroupdId = String.valueOf(themeDisplay.getScopeGroupId());
+			String groupLabel = "Select a site to assign the pages to";
+			
 			%>
 
 			<aui:form action="<%= pageEditURL %>" method="post" >
-				<aui:input name="numberOfPages" label="<%= numberOfPagesLabel %>" >
+				<aui:input name="numberOfpages" label="<%= numberOfPagesLabel %>" >
 					<aui:validator name="digits" />
 					<aui:validator name="min">1</aui:validator>
 					<aui:validator name="required" />				
@@ -49,12 +55,19 @@
 				<aui:input name="basePageName" label="<%= basePageNameLabel %>" >
 					<aui:validator name="required" />				
 				</aui:input>
-		
+				<aui:select name="group" label="<%= groupLabel %>" >
+					<aui:option label="<%= defaultOption %>" value="<%= scopeGroupdId %>" />
+					<%
+					for (Group group : groups) {
+						if (group.isSite()) {
+					%>
+							<aui:option label="<%= group.getDescriptiveName() %>" value="<%= group.getGroupId() %>"/>
+					<%
+						}
+					}
+					%>
+				</aui:select>			
 				<%
-				List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-				String scopeGroupdId = String.valueOf(themeDisplay.getScopeGroupId());
-				String groupLabel = "Select a site to assign the pages to";
-				String defaultOption = "(None)";
 				String parentLayoutIdLabel = "Enter the primary key of the parent layout";
 				String privateLayoutLabel = "Make pages private";
 				String hiddenLabel = "Enable to make this layout is hidden";
@@ -64,18 +77,7 @@
 				<div class="collapsed collapse" id="inputOptions" aria-expanded="false" >
 					<div class="row">
 						<aui:fieldset cssClass="col-md-6">
-							<aui:select name="group" label="<%= groupLabel %>" >
-								<aui:option label="<%= defaultOption %>" value="<%= scopeGroupdId %>" />
-								<%
-								for (Group group : groups) {
-									if (group.isSite()) {
-								%>
-										<aui:option label="<%= group.getDescriptiveName() %>" value="<%= group.getGroupId() %>"/>
-								<%
-									}
-								}
-								%>
-							</aui:select>	
+
 							<aui:input name="parentLayoutId" label="<%= parentLayoutIdLabel %>" value="<%=LayoutConstants.DEFAULT_PARENT_LAYOUT_ID %>">
 								<aui:validator name="digits" />
 							</aui:input>				

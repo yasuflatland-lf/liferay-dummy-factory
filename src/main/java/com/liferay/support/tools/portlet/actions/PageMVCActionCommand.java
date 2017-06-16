@@ -9,13 +9,10 @@ import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionMessages;
-import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.support.tools.constants.LDFPortletKeys;
-
-import java.util.Locale;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
