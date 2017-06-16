@@ -82,19 +82,19 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 			
 			_groupLocalService.addGroup(
 					serviceContext.getUserId(), //userId
-					GroupConstants.DEFAULT_PARENT_GROUP_ID, // parentGroupId
+					parentGroupId, // parentGroupId
 					null, // className
 					0, //classPK
-					GroupConstants.DEFAULT_LIVE_GROUP_ID, //liveGroupId
+					liveGroupId, //liveGroupId
 					nameMap, // nameMap
 					descriptionMap, // descriptionMap
 					siteType, //type
-					false, //manualMembership
+					manualMembership, //manualMembership
 					GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, // membershipRestriction
 					StringPool.BLANK, //friendlyURL
-					true, //site
-					false, //inheritContent
-					true, //active
+					site, //site
+					inheritContent, //inheritContent
+					active, //active
 					serviceContext); //serviceContext
 		}
 
@@ -111,6 +111,13 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 			numberOfSites = ParamUtil.getLong(actionRequest, "numberOfSites",1);
 			baseSiteName = ParamUtil.getString(actionRequest, "baseSiteName","dummy");
 			siteType = ParamUtil.getInteger(actionRequest, "siteType", GroupConstants.TYPE_SITE_OPEN);
+			parentGroupId = ParamUtil.getLong(actionRequest, "parentGroupId", GroupConstants.DEFAULT_PARENT_GROUP_ID);
+			liveGroupId = ParamUtil.getLong(actionRequest, "liveGroupId", GroupConstants.DEFAULT_LIVE_GROUP_ID);
+
+			manualMembership = ParamUtil.getBoolean(actionRequest, "manualMembership", false);
+			site = ParamUtil.getBoolean(actionRequest, "site", true);
+			inheritContent = ParamUtil.getBoolean(actionRequest, "inheritContent", false);
+			active = ParamUtil.getBoolean(actionRequest, "active", true);
 
 			//Create Sites
 			createSites(actionRequest, actionResponse);
@@ -132,5 +139,12 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 	private long numberOfSites = 0;
 	private String baseSiteName = "";
 	private int siteType = GroupConstants.TYPE_SITE_OPEN;
+	private long parentGroupId = GroupConstants.DEFAULT_PARENT_GROUP_ID;
+	private long liveGroupId = GroupConstants.DEFAULT_LIVE_GROUP_ID;
+	private boolean manualMembership = false;
+	private boolean site = true;
+	private boolean inheritContent = false;
+	private boolean active = true;
+	
 	
 }

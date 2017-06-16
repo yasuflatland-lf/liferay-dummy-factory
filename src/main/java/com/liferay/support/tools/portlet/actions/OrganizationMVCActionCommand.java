@@ -64,7 +64,7 @@ public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 
 			_organizationLocalService.addOrganization(
 					serviceContext.getUserId(),
-					OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID, // parentOrganizationId
+					parentOrganizationId, // parentOrganizationId
 					organizationName.toString(), // name
 					false); // site
 
@@ -82,6 +82,7 @@ public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 			//Fetch data
 			numberOfOrganizations = ParamUtil.getLong(actionRequest, "numberOfOrganizations");
 			baseOrganizationName = ParamUtil.getString(actionRequest, "baseOrganizationName");
+			parentOrganizationId = ParamUtil.getInteger(actionRequest, "parentOrganizationId");
 
 			//Create Organization
 			createOrganizations(actionRequest, actionResponse);
@@ -102,5 +103,6 @@ public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 
 	private long numberOfOrganizations = 0;
 	private String baseOrganizationName = "";
+	private int parentOrganizationId = OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID;
 	
 }

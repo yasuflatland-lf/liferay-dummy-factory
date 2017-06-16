@@ -66,7 +66,37 @@
 					<aui:validator name="required" />				
 				</aui:input>
 		
-				<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary"/>
+				<%
+				String parentGroupIdLabel = "Enter the parent group ID";
+				String liveGroupIdLabel = "Enter the live group ID";
+				String manualMembershipLabel = "Enable manual membership";
+				String siteLabel = "Enable site";
+				String inheritContentLabel = "Enable inherit content";
+				String activeLabel = "Activate site";
+				%>
+		
+				<aui:a href="#inputOptions" cssClass="collapse-icon collapsed icon-angle-down" title="Option" aria-expanded="false" data-toggle="collapse" >&nbsp;&nbsp;option</aui:a>
+				<div class="collapsed collapse" id="inputOptions" aria-expanded="false" >
+					<div class="row">
+						<aui:fieldset cssClass="col-md-6">
+							<aui:input name="parentGroupId" label="<%= parentGroupIdLabel %>" value="<%=GroupConstants.DEFAULT_PARENT_GROUP_ID %>">
+								<aui:validator name="digits" />
+							</aui:input>				
+							<aui:input name="liveGroupId" label="<%= liveGroupIdLabel %>" value="<%=GroupConstants.DEFAULT_LIVE_GROUP_ID %>">
+								<aui:validator name="digits" />
+							</aui:input>				
+						</aui:fieldset>
+						<aui:fieldset cssClass="col-md-6">
+							<aui:input type="checkbox" name="manualMembership" label="<%= manualMembershipLabel %>" value="false" />
+							<aui:input type="checkbox" name="site" label="<%= siteLabel %>" value="true" />
+							<aui:input type="checkbox" name="inheritContent" label="<%= inheritContentLabel %>" value="false" />
+							<aui:input type="checkbox" name="active" label="<%= activeLabel %>" value="true" />
+						</aui:fieldset>
+					</div>
+				</div>	
+				<aui:button-row>
+					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary"/>
+				</aui:button-row>	
 			</aui:form>	
 		</aui:fieldset>
 	</aui:fieldset-group>

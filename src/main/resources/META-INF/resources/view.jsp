@@ -38,9 +38,14 @@
 			<%
 			String numberOfOrganizationsLabel = "Enter the number of organizations you would like to create";
 			String baseOrganizationNameLabel = "Enter the base name for the organizations";
+			String parentOrganizationIdLabel = "Enter the parent organization ID";
 			%>
 
 			<aui:form action="<%= organizationEditURL %>" method="post" >
+				<aui:input name="parentOrganizationId" label="<%= parentOrganizationIdLabel %>" >
+					<aui:validator name="digits" />
+					<aui:validator name="min">1</aui:validator>
+				</aui:input>				
 				<aui:input name="numberOfOrganizations" label="<%= numberOfOrganizationsLabel %>" >
 					<aui:validator name="digits" />
 					<aui:validator name="min">1</aui:validator>

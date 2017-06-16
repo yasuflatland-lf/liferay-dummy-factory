@@ -17,7 +17,10 @@
 <%@ page import="com.liferay.portal.kernel.util.*" %>
 <%@ page import="com.liferay.portal.kernel.model.*" %>
 <%@ page import="com.liferay.portal.kernel.portlet.*" %>
+<%@ page import="com.liferay.portal.kernel.service.*" %>
 <%@ page import="com.liferay.support.tools.constants.*" %>
+
+<%@ page import="java.util.List" %>
 
 <liferay-frontend:defineObjects/>
 <liferay-theme:defineObjects/>
