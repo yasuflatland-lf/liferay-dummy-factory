@@ -54,15 +54,6 @@
 					<aui:validator name="required" />				
 				</aui:input>
 				<aui:input name="baseSiteName" label="<%= baseSiteNameLabel %>" >
-					<aui:validator errorMessage="this-field-is-required-and-must-contain-only-following-characters" name="custom">
-						function(val, fieldNode, ruleValue) {
-							var allowedCharacters = '<%= HtmlUtil.escapeJS(LDFPortletKeys.ALLOWED_SITE_NAME) %>';
-							val = val.trim();
-							var regex = new RegExp('[^' + allowedCharacters + ']');
-							var sufixcheck = new RegExp('LFR_ORGANIZATION');
-							return !regex.test(val) && !sufixcheck.test(val);
-						}
-					</aui:validator>				
 					<aui:validator name="required" />				
 				</aui:input>
 		
