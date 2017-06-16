@@ -56,7 +56,7 @@
 				String groupLabel = "Select a site to assign the pages to";
 				String defaultOption = "(None)";
 				String parentLayoutIdLabel = "Enter the primary key of the parent layout";
-				String privateLayoutLabel = "Enable privateLayout whether the layout is private to the group";
+				String privateLayoutLabel = "Make pages private";
 				String hiddenLabel = "Enable to make this layout is hidden";
 				%>
 		
@@ -79,7 +79,10 @@
 							<aui:input name="parentLayoutId" label="<%= parentLayoutIdLabel %>" value="<%=LayoutConstants.DEFAULT_PARENT_LAYOUT_ID %>">
 								<aui:validator name="digits" />
 							</aui:input>				
-							<aui:select name="layoutType" label="<%= groupLabel %>" >
+							<aui:input type="hidden" name="layoutType" label="<%= privateLayoutLabel %>" value="<%= LayoutConstants.TYPE_PORTLET %>" />
+							<%-- 
+							// This function is not really necessarily, so fix value to portlet for now.
+							<aui:select name="layoutType" label="<%= groupLabel %>">
 								<aui:option label="Portlet" value="<%= LayoutConstants.TYPE_PORTLET %>"/>
 								<aui:option label="Control Panel" value="<%= LayoutConstants.TYPE_CONTROL_PANEL %>"/>
 								<aui:option label="Embedded" value="<%= LayoutConstants.TYPE_EMBEDDED %>"/>
@@ -87,7 +90,8 @@
 								<aui:option label="Panel" value="<%= LayoutConstants.TYPE_PANEL %>"/>
 								<aui:option label="Shared Portlet" value="<%= LayoutConstants.TYPE_SHARED_PORTLET %>"/>
 								<aui:option label="URL" value="<%= LayoutConstants.TYPE_URL %>"/>
-							</aui:select>													
+							</aui:select>
+							--%>													
 						</aui:fieldset>
 						<aui:fieldset cssClass="col-md-6">
 							<aui:input type="checkbox" name="privateLayout" label="<%= privateLayoutLabel %>" value="false" />
