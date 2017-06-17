@@ -26,6 +26,7 @@ import org.osgi.service.component.annotations.Reference;
         "mvc.command.name=" + LDFPortletKeys.PAGES,
         "mvc.command.name=" + LDFPortletKeys.USERS,
         "mvc.command.name=" + LDFPortletKeys.WCM,
+        "mvc.command.name=" + LDFPortletKeys.DOCUMENTS,
         "mvc.command.name=" + LDFPortletKeys.COMMON
     }, 
     service = MVCRenderCommand.class
