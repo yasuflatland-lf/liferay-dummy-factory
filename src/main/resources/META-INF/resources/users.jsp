@@ -1,9 +1,11 @@
 <%@ include file="/init.jsp"%>
 
 <div class="container-fluid-1280">
+	<liferay-ui:success key="success" message="Users created successfully" />
 	<%@ include file="/command_select.jspf"%>
 
 	<portlet:actionURL name="<%= LDFPortletKeys.USERS %>" var="userEditURL">
+		<portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_USERS %>" />		
 		<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
 	</portlet:actionURL>
 

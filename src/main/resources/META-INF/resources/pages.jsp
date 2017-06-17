@@ -5,6 +5,7 @@
 	<%@ include file="/command_select.jspf"%>
 
 	<portlet:actionURL name="<%= LDFPortletKeys.PAGES %>" var="pageEditURL">
+		<portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_PAGES %>" />	
 		<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
 	</portlet:actionURL>
 

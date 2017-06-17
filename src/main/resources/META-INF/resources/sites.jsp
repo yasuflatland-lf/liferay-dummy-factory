@@ -5,6 +5,7 @@
 	<%@ include file="/command_select.jspf"%>
 
 	<portlet:actionURL name="<%= LDFPortletKeys.SITES %>" var="siteEditURL">
+		<portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_SITES %>" />		
 		<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
 	</portlet:actionURL>
 
@@ -76,7 +77,7 @@
 					<div class="row">
 						<aui:fieldset cssClass="col-md-6">
 							<aui:select name="parentGroupId" label="<%= parentGroupIdLabel %>" >
-								<aui:option label="<%= defaultOption %>" value="<%= scopeGroupdId %>" />
+								<aui:option label="<%= defaultOption %>" value="<%= GroupConstants.DEFAULT_PARENT_GROUP_ID %>" />
 								<%
 								for (Group group : groups) {
 									if (group.isSite()) {

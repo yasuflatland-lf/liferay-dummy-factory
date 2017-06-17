@@ -15,7 +15,6 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.support.tools.constants.LDFPortletKeys;
-import com.liferay.support.tools.utils.CommonUtil;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -95,7 +94,7 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 					LDFPortletKeys._DDM_STRUCTURE_KEY, //ddmStructureKey, 
 					LDFPortletKeys._DDM_TEMPLATE_KEY, //ddmTemplateKey, 
 					serviceContext //serviceContext
-					);
+			);
 		}
 
 		SessionMessages.add(actionRequest, "success");
@@ -158,6 +157,8 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 			e.printStackTrace();
 		}
 
+		actionResponse.setRenderParameter(
+				"mvcRenderCommandName", LDFPortletKeys.COMMON);		
 	}
 
 	@Reference(unbind = "-")

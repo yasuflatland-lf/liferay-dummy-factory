@@ -1,9 +1,11 @@
 <%@ include file="/init.jsp"%>
 
 <div class="container-fluid-1280">
+	<liferay-ui:success key="success" message="Web contents created successfully" />
 	<%@ include file="/command_select.jspf"%>
 
 	<portlet:actionURL name="<%= LDFPortletKeys.WCM %>" var="journalEditURL">
+		<portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_WCM %>" />
 		<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
 	</portlet:actionURL>
 

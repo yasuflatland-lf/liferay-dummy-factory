@@ -122,6 +122,8 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 			e.printStackTrace();
 		}
 	
+		actionResponse.setRenderParameter(
+				"mvcRenderCommandName", LDFPortletKeys.COMMON);				
 	}
 	
 	@Reference(unbind = "-")

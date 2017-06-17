@@ -138,6 +138,8 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 			e.printStackTrace();
 		}
 
+		actionResponse.setRenderParameter(
+				"mvcRenderCommandName", LDFPortletKeys.COMMON);				
 	}
 
 	@Reference(unbind = "-")

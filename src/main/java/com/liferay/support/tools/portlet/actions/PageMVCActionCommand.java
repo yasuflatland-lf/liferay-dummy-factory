@@ -102,7 +102,9 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 			hideDefaultSuccessMessage(actionRequest);
 			e.printStackTrace();
 		}
-	
+		
+		actionResponse.setRenderParameter(
+				"mvcRenderCommandName", LDFPortletKeys.COMMON);		
 	}
 	
 	@Reference(unbind = "-")
