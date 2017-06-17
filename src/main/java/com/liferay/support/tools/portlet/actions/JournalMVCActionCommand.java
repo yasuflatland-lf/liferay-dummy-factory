@@ -81,23 +81,17 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 			Map<Locale, String> titleMap = new HashMap<Locale, String>();
 			titleMap.put(defaultLocale, title.toString());
 
-			StringBundler content = new StringBundler(4);
-			content.append("<?xml version=\"1.0\"?>");
-			content.append("<root available-locales=\"en_US\" default-locale=\"en_US\">");
-			content.append("<dynamic-element name=\"content\" type=\"text_area\" index-type=\"text\" instance-id=\"jpqu\">");
-			content.append("<dynamic-content language-id=\"en_US\"><![CDATA[<p>");
-			content.append(baseArticle);
-			content.append("</p>]]></dynamic-content>");
-			content.append("</dynamic-element></root>");
+			// Contents
+			String content = getContent(baseArticle, locales);
 			
 			// Create article
 			_journalArticleLocalService.addArticle(
 					serviceContext.getUserId(), //userId, 
-					serviceContext.getScopeGroupId(), //groupId, 
-					0, //folderId, //folderId
+					groupId, //groupId, 
+					folderId, //folderId
 					titleMap, //titleMap
 					descriptionMap, //descriptionMap
-					content.toString(), // content
+					content, // content
 					LDFPortletKeys._DDM_STRUCTURE_KEY, //ddmStructureKey, 
 					LDFPortletKeys._DDM_TEMPLATE_KEY, //ddmTemplateKey, 
 					serviceContext //serviceContext
@@ -109,9 +103,40 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 		System.out.println("Finished creating " + numberOfArticles + " articles");
 	}
 
+	/**
+	 * Build content 
+	 * 
+	 * According to locales, build xml for web contents.
+	 * 
+	 * @param baseArticle contents
+	 * @param locales locales for contents
+	 * @return xml for web contents's "contents" parameter.
+	 */
+	protected String getContent(String baseArticle, String[] locales) {
+		
+		if(0 == locales.length) {
+			locales[0] = LocaleUtil.getDefault().toString();
+		}
+		
+		StringBundler content = new StringBundler();
+		content.append("<?xml version=\"1.0\"?>");
+		content.append("<root available-locales=\"" + String.join(",", locales) + "\" default-locale=\"" + LocaleUtil.getDefault().toString() + "\">");
+		content.append("<dynamic-element name=\"content\" type=\"text_area\" index-type=\"text\" instance-id=\"jpqu\">");
+		for(String passedLocale : locales ) {
+			content.append("<dynamic-content language-id=\"" + passedLocale + "\"><![CDATA[<p>");
+			content.append(baseArticle);
+			content.append("</p>]]></dynamic-content>");
+		}
+		content.append("</dynamic-element></root>");
+		
+		return content.toString();
+	}
+	
 	@Override
 	protected void doProcessAction(ActionRequest actionRequest, ActionResponse actionResponse) {
-
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+		
 		try {
 			// Fetch data
 			numberOfArticles = ParamUtil.getLong(actionRequest, "numberOfArticles", 1);
@@ -119,9 +144,12 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 			baseArticle = ParamUtil.getString(actionRequest, "baseArticle", "");
 			folderId = ParamUtil.getLong(actionRequest, "folderId", 0);
 			
+			// Locales
+			String[] defLang = { LocaleUtil.getDefault().toString() };
+			locales = ParamUtil.getStringValues(actionRequest, "locales", defLang);
+			
 			// Sites
-			String[] groups = ParamUtil.getStringValues(actionRequest, "groups", null);
-			groupIds = _commonUtil.convertStringToLongArray(groups);
+			groupId = ParamUtil.getLong(actionRequest, "groupId", themeDisplay.getScopeGroupId());
 			
 			// Create Web Contents
 			createJournals(actionRequest, actionResponse);
@@ -136,18 +164,13 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 	protected void setJournalArticleLocalService(JournalArticleLocalService journalArticleLocalService) {
 		_journalArticleLocalService = journalArticleLocalService;
 	}
-
-	@Reference(unbind = "-")
-	public void setCommonUtil(CommonUtil commonUtil) {
-		_commonUtil = commonUtil;
-	}
-
-	private CommonUtil _commonUtil;		
+	
 	private JournalArticleLocalService _journalArticleLocalService;
 
 	private long numberOfArticles = 0;
 	private String baseTitle = "";
 	private String baseArticle = "";
-	private long[] groupIds = null;
-	private long folderId;
+	private long groupId = 0;
+	private long folderId = 0;
+	private String[] locales;
 }

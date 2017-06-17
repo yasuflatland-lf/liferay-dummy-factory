@@ -20,8 +20,11 @@
 <%@ page import="com.liferay.portal.kernel.service.*" %>
 <%@ page import="com.liferay.support.tools.constants.*" %>
 <%@ page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %>
+<%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
 
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Set" %>
+<%@ page import="java.util.Locale" %>
 
 <liferay-frontend:defineObjects/>
 <liferay-theme:defineObjects/>

@@ -1,5 +1,6 @@
 package com.liferay.support.tools.utils;
 
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 
 import java.util.Arrays;
@@ -43,4 +44,5 @@ public class CommonUtil {
 		
 		return Arrays.stream(source).mapToLong(Long::parseLong).toArray();
 	}	
+
 }
