@@ -1,30 +1,13 @@
 <%@ include file="/init.jsp"%>
 
-<%
-	PortletURL portletURL = PortletURLUtil.clone(renderResponse.createRenderURL(), liferayPortletResponse);
-	String redirect = ParamUtil.getString(request, "redirect");
-%>
-
 <div class="container-fluid-1280">
-	<h2>What kind of data do you want to create?</h2>
-	<aui:select name="command" label=""> 
-		<option>Organizations</option>
-		<option>Sites</option>
-		<option>Pages</option>
-		<option>Users</option>
-		<option>Web Content Articles</option>
-		<option>Documents</option>				
-	</aui:select>
-	
-	<portlet:actionURL name="/samplesb/crud" var="samplesbEditURL">
+	<liferay-ui:success key="success" message="Organizations created successfully" />
+	<%@ include file="/command_select.jspf"%>
+
+	<portlet:actionURL name="<%= LDFPortletKeys.ORGANIZAION %>" var="organizationEditURL">
 		<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
 	</portlet:actionURL>
 
-
-	<%
-	String numberOfOrganizationsLabel = "Enter the number of organizations you would like to create";
-	String baseOrganizationNameLabel = "Enter the base name for the organizations";
-	%>
 	<aui:fieldset-group markupView="lexicon">	
 		<aui:fieldset>
 			<div class="entry-title form-group">
@@ -53,12 +36,52 @@
 				</ul>
 			</div>
 
-			<aui:form action="<%= samplesbEditURL %>" method="post" >
-				<aui:input name="companyId" type="hidden" value="<%= company.getCompanyId() %>" />
-				<aui:input name="numberOfOrganizations" label="<%= numberOfOrganizationsLabel %>" /><br />
-				<aui:input name="baseOrganizationName" label="<%= baseOrganizationNameLabel %>" /><br />
+			<%
+			String numberOfOrganizationsLabel = "Enter the number of organizations you would like to create";
+			String baseOrganizationNameLabel = "Enter the base name for the organizations";
+			String parentOrganizationIdLabel = "Enter the parent organization ID";
+			%>
+
+			<aui:form action="<%= organizationEditURL %>" method="post" >
+				<aui:input name="numberOfOrganizations" label="<%= numberOfOrganizationsLabel %>" >
+					<aui:validator name="digits" />
+					<aui:validator name="min">1</aui:validator>
+					<aui:validator name="required" />				
+				</aui:input>
+				<aui:input name="baseOrganizationName" label="<%= baseOrganizationNameLabel %>" >
+					<aui:validator name="required" />				
+				</aui:input>
 		
-				<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary"/>
+				<%
+					//Organization
+					List<Organization> organizations = OrganizationLocalServiceUtil.getOrganizations(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+					String defaultOption = "(None)";
+				%>
+				<aui:a href="#inputOptions" cssClass="collapse-icon collapsed icon-angle-down" title="Option" aria-expanded="false" data-toggle="collapse" >&nbsp;&nbsp;option</aui:a>
+				<div class="collapsed collapse" id="inputOptions" aria-expanded="false" >
+					<div class="row">
+						<aui:fieldset cssClass="col-md-6">
+							<aui:select name="parentOrganizationId" label="<%= parentOrganizationIdLabel %>" >
+								<aui:option label="<%= defaultOption %>" value="<%= OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID %>" />
+								<%
+								for (Organization organization : organizations) {
+								%>
+									<aui:option label="<%= organization.getName() %>" value="<%= organization.getOrganizationId() %>"/>
+								<%
+								}
+								%>
+							</aui:select>						
+<%-- 
+							<aui:input name="parentOrganizationId" label="<%= parentOrganizationIdLabel %>" >
+								<aui:validator name="digits" />
+							</aui:input>				
+ --%>
+ 						</aui:fieldset>
+					</div>
+				</div>	
+				<aui:button-row>
+					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary"/>
+				</aui:button-row>	
 			</aui:form>	
 		</aui:fieldset>
 	</aui:fieldset-group>

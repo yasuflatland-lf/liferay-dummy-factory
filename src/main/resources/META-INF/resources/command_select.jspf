@@ -1,0 +1,23 @@
+
+	<portlet:renderURL var="commandURL">
+		<portlet:param name="mvcRenderCommandName" value="<%=LDFPortletKeys.COMMON %>" />
+		<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
+	</portlet:renderURL>
+		
+    <h2>What kind of data do you want to create?</h2>
+    <aui:form name="commandChanger" action="<%=commandURL%>">
+	    <aui:select name="mode" label="" onChange='<%= renderResponse.getNamespace() + "modeChange();"%>'> 
+	        <aui:option label="Organizations" value="<%= LDFPortletKeys.MODE_ORGANIZAION %>" selected="<%= mode.equals(LDFPortletKeys.MODE_ORGANIZAION) %>"/>
+	        <aui:option label="Sites" value="<%= LDFPortletKeys.MODE_SITES %>" selected="<%= mode.equals(LDFPortletKeys.MODE_SITES) %>"/>
+	        <aui:option label="Pages" value="<%= LDFPortletKeys.MODE_PAGES %>" selected="<%= mode.equals(LDFPortletKeys.MODE_PAGES) %>" />
+	        <aui:option label="Users" value="<%= LDFPortletKeys.MODE_USERS %>" selected="<%= mode.equals(LDFPortletKeys.MODE_USERS) %>" />
+	        <aui:option label="Web Content Articles" value="<%= LDFPortletKeys.MODE_WCM %>" selected="<%= mode.equals(LDFPortletKeys.MODE_WCM) %>" />
+	        <aui:option label="Documents" value="<%= LDFPortletKeys.MODE_DOCUMENTS %>" selected="<%= mode.equals(LDFPortletKeys.MODE_DOCUMENTS) %>" />
+	    </aui:select>
+    </aui:form>
+    
+<aui:script>
+	function <portlet:namespace />modeChange() {
+		submitForm(document.<portlet:namespace />commandChanger);	
+	}
+</aui:script>    
