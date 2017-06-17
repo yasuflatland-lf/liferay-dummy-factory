@@ -97,8 +97,8 @@
 							--%>													
 						</aui:fieldset>
 						<aui:fieldset cssClass="col-md-6">
-							<aui:input type="checkbox" name="privateLayout" label="<%= privateLayoutLabel %>" value="false" />
-							<aui:input type="checkbox" name="hidden" label="<%= hiddenLabel %>" value="false" />
+							<aui:input type="toggle-switch" name="privateLayout" label="<%= privateLayoutLabel %>" value="false" />
+							<aui:input type="toggle-switch" name="hidden" label="<%= hiddenLabel %>" value="false" />
 						</aui:fieldset>
 					</div>
 				</div>	

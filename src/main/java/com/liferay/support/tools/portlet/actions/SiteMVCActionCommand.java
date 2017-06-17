@@ -104,7 +104,7 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 
 		try {
 			//Fetch data
-			numberOfSites = ParamUtil.getLong(actionRequest, "numberOfSites",1);
+			numberOfSites = ParamUtil.getLong(actionRequest, "numberOfSites",0);
 			baseSiteName = ParamUtil.getString(actionRequest, "baseSiteName","dummy");
 			siteType = ParamUtil.getInteger(actionRequest, "siteType", GroupConstants.TYPE_SITE_OPEN);
 			parentGroupId = ParamUtil.getLong(actionRequest, "parentGroupId", GroupConstants.DEFAULT_PARENT_GROUP_ID);

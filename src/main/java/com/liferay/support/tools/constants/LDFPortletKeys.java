@@ -1,10 +1,13 @@
 package com.liferay.support.tools.constants;
 
 public class LDFPortletKeys {
+	// Portlet Name
 	public static final String LIFERAY_DUMMY_FACTORY = "portlet_com_liferay_support_tools_portlet_LiferayDummyFactoryPortlet";
 	
+	// Mode parameter
 	public static final String MODE = "mode";
 	
+	// Command
 	public static final String COMMON = "/ldf/common";
 	public static final String ORGANIZAION = "/ldf/org";
 	public static final String SITES = "/ldf/sites";
@@ -13,6 +16,7 @@ public class LDFPortletKeys {
 	public static final String WCM = "/ldf/wcm";
 	public static final String DOCUMENTS = "/ldf/doc";
 	
+	// Mode
 	public static final String MODE_ORGANIZAION = "ORG";
 	public static final String MODE_SITES = "SITES";
 	public static final String MODE_PAGES = "PAGES";
@@ -20,6 +24,7 @@ public class LDFPortletKeys {
 	public static final String MODE_WCM = "WCM";
 	public static final String MODE_DOCUMENTS = "DOC";
 	
+	// Jsps
     public static final String JSP_ORGANIZAION = "/view.jsp";
     public static final String JSP_SITES = "/sites.jsp";
     public static final String JSP_PAGES = "/pages.jsp";
@@ -27,11 +32,8 @@ public class LDFPortletKeys {
     public static final String JSP_WCM = "/wcm.jsp";
     public static final String JSP_DOCUMENTS = "/documents.jsp";	
     
-    //Validations
-    public static final String ALLOWED_ORG_NAME =
-			"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz#:@./_-";    
-
-    //Validations
-    public static final String ALLOWED_SITE_NAME =
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz#:@./_-";        
+    //WEB
+    public static final String _DDM_STRUCTURE_KEY = "BASIC-WEB-CONTENT";
+    public static final String _DDM_TEMPLATE_KEY = "BASIC-WEB-CONTENT";
+    
 }

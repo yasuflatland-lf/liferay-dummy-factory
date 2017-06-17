@@ -97,10 +97,10 @@
 							</aui:input>				
 						</aui:fieldset>
 						<aui:fieldset cssClass="col-md-6">
-							<aui:input type="checkbox" name="manualMembership" label="<%= manualMembershipLabel %>" value="false" />
-							<aui:input type="checkbox" name="site" label="<%= siteLabel %>" value="true" />
-							<aui:input type="checkbox" name="inheritContent" label="<%= inheritContentLabel %>" value="false" />
-							<aui:input type="checkbox" name="active" label="<%= activeLabel %>" value="true" />
+							<aui:input type="toggle-switch" name="manualMembership" label="<%= manualMembershipLabel %>" value="false" />
+							<aui:input type="toggle-switch" name="site" label="<%= siteLabel %>" value="true" />
+							<aui:input type="toggle-switch" name="inheritContent" label="<%= inheritContentLabel %>" value="false" />
+							<aui:input type="toggle-switch" name="active" label="<%= activeLabel %>" value="true" />
 						</aui:fieldset>
 					</div>
 				</div>	

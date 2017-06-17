@@ -80,8 +80,8 @@ public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 
 		try {
 			//Fetch data
-			numberOfOrganizations = ParamUtil.getLong(actionRequest, "numberOfOrganizations");
-			baseOrganizationName = ParamUtil.getString(actionRequest, "baseOrganizationName");
+			numberOfOrganizations = ParamUtil.getLong(actionRequest, "numberOfOrganizations",0);
+			baseOrganizationName = ParamUtil.getString(actionRequest, "baseOrganizationName","");
 			parentOrganizationId = ParamUtil.getInteger(actionRequest, "parentOrganizationId", OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID);
 
 			//Create Organization

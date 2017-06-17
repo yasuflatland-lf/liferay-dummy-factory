@@ -88,7 +88,7 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 
 		try {
 			//Fetch data
-			numberOfpages = ParamUtil.getLong(actionRequest, "numberOfpages",1);
+			numberOfpages = ParamUtil.getLong(actionRequest, "numberOfpages",0);
 			basePageName = ParamUtil.getString(actionRequest, "basePageName","");
 			groupId = ParamUtil.getLong(actionRequest, "group",0);
 			parentLayoutId = ParamUtil.getLong(actionRequest, "parentLayoutId",0);

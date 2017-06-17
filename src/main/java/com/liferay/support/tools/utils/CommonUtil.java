@@ -2,6 +2,7 @@ package com.liferay.support.tools.utils;
 
 import com.liferay.support.tools.constants.LDFPortletKeys;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,4 +29,18 @@ public class CommonUtil {
 	public Map<String,String> getPageFromMode() {
 		return renderJSPs;
 	}
+
+	/**
+	 * Convert string array to long array
+	 * 
+	 * @param source String array of ids
+	 * @return long array of ids
+	 */
+	public long[] convertStringToLongArray(String[] source) {
+		if(null == source || source.length <= 0) {
+			return null;
+		}
+		
+		return Arrays.stream(source).mapToLong(Long::parseLong).toArray();
+	}	
 }

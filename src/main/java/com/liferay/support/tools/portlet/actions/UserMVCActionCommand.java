@@ -13,8 +13,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.support.tools.constants.LDFPortletKeys;
-
-import java.util.Arrays;
+import com.liferay.support.tools.utils.CommonUtil;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -111,26 +110,26 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 
 		try {
 			// Fetch data
-			numberOfusers = ParamUtil.getLong(actionRequest, "numberOfusers", 1);
+			numberOfusers = ParamUtil.getLong(actionRequest, "numberOfusers", 0);
 			baseScreenName = ParamUtil.getString(actionRequest, "baseScreenName", "");
 			male = ParamUtil.getBoolean(actionRequest, "male", true);
 			password = ParamUtil.getString(actionRequest, "password", "test");
 
 			// Organization
 			String[] organizations = ParamUtil.getStringValues(actionRequest, "organizations", null);
-			organizationIds = convertStringToLongArray(organizations);
+			organizationIds = _commonUtil.convertStringToLongArray(organizations);
 
 			// Sites
 			String[] groups = ParamUtil.getStringValues(actionRequest, "groups", null);
-			groupIds = convertStringToLongArray(groups);
+			groupIds = _commonUtil.convertStringToLongArray(groups);
 
 			// Roles
 			String[] roles = ParamUtil.getStringValues(actionRequest, "roles", null);
-			roleIds = convertStringToLongArray(roles);
+			roleIds = _commonUtil.convertStringToLongArray(roles);
 
 			// User Group
 			String[] userGroups = ParamUtil.getStringValues(actionRequest, "userGroups", null);
-			userGroupIds = convertStringToLongArray(userGroups);
+			userGroupIds = _commonUtil.convertStringToLongArray(userGroups);
 			
 			// Create users
 			createUsers(actionRequest, actionResponse);
@@ -141,26 +140,18 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 
 	}
 
-	/**
-	 * Convert string array to long array
-	 * 
-	 * @param source String array of ids
-	 * @return long array of ids
-	 */
-	protected long[] convertStringToLongArray(String[] source) {
-		if(null == source || source.length <= 0) {
-			return null;
-		}
-		
-		return Arrays.stream(source).mapToLong(Long::parseLong).toArray();
-	}
-
 	@Reference(unbind = "-")
 	protected void setUserService(UserService userService) {
 		_userService = userService;
 	}
 
+	@Reference(unbind = "-")
+	public void setCommonUtil(CommonUtil commonUtil) {
+		_commonUtil = commonUtil;
+	}
+
 	private UserService _userService;
+	private CommonUtil _commonUtil;	
 
 	private long numberOfusers = 0;
 	private String baseScreenName = "";
