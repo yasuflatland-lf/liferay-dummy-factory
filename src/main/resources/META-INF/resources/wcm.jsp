@@ -58,7 +58,7 @@
 					<aui:validator name="required" />				
 				</aui:input>
 				<aui:select name="groupId" label="<%= groupIdLabel %>"  >
-					<aui:option label="<%= defaultOption %>" value="<%= themeDisplay.getScopeGroupId() %>" />
+					<aui:option label="<%= defaultOption %>" value="<%= themeDisplay.getScopeGroupId() %>" selected="<%= true %>" />
 					<%
 					for (Group group : groups) {
 						if (group.isSite() && !group.getDescriptiveName().equals("Control Panel")) {
@@ -78,7 +78,8 @@
 					<%
 					for (Locale availableLocale : locales) {
 					%>
-						<aui:option label="<%= availableLocale.getDisplayName(locale) %>" value="<%= LocaleUtil.toLanguageId(availableLocale) %>"/>
+						<aui:option label="<%= availableLocale.getDisplayName(locale) %>" value="<%= LocaleUtil.toLanguageId(availableLocale) %>"
+						selected="<%= availableLocale.toString().equals(LocaleUtil.getDefault().toString()) %>" />
 					<%
 					}
 					%>
