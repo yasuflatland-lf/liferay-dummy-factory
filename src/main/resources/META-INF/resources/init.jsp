@@ -21,6 +21,7 @@
 <%@ page import="com.liferay.support.tools.constants.*" %>
 <%@ page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
+<%@ page import="com.liferay.support.tools.portlet.actions.PageMVCResourceCommand" %>
 
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Set" %>
@@ -36,3 +37,12 @@
 	//Mode
 	String mode = ParamUtil.getString(request, LDFPortletKeys.MODE, LDFPortletKeys.MODE_ORGANIZAION);
 %>
+
+<aui:script use="aui-base">
+//Convert bracket for Lodash template to avoid overraping jsp tag.
+_.templateSettings = {
+    interpolate: /\<\@\=(.+?)\@\>/gim,
+    evaluate: /\<\@([\s\S]+?)\@\>/gim,
+    escape: /\<\@\-(.+?)\@\>/gim
+};
+</aui:script>

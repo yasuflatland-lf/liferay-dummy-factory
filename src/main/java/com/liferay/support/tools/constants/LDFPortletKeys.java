@@ -15,6 +15,7 @@ public class LDFPortletKeys {
 	public static final String USERS = "/ldf/users";
 	public static final String WCM = "/ldf/wcm";
 	public static final String DOCUMENTS = "/ldf/doc";
+	public static final String CMD_PAGES_FOR_A_SITE = "/ldf/pages_for_a_site";
 	
 	// Mode
 	public static final String MODE_ORGANIZAION = "ORG";
