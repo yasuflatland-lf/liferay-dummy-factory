@@ -20,26 +20,21 @@
 			<div class="collapsed collapse" id="navPillsCollapse0" aria-expanded="false" >
 				<blockquote class="blockquote-info">
 				    <small>Example</small>
-					<p>If you enter the values <code>3</code> and "org" the portlet will create three regular organizations: <code>org1</code>, <code>org2</code>, and <code>org3</code>.<p>
+					<p>If you enter the values <code>3</code> and "org" the portlet will create three organizations: <code>org1</code>, <code>org2</code>, and <code>org3</code>.<p>
 				</blockquote>
 			
 				<ul>
 					<li>You must be signed in as an administrator in order to create organizations</li>
 					<li>The counter always starts at <code>1</code></li>
-					<li>The organization type is <code>Regular Organization</code></li>
+					<li>The organization type is <code>Organization</code></li>
 				</ul>
 			
-				<h3>Creating Large Batches of Organizations</h3>
-				<ul>
-					<li>If the number of organizations is large (over <code>100</code>), go to <i>Control Panel -> Server Administration -> Log Levels -> Add Category</i>, and add <code>com.liferay.support.tools</code> and set to <code>INFO</code> to track progress (batches of 10%)</li>
-					<li>It may take some time (even for the logs to show) to create a large number of organizations, and the page will hang until the process is complete; you can query the database if you are uncertain of the progress</li>
-				</ul>
 			</div>
 
 			<%
 			String numberOfOrganizationsLabel = "Enter the number of organizations you would like to create";
 			String baseOrganizationNameLabel = "Enter the base name for the organizations";
-			String parentOrganizationIdLabel = "Enter the parent organization ID";
+			String parentOrganizationIdLabel = "Select the parent organization";
 			%>
 
 			<aui:form action="<%= organizationEditURL %>" method="post" >

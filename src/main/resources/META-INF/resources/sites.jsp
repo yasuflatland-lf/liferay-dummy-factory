@@ -48,7 +48,6 @@
 			        <aui:option label="<%=GroupConstants.TYPE_SITE_OPEN_LABEL %>" value="<%= GroupConstants.TYPE_SITE_OPEN %>" />
 			        <aui:option label="<%=GroupConstants.TYPE_SITE_PRIVATE_LABEL %>" value="<%= GroupConstants.TYPE_SITE_PRIVATE %>" />
 			        <aui:option label="<%=GroupConstants.TYPE_SITE_RESTRICTED_LABEL %>" value="<%= GroupConstants.TYPE_SITE_RESTRICTED %>" />
-			        <aui:option label="<%=GroupConstants.TYPE_SITE_SYSTEM_LABEL %>" value="<%= GroupConstants.TYPE_SITE_SYSTEM %>" />
 			    </aui:select>			
 				<aui:input name="numberOfSites" label="<%= numberOfSitesLabel %>" >
 					<aui:validator name="digits" />
@@ -60,10 +59,8 @@
 				</aui:input>
 		
 				<%
-				String parentGroupIdLabel = "Enter the parent group ID";
-				String liveGroupIdLabel = "Enter the live group ID";
+				String parentGroupIdLabel = "Select the parent site";
 				String manualMembershipLabel = "Enable manual membership";
-				String siteLabel = "Enable site";
 				String inheritContentLabel = "Enable inherit content";
 				String activeLabel = "Activate site";
 				
@@ -88,18 +85,9 @@
 								}
 								%>
 							</aui:select>							
-<%--
- 							<aui:input name="parentGroupId" label="<%= parentGroupIdLabel %>" value="<%=GroupConstants.DEFAULT_PARENT_GROUP_ID %>">
-								<aui:validator name="digits" />
-							</aui:input>				
- --%>
- 							<aui:input name="liveGroupId" label="<%= liveGroupIdLabel %>" value="<%=GroupConstants.DEFAULT_LIVE_GROUP_ID %>">
-								<aui:validator name="digits" />
-							</aui:input>				
 						</aui:fieldset>
 						<aui:fieldset cssClass="col-md-6">
-							<aui:input type="toggle-switch" name="manualMembership" label="<%= manualMembershipLabel %>" value="false" />
-							<aui:input type="toggle-switch" name="site" label="<%= siteLabel %>" value="true" />
+							<aui:input type="toggle-switch" name="manualMembership" label="<%= manualMembershipLabel %>" value="true" />
 							<aui:input type="toggle-switch" name="inheritContent" label="<%= inheritContentLabel %>" value="false" />
 							<aui:input type="toggle-switch" name="active" label="<%= activeLabel %>" value="true" />
 						</aui:fieldset>

@@ -30,11 +30,6 @@
 					<li>If no site is selected, the default site will be <code>liferay.com</code></li>
 				</ul>
 			
-				<h3>Creating Large Batches of Pages</h3>
-				<ul>
-					<li>If the number of pages is large (over <code>100</code>), go to <i>Control Panel -> Server Administration -> Log Levels -> Add Category</i>, and add <code>com.liferay.support.tools</code> and set to <code>INFO</code> to track progress (batches of 10%)</li>
-					<li>It may take some time (even for the logs to show) to create a large number of pages, and the page will hang until the process is complete; you can query the database if you are uncertain of the progress</li>
-				</ul>
 			</div>
 
 			<%
@@ -70,9 +65,9 @@
 					%>
 				</aui:select>			
 				<%
-				String parentLayoutIdLabel = "Enter the primary key of the parent layout";
+				String parentLayoutIdLabel = "Enter the parent page ID";
 				String privateLayoutLabel = "Make pages private";
-				String hiddenLabel = "Enable to make this layout is hidden";
+				String hiddenLabel = "Hide from Navigation Menu";
 				%>
 		
 				<aui:a href="#inputOptions" cssClass="collapse-icon collapsed icon-angle-down" title="Option" aria-expanded="false" data-toggle="collapse" >&nbsp;&nbsp;option</aui:a>

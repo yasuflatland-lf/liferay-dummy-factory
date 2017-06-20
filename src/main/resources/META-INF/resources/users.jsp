@@ -114,7 +114,7 @@
 						</aui:fieldset>
 						<aui:fieldset cssClass="col-md-6">
 							<aui:input name="password" label="<%= passwordLabel %>" value="test"/>
-							<aui:input name="male" label="<%= maleLabel %>" value="<%= true %>"/>		
+							<aui:input name="male" type="toggle-switch" label="<%= maleLabel %>" value="<%= true %>"/>		
 							<aui:select name="userGroups" label="<%= userGroupsLabel %>"  multiple="<%= true %>" >
 								<%
 								for (UserGroup userGroup : userGroups) {

@@ -1,6 +1,9 @@
 package com.liferay.support.tools.portlet.actions;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.UserScreenNameException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -68,35 +71,39 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 			emailAddress.append(screenName);
 			emailAddress.append("@liferay.com");	
 			
-			//Create User
-			_userService.addUserWithWorkflow(
-					serviceContext.getCompanyId(), //companyId,
-					false, //autoPassword,
-					password, //password1, 
-					password, //password2, 
-					false, //autoScreenName, 
-					screenName.toString(),
-					emailAddress.toString(),
-					0, //facebookId, 
-					StringPool.BLANK, //openId, 
-					LocaleUtil.getDefault(), //locale, 
-					baseScreenName, //firstName, 
-					StringPool.BLANK, //middleName, 
-					String.valueOf(i), //lastName, 
-					0, //prefixId, 
-					0, //suffixId, 
-					male, // male
-					1, //birthdayMonth, 
-					1, //birthdayDay, 
-					1970, //birthdayYear, 
-					StringPool.BLANK,//jobTitle, 
-					groupIds, 
-					organizationIds, 
-					roleIds, 
-					userGroupIds, //userGroupIds, 
-					false, //sendEmail
-					serviceContext // serviceContext
-					);
+			try {
+				//Create User
+				_userService.addUserWithWorkflow(
+						serviceContext.getCompanyId(), //companyId,
+						false, //autoPassword,
+						password, //password1, 
+						password, //password2, 
+						false, //autoScreenName, 
+						screenName.toString(),
+						emailAddress.toString(),
+						0, //facebookId, 
+						StringPool.BLANK, //openId, 
+						LocaleUtil.getDefault(), //locale, 
+						baseScreenName, //firstName, 
+						StringPool.BLANK, //middleName, 
+						String.valueOf(i), //lastName, 
+						0, //prefixId, 
+						0, //suffixId, 
+						male, // male
+						1, //birthdayMonth, 
+						1, //birthdayDay, 
+						1970, //birthdayYear, 
+						StringPool.BLANK,//jobTitle, 
+						groupIds, 
+						organizationIds, 
+						roleIds, 
+						userGroupIds, //userGroupIds, 
+						false, //sendEmail
+						serviceContext // serviceContext
+						);
+			} catch (UserScreenNameException e) {
+				_log.error("User is duplicated. Skip : " + e.getMessage());
+			}
 			
 		}
 
@@ -163,4 +170,7 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 	private long[] userGroupIds = null;
 	private boolean male;
 	private String password;
+	
+	private static final Log _log = LogFactoryUtil.getLog(
+			UserMVCActionCommand.class);	
 }
