@@ -78,8 +78,6 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 					StringPool.BLANK, //friendlyURL
 					serviceContext); //serviceContext
 			
-			System.out.println("ppppp <" + layout.toString() + ">");
-			
 		}
 
 		SessionMessages.add(actionRequest, "success");
