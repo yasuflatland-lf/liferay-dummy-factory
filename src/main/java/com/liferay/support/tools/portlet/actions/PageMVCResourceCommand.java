@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
+ * Page lists action
  * 
  * @author yasuflatland
  *

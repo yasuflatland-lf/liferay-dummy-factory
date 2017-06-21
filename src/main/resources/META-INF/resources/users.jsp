@@ -105,7 +105,7 @@
 								<%
 								for (Role role : roles) {
 								%>
-									<aui:option label="<%= role.getDescriptiveName() %>" value="<%= role.getRoleId() %>"/>
+									<aui:option label="<%= role.getDescriptiveName() %>" value="<%= role.getPrimaryKey() %>"/>
 								<%
 								}
 								%>
