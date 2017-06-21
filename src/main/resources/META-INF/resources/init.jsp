@@ -22,6 +22,7 @@
 <%@ page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
 <%@ page import="com.liferay.support.tools.portlet.actions.PageMVCResourceCommand" %>
+<%@ page import="com.liferay.support.tools.portlet.actions.RoleMVCResourceCommand" %>
 
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Set" %>

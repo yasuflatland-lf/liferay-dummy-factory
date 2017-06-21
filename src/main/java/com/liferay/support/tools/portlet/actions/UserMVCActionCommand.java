@@ -18,13 +18,11 @@ import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.service.UserGroupRoleLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.SessionMessages;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.utils.CommonUtil;
 
@@ -61,9 +59,6 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 	 * @throws PortalException
 	 */
 	private void createUsers(ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException {
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-		
 		double loader = 10;
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Group.class.getName(), actionRequest);
@@ -155,6 +150,13 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
         	return null;
         }
         
+        if(_log.isDebugEnabled()) {
+        	String regularids = regularRoles.stream()
+		      .map(r -> String.valueOf(r.getRoleId()))
+		      .collect(Collectors.joining(","));        	
+        	_log.debug("Regular ids : " + regularids);
+        }
+        
         return regularRoles.stream().mapToLong(Role::getRoleId).toArray();		
 	}
 	
@@ -178,6 +180,13 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
         }
         
         long[] orgIds = orgRoles.stream().mapToLong(Role::getRoleId).toArray();
+        
+        if(_log.isDebugEnabled()) {
+        	String orgids = orgRoles.stream()
+		      .map(o -> String.valueOf(o.getPrimaryKey()))
+		      .collect(Collectors.joining(","));        	
+        	_log.debug("Organization ids : " + orgids);
+        }
         
         if(0 == orgIds.length) {
         	_log.debug("Organization didn't exist in the ids. exit");
@@ -213,16 +222,13 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
         
         long[] siteIds = siteRoles.stream().mapToLong(Role::getRoleId).toArray();
     
-    	String aa = siteRoles.stream()
-	      .map(s -> String.valueOf(s.getRoleId()))
-	      .collect(Collectors.joining(","));        	
-    	_log.error("Site ids : " + aa);
         if(_log.isDebugEnabled()) {
         	String siteids = siteRoles.stream()
 		      .map(s -> String.valueOf(s.getRoleId()))
 		      .collect(Collectors.joining(","));        	
         	_log.debug("Site ids : " + siteids);
         }
+        
         if(0 == siteIds.length) {
         	_log.debug("Site roles didn't exist in the ids. exit");
         	return;
