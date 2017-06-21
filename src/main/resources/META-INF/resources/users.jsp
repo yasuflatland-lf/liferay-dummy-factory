@@ -81,7 +81,7 @@
 				<div class="collapsed collapse" id="inputOptions" aria-expanded="false" >
 					<div class="row">
 						<aui:fieldset cssClass="col-md-6">
-							<aui:select name="organizations" label="<%= organizationLabel %>" multiple="<%= true %>">
+							<aui:select name="organizations" label="<%= organizationLabel %>" multiple="<%= true %>" >
 								<%
 								for (Organization organization : organizations) {
 								%>
@@ -90,7 +90,7 @@
 								}
 								%>
 							</aui:select>	
-							<aui:select name="groups" label="<%= groupLabel %>"  multiple="<%= true %>" >
+							<aui:select name="groups" label="<%= groupLabel %>"  multiple="<%= true %>">
 								<%
 								for (Group group : groups) {
 									if (group.isSite() && !group.getDescriptiveName().equals("Control Panel")) {
@@ -105,7 +105,7 @@
 								<%
 								for (Role role : roles) {
 								%>
-									<aui:option label="<%= role.getDescriptiveName() %>" value="<%= role.getRoleId() %>"/>
+									<aui:option label="<%= role.getDescriptiveName() %>" value="<%= role.getPrimaryKey() %>"/>
 								<%
 								}
 								%>
@@ -114,7 +114,7 @@
 						</aui:fieldset>
 						<aui:fieldset cssClass="col-md-6">
 							<aui:input name="password" label="<%= passwordLabel %>" value="test"/>
-							<aui:input name="male" label="<%= maleLabel %>" value="<%= true %>"/>		
+							<aui:input name="male" type="toggle-switch" label="<%= maleLabel %>" value="<%= true %>"/>		
 							<aui:select name="userGroups" label="<%= userGroupsLabel %>"  multiple="<%= true %>" >
 								<%
 								for (UserGroup userGroup : userGroups) {
@@ -134,3 +134,60 @@
 		</aui:fieldset>
 	</aui:fieldset-group>
 </div>
+
+<portlet:resourceURL id="<%=LDFPortletKeys.CMD_ROLELIST %>" var="roleListURL" />
+
+<script type="text/html" id="<portlet:namespace />roles_options">
+    <option value="<@= roleId @>" data-role-type="<@= type @>" ><@= name @></option>
+</script>
+
+<aui:script use="aui-base">
+	function <portlet:namespace />updateRoles() {
+		var data = Liferay.Util.ns(
+			'<portlet:namespace />',
+			{
+				<%=Constants.CMD %>: '<%=RoleMVCResourceCommand.CMD_ROLELIST%>',
+				isSitesSelected: (null==$('#<portlet:namespace />groups').val())?false:true,
+				isOrganizationSelected: (null==$('#<portlet:namespace />organizations').val())?false:true
+			}
+		);
+		
+		$.ajax(
+			'<%= roleListURL.toString() %>',
+			{
+				data: data,
+				success: function(data) {
+					
+					//Load Template
+					var tmpl = _.template($('#<portlet:namespace />roles_options').html());
+					var listAll = "";
+					_.map(data,function(n) {
+						listAll += 
+						tmpl(
+						  {
+							name:(n.name) ? _.escape(n.name) : "",
+							roleId:(n.roleId) ? _.escape(n.roleId) : "",
+							type:(n.type) ? _.escape(n.type) : ""
+						  }
+						);
+					});
+					var pageObj = $('#<portlet:namespace />roles')
+					pageObj.empty();
+					pageObj.append(listAll);
+				}
+			}
+		);		
+	}
+	
+	$('#<portlet:namespace />organizations, #<portlet:namespace />groups').on(
+		'change',
+		function(event) {
+			<portlet:namespace />updateRoles();
+		}
+	);
+	
+	$( function() {
+		//Initialize role options
+		<portlet:namespace />updateRoles();
+	});
+</aui:script>

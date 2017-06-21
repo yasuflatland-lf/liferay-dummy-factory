@@ -30,11 +30,6 @@
 					<li>If no site is selected, the default site will be <code>liferay.com</code></li>
 				</ul>
 			
-				<h3>Creating Large Batches of Pages</h3>
-				<ul>
-					<li>If the number of pages is large (over <code>100</code>), go to <i>Control Panel -> Server Administration -> Log Levels -> Add Category</i>, and add <code>com.liferay.support.tools</code> and set to <code>INFO</code> to track progress (batches of 10%)</li>
-					<li>It may take some time (even for the logs to show) to create a large number of pages, and the page will hang until the process is complete; you can query the database if you are uncertain of the progress</li>
-				</ul>
 			</div>
 
 			<%
@@ -45,7 +40,7 @@
 			
 			String scopeGroupdId = String.valueOf(themeDisplay.getScopeGroupId());
 			String groupLabel = "Select a site to assign the pages to";
-			
+			String pageLabel = "Select a parent page";
 			%>
 
 			<aui:form action="<%= pageEditURL %>" method="post" >
@@ -69,10 +64,15 @@
 					}
 					%>
 				</aui:select>			
+
+				<aui:select name="parentLayoutId" label="<%=pageLabel %>" >
+					<aui:option label="<%= defaultOption %>" value="<%= LayoutConstants.DEFAULT_PARENT_LAYOUT_ID %>" />
+				</aui:select>			
+
 				<%
-				String parentLayoutIdLabel = "Enter the primary key of the parent layout";
+				String parentLayoutIdLabel = "Enter the parent page ID";
 				String privateLayoutLabel = "Make pages private";
-				String hiddenLabel = "Enable to make this layout is hidden";
+				String hiddenLabel = "Hide from Navigation Menu";
 				%>
 		
 				<aui:a href="#inputOptions" cssClass="collapse-icon collapsed icon-angle-down" title="Option" aria-expanded="false" data-toggle="collapse" >&nbsp;&nbsp;option</aui:a>
@@ -84,18 +84,7 @@
 								<aui:validator name="digits" />
 							</aui:input>				
 							<aui:input type="hidden" name="layoutType" label="<%= privateLayoutLabel %>" value="<%= LayoutConstants.TYPE_PORTLET %>" />
-							<%-- 
-							// This function is not really necessarily, so fix value to portlet for now.
-							<aui:select name="layoutType" label="<%= groupLabel %>">
-								<aui:option label="Portlet" value="<%= LayoutConstants.TYPE_PORTLET %>"/>
-								<aui:option label="Control Panel" value="<%= LayoutConstants.TYPE_CONTROL_PANEL %>"/>
-								<aui:option label="Embedded" value="<%= LayoutConstants.TYPE_EMBEDDED %>"/>
-								<aui:option label="Link to Layout" value="<%= LayoutConstants.TYPE_LINK_TO_LAYOUT %>"/>
-								<aui:option label="Panel" value="<%= LayoutConstants.TYPE_PANEL %>"/>
-								<aui:option label="Shared Portlet" value="<%= LayoutConstants.TYPE_SHARED_PORTLET %>"/>
-								<aui:option label="URL" value="<%= LayoutConstants.TYPE_URL %>"/>
-							</aui:select>
-							--%>													
+												
 						</aui:fieldset>
 						<aui:fieldset cssClass="col-md-6">
 							<aui:input type="toggle-switch" name="privateLayout" label="<%= privateLayoutLabel %>" value="false" />
@@ -110,3 +99,53 @@
 		</aui:fieldset>
 	</aui:fieldset-group>
 </div>
+
+<portlet:resourceURL id="<%=LDFPortletKeys.CMD_PAGES_FOR_A_SITE %>" var="pagesForASiteURL" />
+
+<script type="text/html" id="<portlet:namespace />page_per_site_options">
+    <option value="<@= parentLayoutId @>"><@= name @></option>
+</script>
+
+<aui:script use="aui-base">
+	$('#<portlet:namespace />group').on(
+		'change',
+		function(event) {
+			var data = Liferay.Util.ns(
+				'<portlet:namespace />',
+				{
+					<%=Constants.CMD %>: '<%=PageMVCResourceCommand.CMD_PAGELIST%>',
+					siteGroupId: $('#<portlet:namespace />group').val()
+				}
+			);
+
+			$.ajax(
+				'<%= pagesForASiteURL.toString() %>',
+				{
+					data: data,
+					success: function(data) {
+						
+						//Load Template
+						var tmpl = _.template($('#<portlet:namespace />page_per_site_options').html());
+						var listAll = 
+						tmpl({
+							name:'(None)',
+							parentLayoutId:0
+						});
+						_.map(data,function(n) {
+							listAll += 
+							tmpl(
+							  {
+								name:(n.name) ? _.escape(n.name) : "",
+								parentLayoutId:(n.parentLayoutId) ? _.escape(n.parentLayoutId) : ""
+							  }
+							);
+						});
+						var pageObj = $('#<portlet:namespace />parentLayoutId')
+						pageObj.empty();
+						pageObj.append(listAll);
+					}
+				}
+			);
+		}
+	);
+</aui:script>

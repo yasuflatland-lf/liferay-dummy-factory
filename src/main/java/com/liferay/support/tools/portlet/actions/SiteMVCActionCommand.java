@@ -1,6 +1,9 @@
 package com.liferay.support.tools.portlet.actions;
 
+import com.liferay.portal.kernel.exception.DuplicateGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -15,9 +18,9 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -56,7 +59,7 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 
 		System.out.println("Starting to create " + numberOfSites + " sites");
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>() {
+		Map<Locale, String> descriptionMap = new ConcurrentHashMap<Locale, String>() {
 			{put(LocaleUtil.getDefault(), StringPool.BLANK);}
 		};		
 		
@@ -72,26 +75,32 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 			StringBundler siteName = new StringBundler(2);
 			siteName.append(baseSiteName).append(i);
 
-			Map<Locale, String> nameMap = new HashMap<Locale, String>() {
+			Map<Locale, String> nameMap = new ConcurrentHashMap<Locale, String>() {
 				{put(LocaleUtil.getDefault(), siteName.toString());}
 			};
 			
-			_groupLocalService.addGroup(
-					serviceContext.getUserId(), //userId
-					parentGroupId, // parentGroupId
-					null, // className
-					0, //classPK
-					liveGroupId, //liveGroupId
-					nameMap, // nameMap
-					descriptionMap, // descriptionMap
-					siteType, //type
-					manualMembership, //manualMembership
-					GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, // membershipRestriction
-					StringPool.BLANK, //friendlyURL
-					site, //site
-					inheritContent, //inheritContent
-					active, //active
-					serviceContext); //serviceContext
+			try {
+				
+				_groupLocalService.addGroup(
+						serviceContext.getUserId(), //userId
+						parentGroupId, // parentGroupId
+						null, // className
+						0, //classPK
+						liveGroupId, //liveGroupId
+						nameMap, // nameMap
+						descriptionMap, // descriptionMap
+						siteType, //type
+						manualMembership, //manualMembership
+						GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, // membershipRestriction
+						StringPool.BLANK, //friendlyURL
+						site, //site
+						inheritContent, //inheritContent
+						active, //active
+						serviceContext); //serviceContext
+				
+			} catch (DuplicateGroupException e) {
+				_log.error("Site is duplicated. Skip : " + e.getMessage());
+			}
 		}
 
 		SessionMessages.add(actionRequest, "success");
@@ -110,7 +119,7 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 			parentGroupId = ParamUtil.getLong(actionRequest, "parentGroupId", GroupConstants.DEFAULT_PARENT_GROUP_ID);
 			liveGroupId = ParamUtil.getLong(actionRequest, "liveGroupId", GroupConstants.DEFAULT_LIVE_GROUP_ID);
 
-			manualMembership = ParamUtil.getBoolean(actionRequest, "manualMembership", false);
+			manualMembership = ParamUtil.getBoolean(actionRequest, "manualMembership", true);
 			site = ParamUtil.getBoolean(actionRequest, "site", true);
 			inheritContent = ParamUtil.getBoolean(actionRequest, "inheritContent", false);
 			active = ParamUtil.getBoolean(actionRequest, "active", true);
@@ -144,5 +153,6 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 	private boolean inheritContent = false;
 	private boolean active = true;
 	
-	
+	private static final Log _log = LogFactoryUtil.getLog(
+			SiteMVCActionCommand.class);		
 }

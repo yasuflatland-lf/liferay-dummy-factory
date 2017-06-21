@@ -2,6 +2,7 @@ package com.liferay.support.tools.portlet.actions;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -64,7 +65,7 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 			name.append(basePageName);
 			name.append(i);
 
-			_layoutLocalService.addLayout(
+			Layout layout = _layoutLocalService.addLayout(
 					serviceContext.getUserId(),
 					groupId, //groupId
 					privateLayout, //privateLayout
@@ -76,6 +77,7 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 					hidden, //hidden
 					StringPool.BLANK, //friendlyURL
 					serviceContext); //serviceContext
+			
 		}
 
 		SessionMessages.add(actionRequest, "success");
@@ -91,7 +93,7 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 			numberOfpages = ParamUtil.getLong(actionRequest, "numberOfpages",0);
 			basePageName = ParamUtil.getString(actionRequest, "basePageName","");
 			groupId = ParamUtil.getLong(actionRequest, "group",0);
-			parentLayoutId = ParamUtil.getLong(actionRequest, "parentLayoutId",0);
+			parentLayoutId = ParamUtil.getLong(actionRequest, "parentLayoutId",LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 			layoutType = ParamUtil.getString(actionRequest, "layoutType",LayoutConstants.TYPE_PORTLET);
 			privateLayout = ParamUtil.getBoolean(actionRequest, "privateLayout", false);
 			hidden = ParamUtil.getBoolean(actionRequest, "hidden", false);
