@@ -2,7 +2,6 @@ package com.liferay.support.tools.portlet.actions;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -65,7 +64,7 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 			name.append(basePageName);
 			name.append(i);
 
-			Layout layout = _layoutLocalService.addLayout(
+			_layoutLocalService.addLayout(
 					serviceContext.getUserId(),
 					groupId, //groupId
 					privateLayout, //privateLayout
@@ -109,12 +108,7 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 				"mvcRenderCommandName", LDFPortletKeys.COMMON);		
 	}
 	
-	@Reference(unbind = "-")
-	protected void setLayoutLocalService(
-			LayoutLocalService layoutLocalService) {
-		_layoutLocalService = layoutLocalService;
-	}
-
+	@Reference
 	private LayoutLocalService _layoutLocalService;	
 
 	private long numberOfpages = 0;

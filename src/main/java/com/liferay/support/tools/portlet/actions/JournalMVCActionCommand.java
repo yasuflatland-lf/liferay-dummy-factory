@@ -1,6 +1,5 @@
 package com.liferay.support.tools.portlet.actions;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
@@ -25,7 +24,6 @@ import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.utils.DDMLocalUtil;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;

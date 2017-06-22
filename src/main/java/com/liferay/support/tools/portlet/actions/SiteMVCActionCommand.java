@@ -59,6 +59,7 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 
 		System.out.println("Starting to create " + numberOfSites + " sites");
 
+		@SuppressWarnings("serial")
 		Map<Locale, String> descriptionMap = new ConcurrentHashMap<Locale, String>() {
 			{put(LocaleUtil.getDefault(), StringPool.BLANK);}
 		};		
@@ -75,6 +76,7 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 			StringBundler siteName = new StringBundler(2);
 			siteName.append(baseSiteName).append(i);
 
+			@SuppressWarnings("serial")
 			Map<Locale, String> nameMap = new ConcurrentHashMap<Locale, String>() {
 				{put(LocaleUtil.getDefault(), siteName.toString());}
 			};
@@ -99,7 +101,7 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 						serviceContext); //serviceContext
 				
 			} catch (DuplicateGroupException e) {
-				_log.error("Site is duplicated. Skip : " + e.getMessage());
+				_log.error("Site <" + siteName.toString() + "> is duplicated. Skip : " + e.getMessage());
 			}
 		}
 
@@ -135,12 +137,7 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 				"mvcRenderCommandName", LDFPortletKeys.COMMON);				
 	}
 	
-	@Reference(unbind = "-")
-	protected void setGroupLocalService(
-			GroupLocalService groupLocalService) {
-		_groupLocalService = groupLocalService;
-	}
-
+	@Reference
 	private GroupLocalService _groupLocalService;	
 
 	private long numberOfSites = 0;

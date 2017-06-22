@@ -56,11 +56,7 @@ public class CommonMVCRenderCommand implements MVCRenderCommand {
 				.getOrDefault(mode, LDFPortletKeys.JSP_ORGANIZAION);
 	}
 
-	@Reference(unbind = "-")
-	public void setCommonUtil(CommonUtil commonUtil) {
-		_commonUtil = commonUtil;
-	}
-
+	@Reference
 	private CommonUtil _commonUtil;
 	
 	private static Log _log = LogFactoryUtil
