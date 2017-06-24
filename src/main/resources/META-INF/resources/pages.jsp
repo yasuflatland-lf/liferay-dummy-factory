@@ -65,9 +65,6 @@
 					%>
 				</aui:select>			
 
-				<aui:select name="parentLayoutId" label="<%=pageLabel %>" >
-					<aui:option label="<%= defaultOption %>" value="<%= LayoutConstants.DEFAULT_PARENT_LAYOUT_ID %>" />
-				</aui:select>			
 
 				<%
 				String parentLayoutIdLabel = "Enter the parent page ID";
@@ -80,9 +77,9 @@
 					<div class="row">
 						<aui:fieldset cssClass="col-md-6">
 
-							<aui:input name="parentLayoutId" label="<%= parentLayoutIdLabel %>" value="<%=LayoutConstants.DEFAULT_PARENT_LAYOUT_ID %>">
-								<aui:validator name="digits" />
-							</aui:input>				
+							<aui:select name="parentLayoutId" label="<%=pageLabel %>" >
+								<aui:option label="<%= defaultOption %>" value="<%= LayoutConstants.DEFAULT_PARENT_LAYOUT_ID %>" />
+							</aui:select>			
 							<aui:input type="hidden" name="layoutType" label="<%= privateLayoutLabel %>" value="<%= LayoutConstants.TYPE_PORTLET %>" />
 												
 						</aui:fieldset>

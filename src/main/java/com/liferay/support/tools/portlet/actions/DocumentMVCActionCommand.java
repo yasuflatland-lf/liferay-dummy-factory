@@ -73,7 +73,7 @@ public class DocumentMVCActionCommand extends BaseMVCActionCommand {
 			_dLAppLocalService.addFileEntry(
 					serviceContext.getUserId(), //userId, 
 					groupId, // repositoryId,
-					0, // folderId,
+					folderId, // folderId,
 					sourceFileName.toString(), //sourceFileName, 
 					ContentTypes.APPLICATION_OCTET_STREAM, //mimeType, 
 					title.toString(), //title, 
@@ -115,11 +115,8 @@ public class DocumentMVCActionCommand extends BaseMVCActionCommand {
 				"mvcRenderCommandName", LDFPortletKeys.COMMON);		
 	}
 
-	@Reference(unbind = "-")
-	protected void setDLAppLocalService(DLAppLocalService dLAppLocalService) {
-		_dLAppLocalService = dLAppLocalService;
-	}
-	
+
+	@Reference
 	private DLAppLocalService _dLAppLocalService;
 
 	private long numberOfDocuments = 0;

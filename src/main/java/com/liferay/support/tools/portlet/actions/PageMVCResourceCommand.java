@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * Page lists action
  * 
- * @author yasuflatland
+ * @author Yasuyuki Takeo
  *
  */
 @Component(

@@ -82,7 +82,7 @@ public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 						false); // site
 				
 			} catch (DuplicateOrganizationException e) {
-				_log.error("Organizations is duplicated. Skip : " + e.getMessage());
+				_log.error("Organizations <" + organizationName.toString() + "> is duplicated. Skip : " + e.getMessage());
 			}
 
 		}
@@ -111,12 +111,7 @@ public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 	
 	}
 	
-	@Reference(unbind = "-")
-	protected void setOrganizationService(
-			OrganizationLocalService organizationLocalService) {
-		_organizationLocalService = organizationLocalService;
-	}
-
+	@Reference
 	private OrganizationLocalService _organizationLocalService;	
 
 	private long startIndex = 1;

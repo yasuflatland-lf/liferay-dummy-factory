@@ -39,6 +39,7 @@ public class DDMLocalUtil {
 		List<Serializable> serializableValues = null;
 
 		if (value instanceof Collection) {
+			@SuppressWarnings("unchecked")
 			Collection<Serializable> values = (Collection<Serializable>) value;
 
 			serializableValues = new ArrayList<>(values);
