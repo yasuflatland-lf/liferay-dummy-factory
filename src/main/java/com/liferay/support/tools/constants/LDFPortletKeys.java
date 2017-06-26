@@ -1,8 +1,22 @@
 package com.liferay.support.tools.constants;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class LDFPortletKeys {
 	// Portlet Name
 	public static final String LIFERAY_DUMMY_FACTORY = "portlet_com_liferay_support_tools_portlet_LiferayDummyFactoryPortlet";
+	
+	@SuppressWarnings("serial")
+	public static final Map<String,String> renderJSPs = Collections.unmodifiableMap(new ConcurrentHashMap<String, String>() {
+		{put(LDFPortletKeys.MODE_ORGANIZAION, LDFPortletKeys.JSP_ORGANIZAION);}
+		{put(LDFPortletKeys.MODE_SITES, LDFPortletKeys.JSP_SITES);}
+		{put(LDFPortletKeys.MODE_PAGES, LDFPortletKeys.JSP_PAGES);}
+		{put(LDFPortletKeys.MODE_USERS, LDFPortletKeys.JSP_USERS);}
+		{put(LDFPortletKeys.MODE_WCM, LDFPortletKeys.JSP_WCM);}
+		{put(LDFPortletKeys.MODE_DOCUMENTS, LDFPortletKeys.JSP_DOCUMENTS);}
+    });
 	
 	// Mode parameter
 	public static final String MODE = "mode";

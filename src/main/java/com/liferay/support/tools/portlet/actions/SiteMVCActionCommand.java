@@ -52,6 +52,29 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 	 */
 	private void createSites(ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException {
 
+		//Parameter values
+		long numberOfSites = 0;
+		String baseSiteName = StringPool.BLANK;
+		int siteType = GroupConstants.TYPE_SITE_OPEN;
+		long parentGroupId = GroupConstants.DEFAULT_PARENT_GROUP_ID;
+		long liveGroupId = GroupConstants.DEFAULT_LIVE_GROUP_ID;
+		boolean manualMembership = false;
+		boolean site = true;
+		boolean inheritContent = false;
+		boolean active = true;
+		
+		//Fetch data
+		numberOfSites = ParamUtil.getLong(actionRequest, "numberOfSites",0);
+		baseSiteName = ParamUtil.getString(actionRequest, "baseSiteName","dummy");
+		siteType = ParamUtil.getInteger(actionRequest, "siteType", GroupConstants.TYPE_SITE_OPEN);
+		parentGroupId = ParamUtil.getLong(actionRequest, "parentGroupId", GroupConstants.DEFAULT_PARENT_GROUP_ID);
+		liveGroupId = ParamUtil.getLong(actionRequest, "liveGroupId", GroupConstants.DEFAULT_LIVE_GROUP_ID);
+
+		manualMembership = ParamUtil.getBoolean(actionRequest, "manualMembership", true);
+		site = ParamUtil.getBoolean(actionRequest, "site", true);
+		inheritContent = ParamUtil.getBoolean(actionRequest, "inheritContent", false);
+		active = ParamUtil.getBoolean(actionRequest, "active", true);
+		
 		double loader = 10;
 
 		ServiceContext serviceContext = ServiceContextFactory
@@ -114,23 +137,12 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 	protected void doProcessAction(ActionRequest actionRequest, ActionResponse actionResponse) {
 
 		try {
-			//Fetch data
-			numberOfSites = ParamUtil.getLong(actionRequest, "numberOfSites",0);
-			baseSiteName = ParamUtil.getString(actionRequest, "baseSiteName","dummy");
-			siteType = ParamUtil.getInteger(actionRequest, "siteType", GroupConstants.TYPE_SITE_OPEN);
-			parentGroupId = ParamUtil.getLong(actionRequest, "parentGroupId", GroupConstants.DEFAULT_PARENT_GROUP_ID);
-			liveGroupId = ParamUtil.getLong(actionRequest, "liveGroupId", GroupConstants.DEFAULT_LIVE_GROUP_ID);
-
-			manualMembership = ParamUtil.getBoolean(actionRequest, "manualMembership", true);
-			site = ParamUtil.getBoolean(actionRequest, "site", true);
-			inheritContent = ParamUtil.getBoolean(actionRequest, "inheritContent", false);
-			active = ParamUtil.getBoolean(actionRequest, "active", true);
 
 			//Create Sites
 			createSites(actionRequest, actionResponse);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			hideDefaultSuccessMessage(actionRequest);
-			e.printStackTrace();
+			_log.error(e,e);
 		}
 	
 		actionResponse.setRenderParameter(
@@ -140,15 +152,6 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private GroupLocalService _groupLocalService;	
 
-	private long numberOfSites = 0;
-	private String baseSiteName = "";
-	private int siteType = GroupConstants.TYPE_SITE_OPEN;
-	private long parentGroupId = GroupConstants.DEFAULT_PARENT_GROUP_ID;
-	private long liveGroupId = GroupConstants.DEFAULT_LIVE_GROUP_ID;
-	private boolean manualMembership = false;
-	private boolean site = true;
-	private boolean inheritContent = false;
-	private boolean active = true;
 	
 	private static final Log _log = LogFactoryUtil.getLog(
 			SiteMVCActionCommand.class);		

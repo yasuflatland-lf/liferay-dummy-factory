@@ -7,6 +7,8 @@ import com.liferay.dynamic.data.mapping.storage.Fields;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.util.JournalConverter;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -24,9 +26,9 @@ import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.utils.DDMLocalUtil;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -66,7 +68,7 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 
 		Locale defaultLocale = LocaleUtil.fromLanguageId(themeDisplay.getUser().getLanguageId());
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new ConcurrentHashMap<Locale, String>();
 		descriptionMap.put(defaultLocale, StringPool.BLANK);
 
 		//Build contents fields
@@ -86,7 +88,7 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 			title.append(baseTitle);
 			title.append(i);
 
-			Map<Locale, String> titleMap = new HashMap<Locale, String>();
+			Map<Locale, String> titleMap = new ConcurrentHashMap<Locale, String>();
 			titleMap.put(defaultLocale, title.toString());
 
 			// Create article
@@ -156,9 +158,9 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 
 			// Create Web Contents
 			createJournals(actionRequest, actionResponse);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			hideDefaultSuccessMessage(actionRequest);
-			e.printStackTrace();
+			_log.error(e,e);
 		}
 
 		actionResponse.setRenderParameter("mvcRenderCommandName", LDFPortletKeys.COMMON);
@@ -181,4 +183,6 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 	private long groupId = 0;
 	private long folderId = 0;
 	private String[] locales;
+	
+	private static final Log _log = LogFactoryUtil.getLog(JournalMVCActionCommand.class);		
 }

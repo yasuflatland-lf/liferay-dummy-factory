@@ -2,6 +2,8 @@ package com.liferay.support.tools.portlet.actions;
 
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -106,9 +108,9 @@ public class DocumentMVCActionCommand extends BaseMVCActionCommand {
 			
 			// Create Documents
 			createDocuments(actionRequest, actionResponse);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			hideDefaultSuccessMessage(actionRequest);
-			e.printStackTrace();
+			_log.error(e,e);
 		}
 
 		actionResponse.setRenderParameter(
@@ -124,4 +126,6 @@ public class DocumentMVCActionCommand extends BaseMVCActionCommand {
 	private String baseDocumentDescription = "";
 	private long groupId = 0;
 	private long folderId = 0;
+	
+	private static final Log _log = LogFactoryUtil.getLog(DocumentMVCActionCommand.class);	
 }

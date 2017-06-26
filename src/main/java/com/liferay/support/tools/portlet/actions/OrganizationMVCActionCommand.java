@@ -104,9 +104,9 @@ public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 
 			//Create Organization
 			createOrganizations(actionRequest, actionResponse);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			hideDefaultSuccessMessage(actionRequest);
-			e.printStackTrace();
+			_log.error(e,e);
 		}
 	
 	}

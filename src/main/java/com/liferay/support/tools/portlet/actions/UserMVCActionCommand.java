@@ -266,9 +266,9 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 
 			// Create users
 			createUsers(actionRequest, actionResponse);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			hideDefaultSuccessMessage(actionRequest);
-			e.printStackTrace();
+			_log.error(e,e);
 		}
 
 		actionResponse.setRenderParameter("mvcRenderCommandName", LDFPortletKeys.COMMON);

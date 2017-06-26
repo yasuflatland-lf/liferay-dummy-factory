@@ -1,6 +1,8 @@
 package com.liferay.support.tools.portlet.actions;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -99,9 +101,9 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 
 			//Create pages
 			createPages(actionRequest, actionResponse);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			hideDefaultSuccessMessage(actionRequest);
-			e.printStackTrace();
+			_log.error(e,e);
 		}
 		
 		actionResponse.setRenderParameter(
@@ -118,4 +120,6 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 	private String layoutType;
 	private boolean privateLayout;
 	private boolean hidden;
+	
+	private static final Log _log = LogFactoryUtil.getLog(PageMVCActionCommand.class);		
 }
