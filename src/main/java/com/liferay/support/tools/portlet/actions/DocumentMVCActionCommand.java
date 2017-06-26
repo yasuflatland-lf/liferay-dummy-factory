@@ -2,6 +2,8 @@ package com.liferay.support.tools.portlet.actions;
 
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -45,7 +47,24 @@ public class DocumentMVCActionCommand extends BaseMVCActionCommand {
 	 * @throws PortalException 
 	 */
 	private void createDocuments(ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException {
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
+		long numberOfDocuments = 0;
+		String baseDocumentTitle = "";
+		String baseDocumentDescription = "";
+		long groupId = 0;
+		long folderId = 0;  
+		
+		// Fetch data
+		numberOfDocuments = ParamUtil.getLong(actionRequest, "numberOfDocuments", 1);
+		baseDocumentTitle = ParamUtil.getString(actionRequest, "baseDocumentTitle", "");
+		baseDocumentDescription = ParamUtil.getString(actionRequest, "baseDocumentDescription", "");
+		folderId = ParamUtil.getLong(actionRequest, "folderId", 0);
+		
+		// Sites
+		groupId = ParamUtil.getLong(actionRequest, "groupId", themeDisplay.getScopeGroupId());
+		
 		double loader = 10;
 
 		ServiceContext serviceContext = ServiceContextFactory
@@ -91,24 +110,13 @@ public class DocumentMVCActionCommand extends BaseMVCActionCommand {
 
 	@Override
 	protected void doProcessAction(ActionRequest actionRequest, ActionResponse actionResponse) {
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
 		
 		try {
-			// Fetch data
-			numberOfDocuments = ParamUtil.getLong(actionRequest, "numberOfDocuments", 1);
-			baseDocumentTitle = ParamUtil.getString(actionRequest, "baseDocumentTitle", "");
-			baseDocumentDescription = ParamUtil.getString(actionRequest, "baseDocumentDescription", "");
-			folderId = ParamUtil.getLong(actionRequest, "folderId", 0);
-			
-			// Sites
-			groupId = ParamUtil.getLong(actionRequest, "groupId", themeDisplay.getScopeGroupId());
-			
 			// Create Documents
 			createDocuments(actionRequest, actionResponse);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			hideDefaultSuccessMessage(actionRequest);
-			e.printStackTrace();
+			_log.error(e,e);
 		}
 
 		actionResponse.setRenderParameter(
@@ -119,9 +127,6 @@ public class DocumentMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private DLAppLocalService _dLAppLocalService;
 
-	private long numberOfDocuments = 0;
-	private String baseDocumentTitle = "";
-	private String baseDocumentDescription = "";
-	private long groupId = 0;
-	private long folderId = 0;
+	
+	private static final Log _log = LogFactoryUtil.getLog(DocumentMVCActionCommand.class);	
 }

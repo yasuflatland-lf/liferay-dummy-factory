@@ -7,6 +7,8 @@ import com.liferay.dynamic.data.mapping.storage.Fields;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.util.JournalConverter;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
@@ -24,9 +26,9 @@ import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.utils.DDMLocalUtil;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -60,13 +62,33 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
+		long numberOfArticles = 0;
+		String baseTitle = "";
+		String baseArticle = "";
+		long groupId = 0;
+		long folderId = 0;
+		String[] locales;
+		
+		// Fetch data
+		numberOfArticles = ParamUtil.getLong(actionRequest, "numberOfArticles", 1);
+		baseTitle = ParamUtil.getString(actionRequest, "baseTitle", "");
+		baseArticle = ParamUtil.getString(actionRequest, "baseArticle", "");
+		folderId = ParamUtil.getLong(actionRequest, "folderId", 0);
+
+		// Locales
+		String[] defLang = { LocaleUtil.getDefault().toString() };
+		locales = ParamUtil.getStringValues(actionRequest, "locales", defLang);
+
+		// Sites
+		groupId = ParamUtil.getLong(actionRequest, "groupId", themeDisplay.getScopeGroupId());
+		
 		double loader = 10;
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Group.class.getName(), actionRequest);
 
 		Locale defaultLocale = LocaleUtil.fromLanguageId(themeDisplay.getUser().getLanguageId());
 
-		Map<Locale, String> descriptionMap = new HashMap<Locale, String>();
+		Map<Locale, String> descriptionMap = new ConcurrentHashMap<Locale, String>();
 		descriptionMap.put(defaultLocale, StringPool.BLANK);
 
 		//Build contents fields
@@ -86,7 +108,7 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 			title.append(baseTitle);
 			title.append(i);
 
-			Map<Locale, String> titleMap = new HashMap<Locale, String>();
+			Map<Locale, String> titleMap = new ConcurrentHashMap<Locale, String>();
 			titleMap.put(defaultLocale, title.toString());
 
 			// Create article
@@ -138,27 +160,14 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 		
 	@Override
 	protected void doProcessAction(ActionRequest actionRequest, ActionResponse actionResponse) {
-		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		try {
-			// Fetch data
-			numberOfArticles = ParamUtil.getLong(actionRequest, "numberOfArticles", 1);
-			baseTitle = ParamUtil.getString(actionRequest, "baseTitle", "");
-			baseArticle = ParamUtil.getString(actionRequest, "baseArticle", "");
-			folderId = ParamUtil.getLong(actionRequest, "folderId", 0);
-
-			// Locales
-			String[] defLang = { LocaleUtil.getDefault().toString() };
-			locales = ParamUtil.getStringValues(actionRequest, "locales", defLang);
-
-			// Sites
-			groupId = ParamUtil.getLong(actionRequest, "groupId", themeDisplay.getScopeGroupId());
-
 			// Create Web Contents
 			createJournals(actionRequest, actionResponse);
-		} catch (Throwable e) {
+			
+		} catch (Exception e) {
 			hideDefaultSuccessMessage(actionRequest);
-			e.printStackTrace();
+			_log.error(e,e);
 		}
 
 		actionResponse.setRenderParameter("mvcRenderCommandName", LDFPortletKeys.COMMON);
@@ -174,11 +183,7 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 	private DDMLocalUtil _ddmLocalUtil;
 	
 	private static final String DDM_CONTENT = "content";
+
 	
-	private long numberOfArticles = 0;
-	private String baseTitle = "";
-	private String baseArticle = "";
-	private long groupId = 0;
-	private long folderId = 0;
-	private String[] locales;
+	private static final Log _log = LogFactoryUtil.getLog(JournalMVCActionCommand.class);		
 }

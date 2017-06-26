@@ -47,6 +47,17 @@ public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 	 * @throws PortalException 
 	 */
 	private void createOrganizations(ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException {
+		//Parameber values
+		long startIndex = 1;
+		long numberOfOrganizations = 0;
+		String baseOrganizationName = "";
+		int parentOrganizationId = OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID;
+		
+		//Fetch data
+		startIndex = ParamUtil.getLong(actionRequest, "startIndex",1);
+		numberOfOrganizations = ParamUtil.getLong(actionRequest, "numberOfOrganizations",0);
+		baseOrganizationName = ParamUtil.getString(actionRequest, "baseOrganizationName","");
+		parentOrganizationId = ParamUtil.getInteger(actionRequest, "parentOrganizationId", OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID);
 
 		double loader = 10;
 
@@ -96,28 +107,18 @@ public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 	protected void doProcessAction(ActionRequest actionRequest, ActionResponse actionResponse) {
 
 		try {
-			//Fetch data
-			startIndex = ParamUtil.getLong(actionRequest, "startIndex",1);
-			numberOfOrganizations = ParamUtil.getLong(actionRequest, "numberOfOrganizations",0);
-			baseOrganizationName = ParamUtil.getString(actionRequest, "baseOrganizationName","");
-			parentOrganizationId = ParamUtil.getInteger(actionRequest, "parentOrganizationId", OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID);
-
 			//Create Organization
 			createOrganizations(actionRequest, actionResponse);
-		} catch (Throwable e) {
+			
+		} catch (Exception e) {
 			hideDefaultSuccessMessage(actionRequest);
-			e.printStackTrace();
+			_log.error(e,e);
 		}
 	
 	}
 	
 	@Reference
 	private OrganizationLocalService _organizationLocalService;	
-
-	private long startIndex = 1;
-	private long numberOfOrganizations = 0;
-	private String baseOrganizationName = "";
-	private int parentOrganizationId = OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID;
 	
 	private static final Log _log = LogFactoryUtil.getLog(
 			OrganizationMVCActionCommand.class);		

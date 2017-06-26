@@ -1,6 +1,8 @@
 package com.liferay.support.tools.portlet.actions;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
@@ -44,6 +46,24 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 	 */
 	private void createPages(ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException {
 
+		// Parameter values
+		long numberOfpages = 0;
+		String basePageName = "";
+		long groupId = 0;
+		long parentLayoutId;
+		String layoutType;
+		boolean privateLayout;
+		boolean hidden;
+		
+		//Fetch data
+		numberOfpages = ParamUtil.getLong(actionRequest, "numberOfpages",0);
+		basePageName = ParamUtil.getString(actionRequest, "basePageName","");
+		groupId = ParamUtil.getLong(actionRequest, "group",0);
+		parentLayoutId = ParamUtil.getLong(actionRequest, "parentLayoutId",LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
+		layoutType = ParamUtil.getString(actionRequest, "layoutType",LayoutConstants.TYPE_PORTLET);
+		privateLayout = ParamUtil.getBoolean(actionRequest, "privateLayout", false);
+		hidden = ParamUtil.getBoolean(actionRequest, "hidden", false);
+		
 		double loader = 10;
 
 		ServiceContext serviceContext = ServiceContextFactory
@@ -88,20 +108,12 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 	protected void doProcessAction(ActionRequest actionRequest, ActionResponse actionResponse) {
 
 		try {
-			//Fetch data
-			numberOfpages = ParamUtil.getLong(actionRequest, "numberOfpages",0);
-			basePageName = ParamUtil.getString(actionRequest, "basePageName","");
-			groupId = ParamUtil.getLong(actionRequest, "group",0);
-			parentLayoutId = ParamUtil.getLong(actionRequest, "parentLayoutId",LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
-			layoutType = ParamUtil.getString(actionRequest, "layoutType",LayoutConstants.TYPE_PORTLET);
-			privateLayout = ParamUtil.getBoolean(actionRequest, "privateLayout", false);
-			hidden = ParamUtil.getBoolean(actionRequest, "hidden", false);
-
 			//Create pages
 			createPages(actionRequest, actionResponse);
-		} catch (Throwable e) {
+			
+		} catch (Exception e) {
 			hideDefaultSuccessMessage(actionRequest);
-			e.printStackTrace();
+			_log.error(e,e);
 		}
 		
 		actionResponse.setRenderParameter(
@@ -111,11 +123,5 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private LayoutLocalService _layoutLocalService;	
 
-	private long numberOfpages = 0;
-	private String basePageName = "";
-	private long groupId = 0;
-	private long parentLayoutId;
-	private String layoutType;
-	private boolean privateLayout;
-	private boolean hidden;
+	private static final Log _log = LogFactoryUtil.getLog(PageMVCActionCommand.class);		
 }
