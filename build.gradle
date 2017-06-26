@@ -26,6 +26,7 @@ repositories {
 }
 
 dependencies {
+	compile 'biz.aQute.bnd:biz.aQute.bndlib:3.1.0'
 	compile 'com.google.errorprone:error_prone_annotations:2.0.19'
 	compile 'commons-digester:commons-digester:1.8.1'
 	compile "com.google.guava:guava:21.0"
