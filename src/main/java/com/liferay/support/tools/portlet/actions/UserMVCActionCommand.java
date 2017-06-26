@@ -59,6 +59,37 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 	 * @throws PortalException
 	 */
 	private void createUsers(ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException {
+		long numberOfusers = 0;
+		String baseScreenName = "";
+		long[] organizationIds = null;
+		long[] groupIds = null;
+		long[] roleIds = null;
+		long[] userGroupIds = null;
+		boolean male;
+		String password;
+
+		// Fetch data
+		numberOfusers = ParamUtil.getLong(actionRequest, "numberOfusers", 0);
+		baseScreenName = ParamUtil.getString(actionRequest, "baseScreenName", "");
+		male = ParamUtil.getBoolean(actionRequest, "male", true);
+		password = ParamUtil.getString(actionRequest, "password", "test");
+
+		// Organization
+		String[] organizations = ParamUtil.getStringValues(actionRequest, "organizations", null);
+		organizationIds = _commonUtil.convertStringToLongArray(organizations);
+
+		// Sites
+		String[] groups = ParamUtil.getStringValues(actionRequest, "groups", null);
+		groupIds = _commonUtil.convertStringToLongArray(groups);
+
+		// Roles
+		String[] roles = ParamUtil.getStringValues(actionRequest, "roles", null);
+		roleIds = _commonUtil.convertStringToLongArray(roles);
+
+		// User Group
+		String[] userGroups = ParamUtil.getStringValues(actionRequest, "userGroups", null);
+		userGroupIds = _commonUtil.convertStringToLongArray(userGroups);
+
 		double loader = 10;
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Group.class.getName(), actionRequest);
@@ -242,30 +273,9 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 	@Override
 	protected void doProcessAction(ActionRequest actionRequest, ActionResponse actionResponse) {
 		try {
-			// Fetch data
-			numberOfusers = ParamUtil.getLong(actionRequest, "numberOfusers", 0);
-			baseScreenName = ParamUtil.getString(actionRequest, "baseScreenName", "");
-			male = ParamUtil.getBoolean(actionRequest, "male", true);
-			password = ParamUtil.getString(actionRequest, "password", "test");
-
-			// Organization
-			String[] organizations = ParamUtil.getStringValues(actionRequest, "organizations", null);
-			organizationIds = _commonUtil.convertStringToLongArray(organizations);
-
-			// Sites
-			String[] groups = ParamUtil.getStringValues(actionRequest, "groups", null);
-			groupIds = _commonUtil.convertStringToLongArray(groups);
-
-			// Roles
-			String[] roles = ParamUtil.getStringValues(actionRequest, "roles", null);
-			roleIds = _commonUtil.convertStringToLongArray(roles);
-
-			// User Group
-			String[] userGroups = ParamUtil.getStringValues(actionRequest, "userGroups", null);
-			userGroupIds = _commonUtil.convertStringToLongArray(userGroups);
-
 			// Create users
 			createUsers(actionRequest, actionResponse);
+			
 		} catch (Exception e) {
 			hideDefaultSuccessMessage(actionRequest);
 			_log.error(e,e);
@@ -285,14 +295,5 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private OrganizationLocalService _organizationLocalService;
 	
-	private long numberOfusers = 0;
-	private String baseScreenName = "";
-	private long[] organizationIds = null;
-	private long[] groupIds = null;
-	private long[] roleIds = null;
-	private long[] userGroupIds = null;
-	private boolean male;
-	private String password;
-
 	private static final Log _log = LogFactoryUtil.getLog(UserMVCActionCommand.class);
 }

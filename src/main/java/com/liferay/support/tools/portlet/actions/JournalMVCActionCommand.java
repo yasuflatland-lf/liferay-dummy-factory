@@ -62,6 +62,26 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
+		long numberOfArticles = 0;
+		String baseTitle = "";
+		String baseArticle = "";
+		long groupId = 0;
+		long folderId = 0;
+		String[] locales;
+		
+		// Fetch data
+		numberOfArticles = ParamUtil.getLong(actionRequest, "numberOfArticles", 1);
+		baseTitle = ParamUtil.getString(actionRequest, "baseTitle", "");
+		baseArticle = ParamUtil.getString(actionRequest, "baseArticle", "");
+		folderId = ParamUtil.getLong(actionRequest, "folderId", 0);
+
+		// Locales
+		String[] defLang = { LocaleUtil.getDefault().toString() };
+		locales = ParamUtil.getStringValues(actionRequest, "locales", defLang);
+
+		// Sites
+		groupId = ParamUtil.getLong(actionRequest, "groupId", themeDisplay.getScopeGroupId());
+		
 		double loader = 10;
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Group.class.getName(), actionRequest);
@@ -140,24 +160,11 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 		
 	@Override
 	protected void doProcessAction(ActionRequest actionRequest, ActionResponse actionResponse) {
-		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		try {
-			// Fetch data
-			numberOfArticles = ParamUtil.getLong(actionRequest, "numberOfArticles", 1);
-			baseTitle = ParamUtil.getString(actionRequest, "baseTitle", "");
-			baseArticle = ParamUtil.getString(actionRequest, "baseArticle", "");
-			folderId = ParamUtil.getLong(actionRequest, "folderId", 0);
-
-			// Locales
-			String[] defLang = { LocaleUtil.getDefault().toString() };
-			locales = ParamUtil.getStringValues(actionRequest, "locales", defLang);
-
-			// Sites
-			groupId = ParamUtil.getLong(actionRequest, "groupId", themeDisplay.getScopeGroupId());
-
 			// Create Web Contents
 			createJournals(actionRequest, actionResponse);
+			
 		} catch (Exception e) {
 			hideDefaultSuccessMessage(actionRequest);
 			_log.error(e,e);
@@ -176,13 +183,7 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 	private DDMLocalUtil _ddmLocalUtil;
 	
 	private static final String DDM_CONTENT = "content";
-	
-	private long numberOfArticles = 0;
-	private String baseTitle = "";
-	private String baseArticle = "";
-	private long groupId = 0;
-	private long folderId = 0;
-	private String[] locales;
+
 	
 	private static final Log _log = LogFactoryUtil.getLog(JournalMVCActionCommand.class);		
 }

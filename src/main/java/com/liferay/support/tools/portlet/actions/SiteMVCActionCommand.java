@@ -137,9 +137,9 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 	protected void doProcessAction(ActionRequest actionRequest, ActionResponse actionResponse) {
 
 		try {
-
 			//Create Sites
 			createSites(actionRequest, actionResponse);
+			
 		} catch (Exception e) {
 			hideDefaultSuccessMessage(actionRequest);
 			_log.error(e,e);
@@ -151,7 +151,6 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 	
 	@Reference
 	private GroupLocalService _groupLocalService;	
-
 	
 	private static final Log _log = LogFactoryUtil.getLog(
 			SiteMVCActionCommand.class);		
