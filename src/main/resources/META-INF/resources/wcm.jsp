@@ -51,9 +51,6 @@
 				<aui:input name="baseTitle" label="<%= baseTitleLabel %>" cssClass="lfr-textarea-container" >
 					<aui:validator name="required" />				
 				</aui:input>
-				<aui:input name="baseArticle" label="<%= baseArticleLabel %>" cssClass="lfr-textarea-container" type="textarea" wrap="soft">
-					<aui:validator name="required" />				
-				</aui:input>
 				<aui:select name="groupId" label="<%= groupIdLabel %>"  >
 					<aui:option label="<%= defaultOption %>" value="<%= themeDisplay.getScopeGroupId() %>" selected="<%= true %>" />
 					<%
@@ -67,20 +64,28 @@
 					%>
 				</aui:select>		
 					
-				<%
-				Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
-
-				%>
-				<aui:select name="locales" label="<%= localesLabel %>" multiple="<%= true %>">
-					<%
-					for (Locale availableLocale : locales) {
-					%>
-						<aui:option label="<%= availableLocale.getDisplayName(locale) %>" value="<%= LocaleUtil.toLanguageId(availableLocale) %>"
-						selected="<%= availableLocale.toString().equals(LocaleUtil.getDefault().toString()) %>" />
-					<%
-					}
-					%>
-				</aui:select>	
+				<aui:a href="#inputOptions" cssClass="collapse-icon collapsed icon-angle-down" title="Option" aria-expanded="false" data-toggle="collapse" >&nbsp;&nbsp;option</aui:a>
+				<div class="collapsed collapse" id="inputOptions" aria-expanded="false" >
+					<div class="row">
+						<aui:fieldset cssClass="col-md-12">
+							<aui:input name="baseArticle" label="<%= baseArticleLabel %>" cssClass="lfr-textarea-container" type="textarea" wrap="soft" />
+ 						</aui:fieldset>
+						<%
+						Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
+		
+						%>
+						<aui:select name="locales" label="<%= localesLabel %>" multiple="<%= true %>">
+							<%
+							for (Locale availableLocale : locales) {
+							%>
+								<aui:option label="<%= availableLocale.getDisplayName(locale) %>" value="<%= LocaleUtil.toLanguageId(availableLocale) %>"
+								selected="<%= availableLocale.toString().equals(LocaleUtil.getDefault().toString()) %>" />
+							<%
+							}
+							%>
+						</aui:select>	
+					</div>
+				</div>					
 				<aui:button-row>
 					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary"/>
 				</aui:button-row>	

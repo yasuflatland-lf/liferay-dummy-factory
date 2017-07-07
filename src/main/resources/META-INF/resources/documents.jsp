@@ -50,9 +50,6 @@
 				<aui:input name="baseDocumentTitle" label="<%= baseDocumentTitleLabel %>" cssClass="lfr-textarea-container" >
 					<aui:validator name="required" />				
 				</aui:input>
-				<aui:input name="baseDocumentDescription" label="<%= baseDocumentDescriptionLabel %>" cssClass="lfr-textarea-container" type="textarea" wrap="soft">
-					<aui:validator name="required" />				
-				</aui:input>
 				<aui:select name="groupId" label="<%= groupIdLabel %>"  >
 					<aui:option label="<%= defaultOption %>" value="<%= themeDisplay.getScopeGroupId() %>" selected="<%= true %>" />
 					<%
@@ -65,7 +62,14 @@
 					}
 					%>
 				</aui:select>		
-					
+				<aui:a href="#inputOptions" cssClass="collapse-icon collapsed icon-angle-down" title="Option" aria-expanded="false" data-toggle="collapse" >&nbsp;&nbsp;option</aui:a>
+				<div class="collapsed collapse" id="inputOptions" aria-expanded="false" >
+					<div class="row">
+						<aui:fieldset cssClass="col-md-12">
+							<aui:input name="baseDocumentDescription" label="<%= baseDocumentDescriptionLabel %>" cssClass="lfr-textarea-container" type="textarea" wrap="soft" />
+ 						</aui:fieldset>
+					</div>
+				</div>						
 				<aui:button-row>
 					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary"/>
 				</aui:button-row>	
