@@ -69,21 +69,21 @@
 					<div class="row">
 						<aui:fieldset cssClass="col-md-12">
 							<aui:input name="baseArticle" label="<%= baseArticleLabel %>" cssClass="lfr-textarea-container" type="textarea" wrap="soft" />
+							<%
+							Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
+			
+							%>
+							<aui:select name="locales" label="<%= localesLabel %>" multiple="<%= true %>">
+								<%
+								for (Locale availableLocale : locales) {
+								%>
+									<aui:option label="<%= availableLocale.getDisplayName(locale) %>" value="<%= LocaleUtil.toLanguageId(availableLocale) %>"
+									selected="<%= availableLocale.toString().equals(LocaleUtil.getDefault().toString()) %>" />
+								<%
+								}
+								%>
+							</aui:select>	
  						</aui:fieldset>
-						<%
-						Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
-		
-						%>
-						<aui:select name="locales" label="<%= localesLabel %>" multiple="<%= true %>">
-							<%
-							for (Locale availableLocale : locales) {
-							%>
-								<aui:option label="<%= availableLocale.getDisplayName(locale) %>" value="<%= LocaleUtil.toLanguageId(availableLocale) %>"
-								selected="<%= availableLocale.toString().equals(LocaleUtil.getDefault().toString()) %>" />
-							<%
-							}
-							%>
-						</aui:select>	
 					</div>
 				</div>					
 				<aui:button-row>
