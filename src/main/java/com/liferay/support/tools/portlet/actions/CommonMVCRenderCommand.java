@@ -4,6 +4,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PwdGenerator;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.utils.CommonUtil;
 
@@ -50,7 +51,7 @@ public class CommonMVCRenderCommand implements MVCRenderCommand {
 		
 		// Carry around mode
 		renderRequest.setAttribute(LDFPortletKeys.MODE, mode);
-		
+
 		return _commonUtil
 				.getPageFromMode()
 				.getOrDefault(mode, LDFPortletKeys.JSP_ORGANIZAION);

@@ -13,6 +13,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ProgressTracker;
 import com.liferay.portal.kernel.util.ProgressTrackerThreadLocal;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -58,31 +59,33 @@ public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 		numberOfOrganizations = ParamUtil.getLong(actionRequest, "numberOfOrganizations",0);
 		baseOrganizationName = ParamUtil.getString(actionRequest, "baseOrganizationName","");
 		parentOrganizationId = ParamUtil.getInteger(actionRequest, "parentOrganizationId", OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID);
-
+		
+		//Tracking progress start
+		ProgressTracker progressTracker = new ProgressTracker("");
+		ProgressTrackerThreadLocal.setProgressTracker(progressTracker);
+		progressTracker.start(actionRequest);
+		
 		double loader = 10;
 
 		ServiceContext serviceContext = ServiceContextFactory
 				.getInstance(Organization.class.getName(), actionRequest);				
 
-		ProgressTracker progressTracker =
-				ProgressTrackerThreadLocal.getProgressTracker();	
-		
 		System.out.println("Starting to create " + numberOfOrganizations + " organizations");
 
 		for (long i = startIndex; i <= numberOfOrganizations; i++) {
 			if (numberOfOrganizations >= 100) {
 				if (i == (int) (numberOfOrganizations * (loader / 100))) {
 					System.out.println("Creating organizations..." + (int) loader + "% done");
-					loader = loader + 10;
 					if(null != progressTracker ) {
 						progressTracker.setPercent((int)loader);
 					}
+					loader = loader + 10;
 				}
 			}
 
 			//Create Organization Name
 			StringBundler organizationName = new StringBundler(2);
-			organizationName.append(baseOrganizationName).append(i);
+			organizationName.append(i).append(baseOrganizationName);
 
 			try {
 				
@@ -97,6 +100,8 @@ public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 			}
 
 		}
+		
+		progressTracker.finish(actionRequest);	
 
 		SessionMessages.add(actionRequest, "success");
 		
@@ -116,6 +121,9 @@ public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 		}
 	
 	}
+	
+	@Reference
+	private Portal _portal;
 	
 	@Reference
 	private OrganizationLocalService _organizationLocalService;	
