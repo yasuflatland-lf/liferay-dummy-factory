@@ -1,5 +1,5 @@
 ## What's Dummy Factory?
-Dummy Factory is a dummy data creation tool for debugging use. Please don't use this for a production use.
+Dummy Factory generates dummy data for debugging use. Please don't use this for a production use.
 
 ## What does Dummy Factory generate?
 
@@ -23,3 +23,6 @@ Dummy Factory is a dummy data creation tool for debugging use. Please don't use 
 1. Clone this repository to your local. Please make sure you've already installed Gradle 3.0 or above and blade tool that Liferay provides.
 2. At the root directory, run ```gradle clean assemble``` then ```liferay.dummy.factory-x.x.x.jar``` will be created under ```/build/libs/``` directory.
 3. To install onto your Liferay bundle, start up Liferay bundle on your local and run ```blade deploy```. Dummy Factory portlet will be deployed.
+
+## Bug / Enhancement request
+Please create a issue on this repository.
