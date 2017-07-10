@@ -17,6 +17,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.support.tools.constants.LDFPortletKeys;
+import com.liferay.support.tools.utils.ProgressManager;
 
 import java.util.Locale;
 import java.util.Map;
@@ -75,10 +76,12 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 		inheritContent = ParamUtil.getBoolean(actionRequest, "inheritContent", false);
 		active = ParamUtil.getBoolean(actionRequest, "active", true);
 		
-		double loader = 10;
-
 		ServiceContext serviceContext = ServiceContextFactory
 				.getInstance(Group.class.getName(), actionRequest);				
+
+		//Tracking progress start
+		ProgressManager progressManager = new ProgressManager();
+		progressManager.start(actionRequest, 0);
 
 		System.out.println("Starting to create " + numberOfSites + " sites");
 
@@ -88,12 +91,8 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 		};		
 		
 		for (long i = 1; i <= numberOfSites; i++) {
-			if (numberOfSites >= 100) {
-				if (i == (int) (numberOfSites * (loader / 100))) {
-					System.out.println("Creating sites..." + (int) loader + "% done");
-					loader = loader + 10;
-				}
-			}
+			//Update progress
+			progressManager.trackProgress(i, numberOfSites);
 
 			//Create Site Name
 			StringBundler siteName = new StringBundler(2);
@@ -107,27 +106,37 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 			try {
 				
 				_groupLocalService.addGroup(
-						serviceContext.getUserId(), //userId
-						parentGroupId, // parentGroupId
-						null, // className
-						0, //classPK
-						liveGroupId, //liveGroupId
-						nameMap, // nameMap
-						descriptionMap, // descriptionMap
-						siteType, //type
-						manualMembership, //manualMembership
-						GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, // membershipRestriction
-						StringPool.BLANK, //friendlyURL
-						site, //site
-						inheritContent, //inheritContent
-						active, //active
-						serviceContext); //serviceContext
+					serviceContext.getUserId(), //userId
+					parentGroupId, // parentGroupId
+					null, // className
+					0, //classPK
+					liveGroupId, //liveGroupId
+					nameMap, // nameMap
+					descriptionMap, // descriptionMap
+					siteType, //type
+					manualMembership, //manualMembership
+					GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION, // membershipRestriction
+					StringPool.BLANK, //friendlyURL
+					site, //site
+					inheritContent, //inheritContent
+					active, //active
+					serviceContext); //serviceContext
 				
-			} catch (DuplicateGroupException e) {
-				_log.error("Site <" + siteName.toString() + "> is duplicated. Skip : " + e.getMessage());
+			} catch (Exception e) {
+				if (e instanceof DuplicateGroupException ) {
+					_log.error("Site <" + siteName.toString() + "> is duplicated. Skip : " + e.getMessage());
+				}
+				else {
+					//Finish progress
+					progressManager.finish();	
+					throw e;
+				}
 			}
 		}
 
+		//Finish progress
+		progressManager.finish();	
+		
 		SessionMessages.add(actionRequest, "success");
 		
 		System.out.println("Finished creating " + numberOfSites + " sites");

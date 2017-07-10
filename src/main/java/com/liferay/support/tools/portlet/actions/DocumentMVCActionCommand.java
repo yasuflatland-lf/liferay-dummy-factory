@@ -17,6 +17,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.support.tools.constants.LDFPortletKeys;
+import com.liferay.support.tools.utils.ProgressManager;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -46,7 +47,7 @@ public class DocumentMVCActionCommand extends BaseMVCActionCommand {
 	 * @param actionResponse
 	 * @throws PortalException 
 	 */
-	private void createDocuments(ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException {
+	private void createDocuments(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
 
@@ -65,20 +66,18 @@ public class DocumentMVCActionCommand extends BaseMVCActionCommand {
 		// Sites
 		groupId = ParamUtil.getLong(actionRequest, "groupId", themeDisplay.getScopeGroupId());
 		
-		double loader = 10;
-
 		ServiceContext serviceContext = ServiceContextFactory
 				.getInstance(Group.class.getName(), actionRequest);				
 
+		//Tracking progress start
+		ProgressManager progressManager = new ProgressManager();
+		progressManager.start(actionRequest, 0);
+		
 		System.out.println("Starting to create " + numberOfDocuments + " documents");
 
 		for (long i = 1; i <= numberOfDocuments; i++) {
-			if (numberOfDocuments >= 100) {
-				if (i == (int) (numberOfDocuments * (loader / 100))) {
-					System.out.println("Creating Documents..." + (int) loader + "% done");
-					loader = loader + 10;
-				}
-			}
+			//Update progress
+			progressManager.trackProgress(i, numberOfDocuments);
 			
 			StringBundler title = new StringBundler(2);
 			title.append(baseDocumentTitle);
@@ -89,8 +88,10 @@ public class DocumentMVCActionCommand extends BaseMVCActionCommand {
 			sourceFileName.append(".txt");
 
 			byte[] dummyFile = new byte[0];
-			_dLAppLocalService.addFileEntry(
-					serviceContext.getUserId(), //userId, 
+			
+			try {
+				
+				_dLAppLocalService.addFileEntry(serviceContext.getUserId(), //userId, 
 					groupId, // repositoryId,
 					folderId, // folderId,
 					sourceFileName.toString(), //sourceFileName, 
@@ -100,8 +101,16 @@ public class DocumentMVCActionCommand extends BaseMVCActionCommand {
 					StringPool.BLANK, //changeLog, 
 					dummyFile, //file,
 					serviceContext);
-			
+				
+			} catch (Exception e) {
+				//Finish progress
+				progressManager.finish();	
+				throw e;
+			}
 		}
+
+		//Finish progress
+		progressManager.finish();	
 
 		SessionMessages.add(actionRequest, "success");
 		

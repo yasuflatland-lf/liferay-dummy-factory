@@ -1,7 +1,5 @@
 <%@ include file="/init.jsp"%>
-<%
-String progressId = PwdGenerator.getPassword(PwdGenerator.KEY3, 16);
-%>
+
 <div class="container-fluid-1280">
 	<liferay-ui:success key="success" message="Organizations created successfully" />
 	<%@ include file="/command_select.jspf"%>

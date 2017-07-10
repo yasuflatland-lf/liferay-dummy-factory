@@ -46,7 +46,7 @@
 			
 			%>
 
-			<aui:form action="<%= userEditURL %>" method="post" >
+			<aui:form action="<%= userEditURL %>" method="post" name="fm" >
 				<aui:input name="numberOfusers" label="<%= numberOfusersLabel %>" >
 					<aui:validator name="digits" />
 					<aui:validator name="min">1</aui:validator>
@@ -128,12 +128,29 @@
 					</div>
 				</div>	
 				<aui:button-row>
-					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary"/>
+					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary" id="processStart"/>
 				</aui:button-row>	
 			</aui:form>	
+			<liferay-ui:upload-progress
+				id="<%= progressId %>"
+				message="creating..."
+			/>				
 		</aui:fieldset>
 	</aui:fieldset-group>
 </div>
+
+<aui:script use="aui-base">
+	var processStart = A.one('#<portlet:namespace />processStart');
+	
+	processStart.on(
+	    'click',
+	    function() {
+	    	event.preventDefault();
+			<%= progressId %>.startProgress();
+			submitForm(document.<portlet:namespace />fm);
+	    }
+	);
+</aui:script>
 
 <portlet:resourceURL id="<%=LDFPortletKeys.CMD_ROLELIST %>" var="roleListURL" />
 

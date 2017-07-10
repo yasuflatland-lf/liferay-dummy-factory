@@ -4,7 +4,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PwdGenerator;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.utils.CommonUtil;
 

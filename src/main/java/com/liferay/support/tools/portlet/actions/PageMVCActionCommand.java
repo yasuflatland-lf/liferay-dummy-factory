@@ -15,6 +15,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.support.tools.constants.LDFPortletKeys;
+import com.liferay.support.tools.utils.ProgressManager;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -44,7 +45,7 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 	 * @param actionResponse
 	 * @throws PortalException 
 	 */
-	private void createPages(ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException {
+	private void createPages(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 
 		// Parameter values
 		long numberOfpages = 0;
@@ -64,29 +65,26 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 		privateLayout = ParamUtil.getBoolean(actionRequest, "privateLayout", false);
 		hidden = ParamUtil.getBoolean(actionRequest, "hidden", false);
 		
-		double loader = 10;
-
 		ServiceContext serviceContext = ServiceContextFactory
 				.getInstance(Group.class.getName(), actionRequest);				
 
+		//Tracking progress start
+		ProgressManager progressManager = new ProgressManager();
+		progressManager.start(actionRequest, 0);
+		
 		System.out.println("Starting to create " + numberOfpages + " pages");
 
 		for (long i = 1; i <= numberOfpages; i++) {
-			if (numberOfpages >= 100) {
-				if (i == (int) (numberOfpages * (loader / 100))) {
-					System.out.println("Creating pages..." + (int) loader + "% done");
-					loader = loader + 10;
-				}
-			}
+			//Update progress
+			progressManager.trackProgress(i, numberOfpages);
 			
 			//Create page name
 			StringBundler name = new StringBundler(2);
 			name.append(basePageName);
 			name.append(i);
 
-			_layoutLocalService.addLayout(
-					serviceContext.getUserId(),
-					groupId, //groupId
+			try {
+				_layoutLocalService.addLayout(serviceContext.getUserId(), groupId, //groupId
 					privateLayout, //privateLayout
 					parentLayoutId, //parentLayoutId
 					name.toString(), //nameMap
@@ -96,9 +94,18 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 					hidden, //hidden
 					StringPool.BLANK, //friendlyURL
 					serviceContext); //serviceContext
+				
+			} catch (Exception e) {
+				//Finish progress
+				progressManager.finish();	
+				throw e;
+			}
 			
 		}
 
+		//Finish progress
+		progressManager.finish();	
+		
 		SessionMessages.add(actionRequest, "success");
 		
 		System.out.println("Finished creating " + numberOfpages + " pages");
