@@ -47,3 +47,7 @@ _.templateSettings = {
     escape: /\<\@\-(.+?)\@\>/gim
 };
 </aui:script>
+
+<%
+String progressId = PwdGenerator.getPassword(PwdGenerator.KEY3, 16);
+%>

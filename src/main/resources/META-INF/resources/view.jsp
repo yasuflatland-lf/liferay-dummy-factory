@@ -16,19 +16,16 @@
 					</a>
 				</h1>
 			</div>
-		
 			<div class="collapsed collapse" id="navPillsCollapse0" aria-expanded="false" >
 				<blockquote class="blockquote-info">
 				    <small>Example</small>
 					<p>If you enter the values <code>3</code> and "org" the portlet will create three organizations: <code>org1</code>, <code>org2</code>, and <code>org3</code>.<p>
 				</blockquote>
-			
 				<ul>
 					<li>You must be signed in as an administrator in order to create organizations</li>
 					<li>The counter always starts at <code>1</code></li>
 					<li>The organization type is <code>Organization</code></li>
 				</ul>
-			
 			</div>
 
 			<%
@@ -37,7 +34,9 @@
 			String parentOrganizationIdLabel = "Select the parent organization";
 			%>
 
-			<aui:form action="<%= organizationEditURL %>" method="post" >
+			<aui:form action="<%= organizationEditURL %>" method="post" name="fm" >
+				<aui:input name="<%= Constants.CMD %>" type="hidden" />
+				<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 				<aui:input name="numberOfOrganizations" label="<%= numberOfOrganizationsLabel %>" >
 					<aui:validator name="digits" />
 					<aui:validator name="min">1</aui:validator>
@@ -47,7 +46,7 @@
 					<aui:validator name="required" />				
 				</aui:input>
 		
-				<%
+			   <%
 					//Organization
 					List<Organization> organizations = OrganizationLocalServiceUtil.getOrganizations(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 					String defaultOption = "(None)";
@@ -66,18 +65,33 @@
 								}
 								%>
 							</aui:select>						
-<%-- 
-							<aui:input name="parentOrganizationId" label="<%= parentOrganizationIdLabel %>" >
-								<aui:validator name="digits" />
-							</aui:input>				
- --%>
  						</aui:fieldset>
 					</div>
 				</div>	
 				<aui:button-row>
-					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary"/>
+					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary" id="processStart"/>
 				</aui:button-row>	
 			</aui:form>	
-		</aui:fieldset>
+			
+			<liferay-ui:upload-progress
+				id="<%= progressId %>"
+				message="creating..."
+			/>	
+				
+		</aui:fieldset>	
 	</aui:fieldset-group>
+		
 </div>
+
+<aui:script use="aui-base">
+	var processStart = A.one('#<portlet:namespace />processStart');
+	
+	processStart.on(
+	    'click',
+	    function() {
+	    	event.preventDefault();
+			<%= progressId %>.startProgress();
+			submitForm(document.<portlet:namespace />fm);
+	    }
+	);
+</aui:script>

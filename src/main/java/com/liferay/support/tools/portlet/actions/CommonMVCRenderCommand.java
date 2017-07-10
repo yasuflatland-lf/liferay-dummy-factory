@@ -50,7 +50,7 @@ public class CommonMVCRenderCommand implements MVCRenderCommand {
 		
 		// Carry around mode
 		renderRequest.setAttribute(LDFPortletKeys.MODE, mode);
-		
+
 		return _commonUtil
 				.getPageFromMode()
 				.getOrDefault(mode, LDFPortletKeys.JSP_ORGANIZAION);

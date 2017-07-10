@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.utils.DDMLocalUtil;
+import com.liferay.support.tools.utils.ProgressManager;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -82,8 +83,6 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 		// Sites
 		groupId = ParamUtil.getLong(actionRequest, "groupId", themeDisplay.getScopeGroupId());
 		
-		double loader = 10;
-
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Group.class.getName(), actionRequest);
 
 		Locale defaultLocale = LocaleUtil.fromLanguageId(themeDisplay.getUser().getLanguageId());
@@ -94,15 +93,15 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 		//Build contents fields
 		String content = buildFields(themeDisplay.getCompanyGroupId(),locales, baseArticle);
 		
+		//Tracking progress start
+		ProgressManager progressManager = new ProgressManager();
+		progressManager.start(actionRequest, 0);
+		
 		System.out.println("Starting to create " + numberOfArticles + " articles");
 
 		for (long i = 1; i <= numberOfArticles; i++) {
-			if (numberOfArticles >= 100) {
-				if (i == (int) (numberOfArticles * (loader / 100))) {
-					System.out.println("Creating Web Contents..." + (int) loader + "% done");
-					loader = loader + 10;
-				}
-			}
+			//Update progress
+			progressManager.trackProgress(i, numberOfArticles);
 
 			StringBundler title = new StringBundler(2);
 			title.append(baseTitle);
@@ -111,18 +110,27 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 			Map<Locale, String> titleMap = new ConcurrentHashMap<Locale, String>();
 			titleMap.put(defaultLocale, title.toString());
 
-			// Create article
-			_journalArticleLocalService.addArticle(serviceContext.getUserId(), // userId,
-					groupId, // groupId,
-					folderId, // folderId
-					titleMap, // titleMap
-					descriptionMap, // descriptionMap
-					content, // content
-					LDFPortletKeys._DDM_STRUCTURE_KEY, // ddmStructureKey,
-					LDFPortletKeys._DDM_TEMPLATE_KEY, // ddmTemplateKey,
-					serviceContext // serviceContext
-			);
+			try {
+				// Create article
+				_journalArticleLocalService.addArticle(serviceContext.getUserId(), // userId,
+						groupId, // groupId,
+						folderId, // folderId
+						titleMap, // titleMap
+						descriptionMap, // descriptionMap
+						content, // content
+						LDFPortletKeys._DDM_STRUCTURE_KEY, // ddmStructureKey,
+						LDFPortletKeys._DDM_TEMPLATE_KEY, // ddmTemplateKey,
+						serviceContext // serviceContext
+				);
+			} catch (Exception e) {
+				//Finish progress
+				progressManager.finish();	
+				throw e;
+			}
 		}
+
+		//Finish progress
+		progressManager.finish();	
 
 		SessionMessages.add(actionRequest, "success");
 

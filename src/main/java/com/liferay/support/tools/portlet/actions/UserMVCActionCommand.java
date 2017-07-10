@@ -13,6 +13,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.utils.CommonUtil;
+import com.liferay.support.tools.utils.ProgressManager;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -42,7 +43,7 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 	 * @param actionResponse
 	 * @throws PortalException
 	 */
-	private void createUsers(ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException {
+	private void createUsers(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 		long numberOfusers = 0;
 		String baseScreenName = "";
 		long[] organizationIds = null;
@@ -74,19 +75,17 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 		String[] userGroups = ParamUtil.getStringValues(actionRequest, "userGroups", null);
 		userGroupIds = _commonUtil.convertStringToLongArray(userGroups);
 
-		double loader = 10;
-
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Group.class.getName(), actionRequest);
 
+		//Tracking progress start
+		ProgressManager progressManager = new ProgressManager();
+		progressManager.start(actionRequest, 0);
+		
 		System.out.println("Starting to create " + numberOfusers + " users");
 
 		for (long i = 1; i <= numberOfusers; i++) {
-			if (numberOfusers >= 100) {
-				if (i == (int) (numberOfusers * (loader / 100))) {
-					System.out.println("Creating users..." + (int) loader + "% done");
-					loader = loader + 10;
-				}
-			}
+			//Update progress
+			progressManager.trackProgress(i, numberOfusers);
 
 			StringBundler screenName = new StringBundler(2);
 			screenName.append(baseScreenName);
@@ -96,11 +95,20 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 			emailAddress.append(screenName);
 			emailAddress.append("@liferay.com");
 
-			// Create user and apply roles
-			_userDataService.createUserData(serviceContext, organizationIds, groupIds, roleIds, userGroupIds, male,
-					password, screenName.toString(), emailAddress.toString(), baseScreenName, i);
+			try {
+				// Create user and apply roles
+				_userDataService.createUserData(serviceContext, organizationIds, groupIds, roleIds, userGroupIds, male,
+						password, screenName.toString(), emailAddress.toString(), baseScreenName, i);
+			} catch (Exception e) {
+				//Finish progress
+				progressManager.finish();	
+				throw e;
+			}
 		}
 
+		//Finish progress
+		progressManager.finish();	
+		
 		SessionMessages.add(actionRequest, "success");
 
 		System.out.println("Finished creating " + numberOfusers + " users");

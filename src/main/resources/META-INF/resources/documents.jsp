@@ -41,7 +41,7 @@
 			List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 			%>
 
-			<aui:form action="<%= documentEditURL %>" method="post" >
+			<aui:form action="<%= documentEditURL %>" method="post" name="fm" >
 				<aui:input name="numberOfDocuments" label="<%= numberOfDocumentsLabel %>" >
 					<aui:validator name="digits" />
 					<aui:validator name="min">1</aui:validator>
@@ -71,9 +71,28 @@
 					</div>
 				</div>						
 				<aui:button-row>
-					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary"/>
+					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary" id="processStart"/>
 				</aui:button-row>	
 			</aui:form>	
+			
+			<liferay-ui:upload-progress
+				id="<%= progressId %>"
+				message="creating..."
+			/>		
+					
 		</aui:fieldset>
 	</aui:fieldset-group>
 </div>
+
+<aui:script use="aui-base">
+	var processStart = A.one('#<portlet:namespace />processStart');
+	
+	processStart.on(
+	    'click',
+	    function() {
+	    	event.preventDefault();
+			<%= progressId %>.startProgress();
+			submitForm(document.<portlet:namespace />fm);
+	    }
+	);
+</aui:script>

@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Dummy Factory Portlet
 Bundle-SymbolicName: liferay.dummy.factory
-Bundle-Version: 0.6.1
+Bundle-Version: 0.7.0
 
 Bundle-ClassPath:\
 	.,\

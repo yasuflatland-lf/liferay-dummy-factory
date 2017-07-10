@@ -43,7 +43,7 @@
 			String siteTypeLabel = "Site type";
 			%>
 
-			<aui:form action="<%= siteEditURL %>" method="post" >
+			<aui:form action="<%= siteEditURL %>" method="post" name="fm">
 			    <aui:select name="siteType" label="<%=siteTypeLabel %>" > 
 			        <aui:option label="<%=GroupConstants.TYPE_SITE_OPEN_LABEL %>" value="<%= GroupConstants.TYPE_SITE_OPEN %>" />
 			        <aui:option label="<%=GroupConstants.TYPE_SITE_PRIVATE_LABEL %>" value="<%= GroupConstants.TYPE_SITE_PRIVATE %>" />
@@ -94,9 +94,26 @@
 					</div>
 				</div>	
 				<aui:button-row>
-					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary"/>
+					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary" id="processStart"/>
 				</aui:button-row>	
 			</aui:form>	
+			<liferay-ui:upload-progress
+				id="<%= progressId %>"
+				message="creating..."
+			/>				
 		</aui:fieldset>
 	</aui:fieldset-group>
 </div>
+
+<aui:script use="aui-base">
+	var processStart = A.one('#<portlet:namespace />processStart');
+	
+	processStart.on(
+	    'click',
+	    function() {
+	    	event.preventDefault();
+			<%= progressId %>.startProgress();
+			submitForm(document.<portlet:namespace />fm);
+	    }
+	);
+</aui:script>
