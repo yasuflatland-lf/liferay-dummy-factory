@@ -15,6 +15,13 @@ import java.util.stream.Collectors;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+/**
+ * 
+ * Common Library
+ * 
+ * @author Yasuyuki Takeo
+ *
+ */
 @Component(service = CommonUtil.class)
 public class CommonUtil {
 

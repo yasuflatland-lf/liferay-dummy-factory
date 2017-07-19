@@ -18,7 +18,9 @@ import java.util.Map;
 import org.osgi.service.component.annotations.Component;
 
 /**
- * DDM Structure handl utilities
+ * DDM Structure handle utilities
+ * 
+ * Copy version of the same name internal class.
  * 
  * @author Yasuyuki Takeo
  *
