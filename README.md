@@ -12,6 +12,7 @@ Dummy Factory generates dummy data for debugging use. Please don't use this for 
 
 ## Required environment
 * Java 1.8 or above
+* Liferay 7.0 GA1 / Liferay DXP SP1 or above
 
 ## Usage
 1. Download jar file from [here](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/master/latest) and place it in ${liferay-home}/deploy folder. 

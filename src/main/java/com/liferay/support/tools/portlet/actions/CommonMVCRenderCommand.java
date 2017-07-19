@@ -15,6 +15,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
+ * Render command for all jsps
+ * 
  * @author Yasuyuki Takeo
  */
 @Component(
