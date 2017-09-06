@@ -74,8 +74,14 @@ public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 
 			//Create Organization Name
 			StringBundler organizationName = new StringBundler(2);
-			organizationName.append(i).append(baseOrganizationName);
-
+			
+			//Only basename if creating Organization is only one.
+			if(1 < numberOfOrganizations) {
+				organizationName.append(i).append(baseOrganizationName);
+			} else {
+				organizationName.append(baseOrganizationName);
+			}
+			
 			try {
 				
 				_organizationLocalService.addOrganization(

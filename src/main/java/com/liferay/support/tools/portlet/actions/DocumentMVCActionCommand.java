@@ -81,7 +81,11 @@ public class DocumentMVCActionCommand extends BaseMVCActionCommand {
 			
 			StringBundler title = new StringBundler(2);
 			title.append(baseDocumentTitle);
-			title.append(i);
+
+			//Add number more then one docunent
+			if(1 < numberOfDocuments) {
+				title.append(i);
+			}
 
 			StringBundler sourceFileName = new StringBundler(2);
 			sourceFileName.append(title.toString());
