@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Dummy Factory Portlet
 Bundle-SymbolicName: liferay.dummy.factory
-Bundle-Version: 0.8.0
+Bundle-Version: 0.9.0
 
 Bundle-ClassPath:\
 	.,\
@@ -9,14 +9,20 @@ Bundle-ClassPath:\
 	lib/commons-digester.jar,\
 	lib/commons-validator.jar,\
 	lib/commons-io.jar,\
-	lib/commons-lang3.jar
-
+	lib/commons-lang3.jar,\
+	lib/generex.jar,\
+	lib/automaton.jar,\
+	lib/javafaker.jar
+	
 -includeresource:\
 	lib/guava.jar=guava-[0-9]*.jar,\
 	lib/error_prone_annotations.jar=error_prone_annotations-[0-9]*.jar,\
 	lib/commons-digester.jar=commons-digester-[0-9]*.jar,\
 	lib/commons-validator.jar=commons-validator-[0-9]*.jar,\
 	lib/commons-io.jar=commons-io-[0-9]*.jar,\
-	lib/commons-lang3.jar=commons-lang[0-9]*.jar
+	lib/commons-lang3.jar=commons-lang[0-9]*.jar,\
+	lib/generex.jar=generex-[0-9]*.jar,\
+	lib/automaton.jar=automaton-[0-9]*.jar,\
+	lib/javafaker.jar=javafaker-[0-9]*.jar
 	
 -metatype: *

@@ -1,5 +1,6 @@
 package com.liferay.support.tools.portlet.actions;
 
+import com.github.javafaker.Faker;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.exception.UserScreenNameException;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -58,6 +60,7 @@ public class UserDataService {
 	 * @param roleIds
 	 * @param userGroupIds
 	 * @param male
+	 * @param fakerEnable
 	 * @param password
 	 * @param screenName
 	 * @param emailAddress
@@ -66,8 +69,13 @@ public class UserDataService {
 	 * @throws PortalException
 	 */
 	public void createUserData(ServiceContext serviceContext, long[] organizationIds, long[] groupIds, long[] roleIds,
-			long[] userGroupIds, boolean male, String password, String screenName, String emailAddress,
+			long[] userGroupIds, boolean male, boolean fakerEnable, String password, String screenName, String emailAddress,
 			String baseScreenName, long index) throws PortalException {
+		
+		// Generate first / last name
+		String firstName = (fakerEnable) ? _faker.name().firstName() : baseScreenName;
+		String lastName = (fakerEnable) ? _faker.name().lastName() : String.valueOf(index);
+		
 		try {
 			// Create User
 			User user = _userLocalService.addUserWithWorkflow(serviceContext.getUserId(), serviceContext.getCompanyId(), // companyId,
@@ -78,9 +86,9 @@ public class UserDataService {
 					screenName.toString(), emailAddress.toString(), 0, // facebookId,
 					StringPool.BLANK, // openId,
 					LocaleUtil.getDefault(), // locale,
-					baseScreenName, // firstName,
+					firstName, // firstName,
 					StringPool.BLANK, // middleName,
-					String.valueOf(index), // lastName,
+					lastName, // lastName,
 					0, // prefixId,
 					0, // suffixId,
 					male, // male
@@ -214,6 +222,13 @@ public class UserDataService {
 		}
 	}
 
+	@Activate
+	public void activate() {
+		_faker =  new Faker();
+	}
+	
+	private Faker _faker;
+	
 	@Reference
 	private UserLocalService _userLocalService;
 	@Reference

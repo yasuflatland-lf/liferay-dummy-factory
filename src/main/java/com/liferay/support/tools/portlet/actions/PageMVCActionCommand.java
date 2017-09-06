@@ -81,7 +81,11 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 			//Create page name
 			StringBundler name = new StringBundler(2);
 			name.append(basePageName);
-			name.append(i);
+			
+			//Add number more then one Page
+			if(1 < numberOfpages) {
+				name.append(i);
+			}
 
 			try {
 				_layoutLocalService.addLayout(serviceContext.getUserId(), groupId, //groupId

@@ -96,8 +96,13 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 
 			//Create Site Name
 			StringBundler siteName = new StringBundler(2);
-			siteName.append(baseSiteName).append(i);
+			siteName.append(baseSiteName);
 
+			//Add number more then one site
+			if(1 < numberOfSites) {
+				siteName.append(i);
+			}
+			
 			@SuppressWarnings("serial")
 			Map<Locale, String> nameMap = new ConcurrentHashMap<Locale, String>() {
 				{put(LocaleUtil.getDefault(), siteName.toString());}

@@ -51,12 +51,14 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 		long[] roleIds = null;
 		long[] userGroupIds = null;
 		boolean male;
+		boolean fakerEnable;
 		String password;
 
 		// Fetch data
 		numberOfusers = ParamUtil.getLong(actionRequest, "numberOfusers", 0);
 		baseScreenName = ParamUtil.getString(actionRequest, "baseScreenName", "");
 		male = ParamUtil.getBoolean(actionRequest, "male", true);
+		fakerEnable = ParamUtil.getBoolean(actionRequest, "fakerEnable", false);
 		password = ParamUtil.getString(actionRequest, "password", "test");
 
 		// Organization
@@ -89,7 +91,11 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 
 			StringBundler screenName = new StringBundler(2);
 			screenName.append(baseScreenName);
-			screenName.append(i);
+			
+			//Add number more then one user
+			if(1 < numberOfusers) {
+				screenName.append(i);
+			}
 
 			StringBundler emailAddress = new StringBundler(2);
 			emailAddress.append(screenName);
@@ -97,7 +103,7 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 
 			try {
 				// Create user and apply roles
-				_userDataService.createUserData(serviceContext, organizationIds, groupIds, roleIds, userGroupIds, male,
+				_userDataService.createUserData(serviceContext, organizationIds, groupIds, roleIds, userGroupIds, male, fakerEnable,
 						password, screenName.toString(), emailAddress.toString(), baseScreenName, i);
 			} catch (Exception e) {
 				//Finish progress

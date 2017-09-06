@@ -105,7 +105,11 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 
 			StringBundler title = new StringBundler(2);
 			title.append(baseTitle);
-			title.append(i);
+			
+			//Add number more then one article
+			if( 1 < numberOfArticles) {
+				title.append(i);
+			}
 
 			Map<Locale, String> titleMap = new ConcurrentHashMap<Locale, String>();
 			titleMap.put(defaultLocale, title.toString());
