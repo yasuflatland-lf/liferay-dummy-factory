@@ -29,7 +29,6 @@
                     <li>The counter always starts at <code>1</code></li>
 					<li>If no site is selected, the default site will be <code>liferay.com</code><li>
                 </ul>
-            
             </div>
 
 			<%
@@ -51,7 +50,7 @@
 				<aui:input name="baseTitle" label="<%= baseTitleLabel %>" cssClass="lfr-textarea-container" >
 					<aui:validator name="required" />				
 				</aui:input>
-				<aui:select name="groupId" label="<%= groupIdLabel %>"  >
+				<aui:select name="groupIds" label="<%= groupIdLabel %>" multiple="<%= true %>" >
 					<aui:option label="<%= defaultOption %>" value="<%= themeDisplay.getScopeGroupId() %>" selected="<%= true %>" />
 					<%
 					for (Group group : groups) {

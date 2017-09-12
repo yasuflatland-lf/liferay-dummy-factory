@@ -12,6 +12,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -23,6 +24,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.support.tools.constants.LDFPortletKeys;
+import com.liferay.support.tools.utils.CommonUtil;
 import com.liferay.support.tools.utils.DDMLocalUtil;
 import com.liferay.support.tools.utils.ProgressManager;
 
@@ -66,7 +68,7 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 		long numberOfArticles = 0;
 		String baseTitle = "";
 		String baseArticle = "";
-		long groupId = 0;
+		long[] groupIds;
 		long folderId = 0;
 		String[] locales;
 		
@@ -81,7 +83,8 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 		locales = ParamUtil.getStringValues(actionRequest, "locales", defLang);
 
 		// Sites
-		groupId = ParamUtil.getLong(actionRequest, "groupId", themeDisplay.getScopeGroupId());
+		String[] groupsStrIds = ParamUtil.getStringValues(actionRequest, "groupIds", new String[] {String.valueOf(themeDisplay.getScopeGroupId())});
+		groupIds = _commonUtil.convertStringToLongArray(groupsStrIds);		
 		
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Group.class.getName(), actionRequest);
 
@@ -97,40 +100,44 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 		ProgressManager progressManager = new ProgressManager();
 		progressManager.start(actionRequest, 0);
 		
-		System.out.println("Starting to create " + numberOfArticles + " articles");
 
-		for (long i = 1; i <= numberOfArticles; i++) {
-			//Update progress
-			progressManager.trackProgress(i, numberOfArticles);
+		for(long groupId : groupIds ) {
+			System.out.println("Starting to create " 
+					+ numberOfArticles + " articles for site id <" + _groupLocalServiceUtil.getGroup(groupId).getDescriptiveName() + ">");
 
-			StringBundler title = new StringBundler(2);
-			title.append(baseTitle);
-			
-			//Add number more then one article
-			if( 1 < numberOfArticles) {
-				title.append(i);
-			}
-
-			Map<Locale, String> titleMap = new ConcurrentHashMap<Locale, String>();
-			titleMap.put(defaultLocale, title.toString());
-
-			try {
-				// Create article
-				_journalArticleLocalService.addArticle(serviceContext.getUserId(), // userId,
-						groupId, // groupId,
-						folderId, // folderId
-						titleMap, // titleMap
-						descriptionMap, // descriptionMap
-						content, // content
-						LDFPortletKeys._DDM_STRUCTURE_KEY, // ddmStructureKey,
-						LDFPortletKeys._DDM_TEMPLATE_KEY, // ddmTemplateKey,
-						serviceContext // serviceContext
-				);
-			} catch (Exception e) {
-				//Finish progress
-				progressManager.finish();	
-				throw e;
-			}
+			for (long i = 1; i <= numberOfArticles; i++) {
+				//Update progress
+				progressManager.trackProgress(i, numberOfArticles);
+	
+				StringBundler title = new StringBundler(2);
+				title.append(baseTitle);
+				
+				//Add number more then one article
+				if( 1 < numberOfArticles) {
+					title.append(i);
+				}
+	
+				Map<Locale, String> titleMap = new ConcurrentHashMap<Locale, String>();
+				titleMap.put(defaultLocale, title.toString());
+	
+				try {
+					// Create article
+					_journalArticleLocalService.addArticle(serviceContext.getUserId(), // userId,
+							groupId, // groupId,
+							folderId, // folderId
+							titleMap, // titleMap
+							descriptionMap, // descriptionMap
+							content, // content
+							LDFPortletKeys._DDM_STRUCTURE_KEY, // ddmStructureKey,
+							LDFPortletKeys._DDM_TEMPLATE_KEY, // ddmTemplateKey,
+							serviceContext // serviceContext
+					);
+				} catch (Exception e) {
+					//Finish progress
+					progressManager.finish();	
+					throw e;
+				}
+			}			
 		}
 
 		//Finish progress
@@ -190,9 +197,13 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private JournalArticleLocalService _journalArticleLocalService;
 	@Reference
+	private GroupLocalService _groupLocalServiceUtil;
+	@Reference
 	private DDMStructureLocalService _DDMStructureLocalService;
 	@Reference
 	private DDMLocalUtil _ddmLocalUtil;
+	@Reference
+	private CommonUtil _commonUtil;
 	
 	private static final String DDM_CONTENT = "content";
 
