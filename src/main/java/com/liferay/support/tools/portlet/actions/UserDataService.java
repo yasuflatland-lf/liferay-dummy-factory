@@ -1,6 +1,5 @@
 package com.liferay.support.tools.portlet.actions;
 
-import com.github.javafaker.Faker;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.exception.UserScreenNameException;
@@ -23,15 +22,16 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.support.tools.utils.CommonUtil;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import aQute.bnd.annotation.ProviderType;
+import io.bloco.faker.Faker;
 
 /**
  * User Data (User / Related roles applying) service
@@ -66,19 +66,29 @@ public class UserDataService {
 	 * @param emailAddress
 	 * @param baseScreenName
 	 * @param index
+	 * @param locale
 	 * @throws PortalException
 	 */
 	public void createUserData(ServiceContext serviceContext, long[] organizationIds, long[] groupIds, long[] roleIds,
 			long[] userGroupIds, boolean male, boolean fakerEnable, String password, String screenName, String emailAddress,
-			String baseScreenName, long index) throws PortalException {
+			String baseScreenName, long index, String locale) throws PortalException {
+		
+		// For generating dummy user name
+		Faker faker = new Faker(locale);
+		
+		if(Validator.isNull(faker)) {
+			throw new InvalidParameterException("Locale is not accepted. locale<" + locale +">");
+		}
 		
 		// Generate first / last name
-		String firstName = (fakerEnable) ? _faker.name().firstName() : baseScreenName;
-		String lastName = (fakerEnable) ? _faker.name().lastName() : String.valueOf(index);
+		String firstName = (fakerEnable) ? faker.name.firstName() : baseScreenName;
+		String lastName = (fakerEnable) ? faker.name.lastName() : String.valueOf(index);
 		
 		try {
 			// Create User
-			User user = _userLocalService.addUserWithWorkflow(serviceContext.getUserId(), serviceContext.getCompanyId(), // companyId,
+			User user = _userLocalService.addUserWithWorkflow(
+					serviceContext.getUserId(), 
+					serviceContext.getCompanyId(), // companyId,
 					false, // autoPassword,
 					password, // password1,
 					password, // password2,
@@ -222,13 +232,6 @@ public class UserDataService {
 		}
 	}
 
-	@Activate
-	public void activate() {
-		_faker =  new Faker();
-	}
-	
-	private Faker _faker;
-	
 	@Reference
 	private UserLocalService _userLocalService;
 	@Reference

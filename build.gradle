@@ -22,6 +22,7 @@ repositories {
 		url "http://m2repo.spockframework.org/snapshots"                    // Spock Snapshot
 		url "http://repository.sonatype.org/content/groups/public"
 		url "https://mvnrepository.com/artifact/com.sun/tools"
+		url 'https://jitpack.io'
 	}
 }
 
@@ -33,9 +34,13 @@ dependencies {
 	compile "commons-io:commons-io:2.5"
 	compile "commons-validator:commons-validator:1.6"
 	compile "org.apache.commons:commons-lang3:3.5"
-	compile "com.github.javafaker:javafaker:latest.release"
 	compile "com.github.mifmif:generex:1.0.2"
 	compile "dk.brics.automaton:automaton:1.11-8"
+	
+	compile 'com.github.blocoio:faker:latest.integration'
+	compile 'joda-time:joda-time:latest.integration'
+	compile 'org.joda:joda-convert:latest.integration'
+	compile 'org.yaml:snakeyaml:latest.integration'
 	
 	compile group: "com.liferay", name: "com.liferay.frontend.taglib", version: "2.0.0"
 	compile group: "com.liferay", name: "com.liferay.item.selector.api", version: "2.0.0"
