@@ -32,6 +32,7 @@
 			String numberOfOrganizationsLabel = "Enter the number of organizations you would like to create";
 			String baseOrganizationNameLabel = "Enter the base name for the organizations";
 			String parentOrganizationIdLabel = "Select the parent organization";
+			String organizationSiteCreateLabel = "Creating organization site";
 			%>
 
 			<aui:form action="<%= organizationEditURL %>" method="post" name="fm" >
@@ -66,6 +67,9 @@
 								%>
 							</aui:select>						
  						</aui:fieldset>
+						<aui:fieldset cssClass="col-md-6">
+							<aui:input type="toggle-switch" name="organizationSiteCreate" label="<%= organizationSiteCreateLabel %>" value="false" />
+						</aui:fieldset> 						
 					</div>
 				</div>	
 				<aui:button-row>

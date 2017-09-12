@@ -1,5 +1,6 @@
 package com.liferay.support.tools.portlet.actions;
 
+import com.liferay.portal.kernel.exception.GroupFriendlyURLException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -8,6 +9,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -108,7 +110,12 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 			} catch (Exception e) {
 				//Finish progress
 				progressManager.finish();	
-				throw e;
+				if (e instanceof GroupFriendlyURLException) {
+					SessionErrors.add(actionRequest, "group-friendly-url-error");
+		            hideDefaultSuccessMessage(actionRequest);
+				}
+				e.printStackTrace();
+				return;
 			}
 		}
 

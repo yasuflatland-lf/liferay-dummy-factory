@@ -52,12 +52,14 @@ public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 		long numberOfOrganizations = 0;
 		String baseOrganizationName = "";
 		int parentOrganizationId = OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID;
+		boolean organizationSiteCreate = false;
 		
 		//Fetch data
 		startIndex = ParamUtil.getLong(actionRequest, "startIndex",1);
 		numberOfOrganizations = ParamUtil.getLong(actionRequest, "numberOfOrganizations",0);
 		baseOrganizationName = ParamUtil.getString(actionRequest, "baseOrganizationName","");
 		parentOrganizationId = ParamUtil.getInteger(actionRequest, "parentOrganizationId", OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID);
+		organizationSiteCreate = ParamUtil.getBoolean(actionRequest, "organizationSiteCreate", false);
 		
 		ServiceContext serviceContext = ServiceContextFactory
 				.getInstance(Organization.class.getName(), actionRequest);				
@@ -88,7 +90,7 @@ public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 						serviceContext.getUserId(),
 						parentOrganizationId, // parentOrganizationId
 						organizationName.toString(), // name
-						false); // site
+						organizationSiteCreate); // site
 				
 			} catch (Exception e) {
 				if (e instanceof DuplicateOrganizationException ) {
