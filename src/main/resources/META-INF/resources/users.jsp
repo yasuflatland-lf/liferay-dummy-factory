@@ -2,6 +2,8 @@
 
 <div class="container-fluid-1280">
 	<liferay-ui:success key="success" message="Users created successfully" />
+	<liferay-ui:error key="group-friendly-url-error" message="The username has already been used for the name of a site or an organization. These names must be unique." />
+	
 	<%@ include file="/command_select.jspf"%>
 
 	<portlet:actionURL name="<%= LDFPortletKeys.USERS %>" var="userEditURL">
