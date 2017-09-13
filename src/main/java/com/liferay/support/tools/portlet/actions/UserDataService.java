@@ -1,5 +1,7 @@
 package com.liferay.support.tools.portlet.actions;
 
+import com.github.javafaker.Faker;
+import com.github.javafaker.service.LocaleDoesNotExistException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.exception.UserScreenNameException;
@@ -22,32 +24,33 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.support.tools.utils.CommonUtil;
 
-import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import aQute.bnd.annotation.ProviderType;
-import io.bloco.faker.Faker;
 
 /**
  * User Data (User / Related roles applying) service
  * 
  * @author Yasuyuki Takeo
- *
  */
 @AccessControlled
 @Component(service = UserDataService.class)
 @ProviderType
 @Transactional(
-	isolation = Isolation.PORTAL, 
-	rollbackFor = { 
-		PortalException.class, 
-		SystemException.class 
-	}
+    isolation = Isolation.PORTAL, 
+    rollbackFor = { 
+        PortalException.class, 
+        SystemException.class 
+    }
 )
 public class UserDataService {
 
@@ -66,24 +69,20 @@ public class UserDataService {
 	 * @param emailAddress
 	 * @param baseScreenName
 	 * @param index
-	 * @param locale
+	 * @param localeStr
 	 * @throws PortalException
 	 */
 	public void createUserData(ServiceContext serviceContext, long[] organizationIds, long[] groupIds, long[] roleIds,
-			long[] userGroupIds, boolean male, boolean fakerEnable, String password, String screenName, String emailAddress,
-			String baseScreenName, long index, String locale) throws PortalException {
-		
+			long[] userGroupIds, boolean male, boolean fakerEnable, String password, String screenName,
+			String emailAddress, String baseScreenName, long index, String localeStr) throws PortalException {
+
 		// For generating dummy user name
-		Faker faker = new Faker(locale);
-		
-		if(Validator.isNull(faker)) {
-			throw new InvalidParameterException("Locale is not accepted. locale<" + locale +">");
-		}
-		
+		Faker faker = createFaker(localeStr);
+
 		// Generate first / last name
-		String firstName = (fakerEnable) ? faker.name.firstName() : baseScreenName;
-		String lastName = (fakerEnable) ? faker.name.lastName() : String.valueOf(index);
-		
+		String firstName = (fakerEnable) ? faker.name().firstName() : baseScreenName;
+		String lastName = (fakerEnable) ? faker.name().lastName() : String.valueOf(index);
+
 		try {
 			// Create User
 			User user = _userLocalService.addUserWithWorkflow(
@@ -106,7 +105,9 @@ public class UserDataService {
 					1, // birthdayDay,
 					1970, // birthdayYear,
 					StringPool.BLANK, // jobTitle,
-					groupIds, organizationIds, getRegularRoleIds(roleIds), // roldIds. This is only for reguler roles
+					groupIds,
+					organizationIds, 
+					getRegularRoleIds(roleIds), // this is only for reguler roles
 					userGroupIds, // userGroupIds,
 					false, // sendEmail
 					serviceContext // serviceContext
@@ -123,10 +124,57 @@ public class UserDataService {
 
 			// Set org roles
 			setOrgRoles(user.getUserId(), organizationIds, roleIds);
-			
+
 		} catch (UserScreenNameException e) {
 			_log.error("User is duplicated. Skip : " + e.getMessage());
 		}
+	}
+
+	/**
+	 * Create Faker
+	 * 
+	 * @param locale
+	 *            Language to create Faker object based on.
+	 * @return Faker object.
+	 */
+	private Faker createFaker(String locale) {
+		// For generating dummy user name
+		Faker faker = new Faker(new Locale(Locale.ENGLISH.toLanguageTag()));
+
+		try {
+			Faker fakerTmp = new Faker(new Locale(locale));
+			faker = fakerTmp;
+		} catch (Exception e) {
+
+			// If the local is not available for Faker, generate Faker wit
+			// English locale
+
+			if (e instanceof LocaleDoesNotExistException) {
+				_log.error(locale + " doesn't valid for Faker. Use english instead.");
+			} else {
+				e.printStackTrace();
+			}
+		}
+
+		return faker;
+	}
+
+	/**
+	 * Get Faker available locales
+	 * 
+	 * Filter Faker available locales based on Liferay available locales.
+	 * @param locales
+	 * @return Faker available locales based on Liferay available locales.
+	 */
+	public List<Locale> getFakerAvailableLocales(Set<Locale> locales) {
+		List<String> fakerList = new ArrayList<>(
+				Arrays.asList("bg", "ca", "ca-CAT", "da-DK", "de", "de-AT", "de-CH", "en", "en-AU", "en-au-ocker",
+						"en-BORK", "en-CA", "en-GB", "en-IND", "en-NEP", "en-NG", "en-NZ", "en-PAK", "en-SG", "en-UG",
+						"en-US", "en-ZA", "es", "es-MX", "fa", "fi-FI", "fr", "he", "in-ID", "it", "ja", "ko", "nb-NO",
+						"nl", "pl", "pt", "pt-BR", "ru", "sk", "sv", "sv-SE", "tr", "uk", "vi", "zh-CN", "zh-TW"));
+		return locales.stream()
+				.filter(locale -> fakerList.contains(locale.getLanguage()))
+				.collect(Collectors.toList());
 	}
 
 	/**

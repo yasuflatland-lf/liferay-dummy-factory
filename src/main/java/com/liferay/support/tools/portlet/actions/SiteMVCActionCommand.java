@@ -81,7 +81,7 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 
 		//Tracking progress start
 		ProgressManager progressManager = new ProgressManager();
-		progressManager.start(actionRequest, 0);
+		progressManager.start(actionRequest);
 
 		System.out.println("Starting to create " + numberOfSites + " sites");
 

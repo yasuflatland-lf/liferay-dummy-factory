@@ -85,7 +85,7 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 
 		// Tracking progress start
 		ProgressManager progressManager = new ProgressManager();
-		progressManager.start(actionRequest, 0);
+		progressManager.start(actionRequest);
 
 		System.out.println("Starting to create " + numberOfusers + " users");
 
@@ -164,6 +164,6 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private CommonUtil _commonUtil;
-
+	
 	private static final Log _log = LogFactoryUtil.getLog(UserMVCActionCommand.class);
 }

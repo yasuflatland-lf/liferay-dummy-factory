@@ -12,10 +12,7 @@ Bundle-ClassPath:\
 	lib/commons-lang3.jar,\
 	lib/generex.jar,\
 	lib/automaton.jar,\
-	lib/joda-time.jar,\
-	lib/joda-convert.jar,\
-	lib/snakeyaml.jar,\
-	lib/faker.jar
+	lib/javafaker.jar
 	
 -includeresource:\
 	lib/guava.jar=guava-[0-9]*.jar,\
@@ -26,10 +23,7 @@ Bundle-ClassPath:\
 	lib/commons-lang3.jar=commons-lang[0-9]*.jar,\
 	lib/generex.jar=generex-[0-9]*.jar,\
 	lib/automaton.jar=automaton-[0-9]*.jar,\
-	lib/joda-time.jar=joda-time-[0-9]*.jar,\
-	lib/joda-convert.jar=joda-convert-[0-9]*.jar,\
-	lib/snakeyaml.jar=snakeyaml-[0-9]*.jar,\
-	lib/faker.jar=faker-[0-9]*.jar	
+	lib/javafaker.jar=javafaker-[0-9]*.jar	
 	
 compile group: 'org.yaml', name: 'snakeyaml', version: '1.18'
 	

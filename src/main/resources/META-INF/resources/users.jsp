@@ -129,6 +129,8 @@
 							<aui:input name="fakerEnable" type="toggle-switch" label="<%= fakerEnableLabel %>" value="<%= false %>"/>		
 							<%
 							Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
+							//TODO : Locale need to be filtered for only available 
+							//List<Locale> locales = UserDataService.getFakerAvailableLocales(orgLocales);
 			
 							%>
 							<aui:select name="locale" label="<%= localesLabel %>" multiple="<%= false %>">

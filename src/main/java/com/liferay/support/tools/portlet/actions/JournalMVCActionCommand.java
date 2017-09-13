@@ -98,7 +98,7 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 		
 		//Tracking progress start
 		ProgressManager progressManager = new ProgressManager();
-		progressManager.start(actionRequest, 0);
+		progressManager.start(actionRequest);
 		
 
 		for(long groupId : groupIds ) {
