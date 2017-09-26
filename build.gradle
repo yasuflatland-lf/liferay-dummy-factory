@@ -38,7 +38,11 @@ dependencies {
 	compile "dk.brics.automaton:automaton:1.11-8"
 	compile "com.github.javafaker:javafaker:latest.release"
 	compile 'edu.uci.ics:crawler4j:4.+'
+	compile group: 'com.sleepycat', name: 'je', version: '5.0.+'
 	compile "io.reactivex.rxjava2:rxjava:2.1.+"
+	compile group: 'org.apache.httpcomponents', name: 'httpcore-osgi', version: '4.4.+'
+	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.+'
+	compile group: 'org.reactivestreams', name: 'reactive-streams', version: 'latest.release'
 	
 	compile group: "com.liferay", name: "com.liferay.frontend.taglib", version: "2.0.0"
 	compile group: "com.liferay", name: "com.liferay.item.selector.api", version: "2.0.0"

@@ -9,20 +9,15 @@ class ImageCrawlControllerTest extends Specification {
 	@Unroll("ImageCrawlController test")
 	def "ImageCrawlController test"() {
 		when:
-		List<String> targets = new ArrayList<>();
-		
-		targeturls.each{ s ->
-			targets.add(s)
-		}
-		String[] urlarray = targets.toArray(new String[targets.size()]);
-		ImageCrawlController.run(15, 20, urlarray);
-		List<String> results = ImageCrawlController.getURL();
-		
+		def icc = new ImageCrawlController();
+		icc.exec(10, 2, 20, targeturl);
+		List<String> results = icc.getURL();
+
 		then:
-		0 == results.size()
-		
+		0 != results.size()
+
 		where:
-		targeturls | _
-		["https://imgur.com/","https://www.shutterstock.com/photos"] | _
+		targeturl | _
+		"https://imgur.com/" | _
 	}
 }

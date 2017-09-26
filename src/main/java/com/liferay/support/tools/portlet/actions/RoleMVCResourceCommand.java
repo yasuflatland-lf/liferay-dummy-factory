@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
  *
  */
 @Component(
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
 		"mvc.command.name=" + LDFPortletKeys.CMD_ROLELIST

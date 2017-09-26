@@ -65,25 +65,54 @@
 					
 				<aui:a href="#inputOptions" cssClass="collapse-icon collapsed icon-angle-down" title="Option" aria-expanded="false" data-toggle="collapse" >&nbsp;&nbsp;option</aui:a>
 				<div class="collapsed collapse" id="inputOptions" aria-expanded="false" >
+				
+				
 					<div class="row">
 						<aui:fieldset cssClass="col-md-12">
-							<aui:input name="baseArticle" label="<%= baseArticleLabel %>" cssClass="lfr-textarea-container" type="textarea" wrap="soft" />
-							<%
-							Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
-			
-							%>
-							<aui:select name="locales" label="<%= localesLabel %>" multiple="<%= true %>">
-								<%
-								for (Locale availableLocale : locales) {
-								%>
-									<aui:option label="<%= availableLocale.getDisplayName(locale) %>" value="<%= LocaleUtil.toLanguageId(availableLocale) %>"
-									selected="<%= availableLocale.toString().equals(LocaleUtil.getDefault().toString()) %>" />
-								<%
-								}
-								%>
-							</aui:select>	
- 						</aui:fieldset>
-					</div>
+							<ul class="nav nav-tabs nav-justified" role="tablist">
+					            <li class="active" role="presentation"><a aria-controls="fields" href="#<portlet:namespace />common" data-toggle="tab" role="tab" aria-expanded="true">Common</a></li>
+					            <li role="presentation" class=""><a aria-controls="settings" href="#<portlet:namespace />detailed_contents" data-toggle="tab" role="tab" aria-expanded="false">Detailed Contents</a></li>
+					        </ul>
+					
+					        <div class="tab-content">
+					            <div role="tabpanel" class="tab-pane fade active in" id="<portlet:namespace />common">
+
+									<div class="row">
+										<aui:fieldset cssClass="col-md-12">
+											<aui:input name="baseArticle" label="<%= baseArticleLabel %>" cssClass="lfr-textarea-container" type="textarea" wrap="soft" />
+											<%
+											Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
+							
+											%>
+											<aui:select name="locales" label="<%= localesLabel %>" multiple="<%= true %>">
+												<%
+												for (Locale availableLocale : locales) {
+												%>
+													<aui:option label="<%= availableLocale.getDisplayName(locale) %>" value="<%= LocaleUtil.toLanguageId(availableLocale) %>"
+													selected="<%= availableLocale.toString().equals(LocaleUtil.getDefault().toString()) %>" />
+												<%
+												}
+												%>
+											</aui:select>	
+										</aui:fieldset>
+									</div>
+					            </div><%-- common --%>
+					            <div role="tabpanel" class="tab-pane fade" id="<portlet:namespace />detailed_contents">
+									<div class="row">
+										<aui:fieldset cssClass="col-md-12">
+					                		<div id="<portlet:namespace />linkLoader" class="loading-icon linear loading-icon-lg hide"></div>
+											<aui:button-row>
+												<aui:button type="button" value="Fetch links" cssClass="btn-lg btn-block btn-primary" id="fetchLinks"/>
+											</aui:button-row>											
+										</aui:fieldset>
+									</div>					            
+					            </div>
+					        </div>				
+
+						</aui:fieldset>
+					</div>				
+				
+				
 				</div>					
 				<aui:button-row>
 					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary" id="processStart"/>
@@ -99,8 +128,11 @@
 	</aui:fieldset-group>
 </div>
 
+<portlet:resourceURL id="/ldf/image/list" var="linkListURL" />
+
 <aui:script use="aui-base">
 	var processStart = A.one('#<portlet:namespace />processStart');
+	var linkLoader = A.one('#<portlet:namespace />linkLoader');
 	
 	processStart.on(
 	    'click',
@@ -110,4 +142,36 @@
 			submitForm(document.<portlet:namespace />fm);
 	    }
 	);
+	
+    var fetchLinks = A.one('#<portlet:namespace />fetchLinks');
+    
+    fetchLinks.on(
+        'click',
+        function() {
+            event.preventDefault();
+            Liferay.Util.toggleDisabled('#<portlet:namespace />fetchLinks', true);
+            linkLoader.show();
+            var data = Liferay.Util.ns(
+                '<portlet:namespace />',
+                {
+                    numberOfCrawlers: 10,
+                    maxDepthOfCrawling: 2,
+                    maxPagesToFetch: 100,
+                    urls: 'https://imgur.com/,https://www.shutterstock.com/photos'
+                }
+            );
+
+            $.ajax(
+                '<%= linkListURL.toString() %>',
+                {
+                    data: data,
+                    success: function(data) {
+			            Liferay.Util.toggleDisabled('#<portlet:namespace />fetchLinks', false);
+			            linkLoader.hide();
+                    }
+                }
+            );
+        }
+    );  
+
 </aui:script>

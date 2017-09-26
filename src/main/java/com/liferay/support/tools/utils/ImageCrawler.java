@@ -1,31 +1,29 @@
 package com.liferay.support.tools.utils;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Pattern;
-
-import org.osgi.service.component.annotations.Reference;
 
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.BinaryParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
 
-/*
- * This class shows how you can crawl images on the web and store them in a
- * folder. This is just for demonstration purposes and doesn't scale for large
- * number of images. For crawling millions of images you would need to store
- * downloaded images in a hierarchy of folders
+/**
+ * Image Link Crawler
+ * 
+ * @author Yasuyuki Takeo
+ *
  */
 public class ImageCrawler extends WebCrawler {
 
 	private static final Pattern imgPatterns = Pattern.compile(".*(\\.(gif|jpe?g|png|tiff?))$");
 
-	private static String[] crawlDomains;
+	private static String crawlDomain;
 	
-	public static void configure(String[] domain) {
-		crawlDomains = domain;
+	public static void configure(String domain) {
+		crawlDomain = domain;
 	}
 
 	@Override
@@ -36,11 +34,10 @@ public class ImageCrawler extends WebCrawler {
 			return true;
 		}
 
-		for (String domain : crawlDomains) {
-			if (href.startsWith(domain)) {
-				return true;
-			}
+		if (href.startsWith(crawlDomain)) {
+			return true;
 		}
+
 		return false;
 	}
 
@@ -54,14 +51,16 @@ public class ImageCrawler extends WebCrawler {
 			return;
 		}
 
-		_imageCrawlController.setURL(url);
-		_log.error("URL : " + url);
+		gatheredURLs.add(url);
+		System.out.println("Fetched URL : " + url);
 	}
 
-	@Reference
-	private ImageCrawlController _imageCrawlController;
-	
-	private static final Log _log = LogFactoryUtil.getLog(ImageCrawler.class);
-	
+    @Override
+    public Object getMyLocalData() {
+        return gatheredURLs;
+    }
+    
+	private List<String> gatheredURLs = Collections.synchronizedList(new ArrayList<>());
+    
 
 }
