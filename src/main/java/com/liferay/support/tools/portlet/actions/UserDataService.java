@@ -1,7 +1,6 @@
 package com.liferay.support.tools.portlet.actions;
 
 import com.github.javafaker.Faker;
-import com.github.javafaker.service.LocaleDoesNotExistException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.exception.UserScreenNameException;
@@ -77,7 +76,7 @@ public class UserDataService {
 			String emailAddress, String baseScreenName, long index, String localeStr) throws PortalException {
 
 		// For generating dummy user name
-		Faker faker = createFaker(localeStr);
+		Faker faker = _commonUtil.createFaker(localeStr);
 
 		// Generate first / last name
 		String firstName = (fakerEnable) ? faker.name().firstName() : baseScreenName;
@@ -130,34 +129,6 @@ public class UserDataService {
 		}
 	}
 
-	/**
-	 * Create Faker
-	 * 
-	 * @param locale
-	 *            Language to create Faker object based on.
-	 * @return Faker object.
-	 */
-	private Faker createFaker(String locale) {
-		// For generating dummy user name
-		Faker faker = new Faker(new Locale(Locale.ENGLISH.toLanguageTag()));
-
-		try {
-			Faker fakerTmp = new Faker(new Locale(locale));
-			faker = fakerTmp;
-		} catch (Exception e) {
-
-			// If the local is not available for Faker, generate Faker wit
-			// English locale
-
-			if (e instanceof LocaleDoesNotExistException) {
-				_log.error(locale + " doesn't valid for Faker. Use english instead.");
-			} else {
-				e.printStackTrace();
-			}
-		}
-
-		return faker;
-	}
 
 	/**
 	 * Get Faker available locales

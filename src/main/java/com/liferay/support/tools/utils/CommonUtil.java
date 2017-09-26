@@ -1,6 +1,10 @@
 package com.liferay.support.tools.utils;
 
+import com.github.javafaker.Faker;
+import com.github.javafaker.service.LocaleDoesNotExistException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.util.Validator;
@@ -8,6 +12,7 @@ import com.liferay.support.tools.constants.LDFPortletKeys;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -22,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Yasuyuki Takeo
  *
  */
-@Component(service = CommonUtil.class)
+@Component(immediate = true,service = CommonUtil.class)
 public class CommonUtil {
 
 	/**
@@ -71,6 +76,38 @@ public class CommonUtil {
 		return roles.stream().collect(Collectors.groupingBy(Role::getType));
 	}
 
+
+	/**
+	 * Create Faker
+	 * 
+	 * @param locale
+	 *            Language to create Faker object based on.
+	 * @return Faker object.
+	 */
+	public Faker createFaker(String locale) {
+		// For generating dummy user name
+		Faker faker = new Faker(new Locale(Locale.ENGLISH.toLanguageTag()));
+
+		try {
+			Faker fakerTmp = new Faker(new Locale(locale));
+			faker = fakerTmp;
+		} catch (Exception e) {
+
+			// If the local is not available for Faker, generate Faker wit
+			// English locale
+
+			if (e instanceof LocaleDoesNotExistException) {
+				_log.error(locale + " doesn't valid for Faker. Use english instead.");
+			} else {
+				e.printStackTrace();
+			}
+		}
+
+		return faker;
+	}
+	
 	@Reference
 	private RoleLocalService _roleLocalService;
+	
+	private static final Log _log = LogFactoryUtil.getLog(CommonUtil.class);			
 }
