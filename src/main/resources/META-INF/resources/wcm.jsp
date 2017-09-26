@@ -38,6 +38,12 @@
 			String defaultOption = "(None)";
 			String groupIdLabel = "Select a site to assign the web content articles to";
 			String localesLabel = "Select languages";
+			String fakeContentsGenerateEnableLabel = "Generate Fake Contents";
+			String linkListsLabel = "Image links to insert into the generated contents";
+			String linkRandomNumLabel = "Amount of links in the generated contents";
+			String wordCountLabel = "Word count";
+			String randomWordsToAddLabel = "Random words to add";
+			
 			List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 			%>
 
@@ -78,8 +84,7 @@
 					            <div role="tabpanel" class="tab-pane fade active in" id="<portlet:namespace />common">
 
 									<div class="row">
-										<aui:fieldset cssClass="col-md-12">
-											<aui:input name="baseArticle" label="<%= baseArticleLabel %>" cssClass="lfr-textarea-container" type="textarea" wrap="soft" />
+										<aui:fieldset cssClass="col-md-6">
 											<%
 											Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
 							
@@ -93,17 +98,45 @@
 												<%
 												}
 												%>
-											</aui:select>	
+											</aui:select>
 										</aui:fieldset>
+										<aui:fieldset cssClass="col-md-6">
+											<aui:input name="fakeContentsGenerateEnable" type="toggle-switch" label="<%= fakeContentsGenerateEnableLabel %>" value="<%= false %>"/>
+											<span id="<portlet:namespace />randomContents" class="hide">
+												<aui:input name="wordCount" label="<%= wordCountLabel %>" placeholder="0" >
+													<aui:validator name="digits" />
+													<aui:validator name="min">0</aui:validator>
+												</aui:input>												
+												<aui:input name="randomWordsToAdd" label="<%= randomWordsToAddLabel %>" placeholder="1" >
+													<aui:validator name="digits" />
+													<aui:validator name="min">1</aui:validator>
+												</aui:input>				
+												<aui:input name="linkRandomNum" label="<%= linkRandomNumLabel %>" placeholder="0" >
+													<aui:validator name="digits" />
+													<aui:validator name="min">0</aui:validator>
+												</aui:input>												
+												<aui:input label="<%= linkListsLabel %>" rows="5" name="linkLists" type="textarea" value="" placeholder="Input URLs each row"/>
+											</span>		
+											<span id="<portlet:namespace />manualContents">
+												<aui:input name="baseArticle" label="<%= baseArticleLabel %>" cssClass="lfr-textarea-container" type="textarea" wrap="soft" />
+											</span>		
+										</aui:fieldset>
+										
 									</div>
 					            </div><%-- common --%>
 					            <div role="tabpanel" class="tab-pane fade" id="<portlet:namespace />detailed_contents">
 									<div class="row">
 										<aui:fieldset cssClass="col-md-12">
-					                		<div id="<portlet:namespace />linkLoader" class="loading-icon linear loading-icon-lg hide"></div>
-											<aui:button-row>
-												<aui:button type="button" value="Fetch links" cssClass="btn-lg btn-block btn-primary" id="fetchLinks"/>
-											</aui:button-row>											
+											<div class="row">
+												<aui:fieldset cssClass="col-md-6">
+							                		<div id="<portlet:namespace />linkLoader" class="loading-icon linear loading-icon-lg hide"></div>
+													<aui:button-row>
+														<aui:button type="button" value="Fetch links" cssClass="btn-lg btn-block btn-primary" id="fetchLinks"/>
+													</aui:button-row>											
+												</aui:fieldset>
+												<aui:fieldset cssClass="col-md-6">
+												</aui:fieldset>
+											</div>
 										</aui:fieldset>
 									</div>					            
 					            </div>
@@ -111,7 +144,6 @@
 
 						</aui:fieldset>
 					</div>				
-				
 				
 				</div>					
 				<aui:button-row>
@@ -173,5 +205,16 @@
             );
         }
     );  
-
+    
+	var fakeContentsGenerateEnable = A.one('#<portlet:namespace />fakeContentsGenerateEnable');
+	
+	fakeContentsGenerateEnable.on(
+	    'click',
+	    function() {
+	    	console.log(fakeContentsGenerateEnable.val());
+	    	$('#<portlet:namespace />randomContents').toggleClass('hide');
+	    	$('#<portlet:namespace />manualContents').toggleClass('hide');
+	    }
+	);
+	
 </aui:script>

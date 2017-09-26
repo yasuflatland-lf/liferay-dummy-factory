@@ -1,5 +1,6 @@
 package com.liferay.support.tools.portlet.actions;
 
+import com.github.javafaker.Faker;
 import com.google.common.collect.Maps;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
@@ -71,12 +72,18 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 		long[] groupIds;
 		long folderId = 0;
 		String[] locales;
+		Boolean fakeContentsGenerateEnable;
+		int wordCount;
+		int randomWordsToAdd;		
 		
 		// Fetch data
 		numberOfArticles = ParamUtil.getLong(actionRequest, "numberOfArticles", 1);
 		baseTitle = ParamUtil.getString(actionRequest, "baseTitle", "");
 		baseArticle = ParamUtil.getString(actionRequest, "baseArticle", "");
 		folderId = ParamUtil.getLong(actionRequest, "folderId", 0);
+		wordCount = ParamUtil.getInteger(actionRequest, "wordCount", 0);
+		randomWordsToAdd = ParamUtil.getInteger(actionRequest, "randomWordsToAdd", 0);
+		fakeContentsGenerateEnable = ParamUtil.getBoolean(actionRequest, "fakeContentsGenerateEnable", false);
 
 		// Locales
 		String[] defLang = { LocaleUtil.getDefault().toString() };
@@ -88,18 +95,22 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 		
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Group.class.getName(), actionRequest);
 
+		// Fetch default locale
 		Locale defaultLocale = LocaleUtil.fromLanguageId(themeDisplay.getUser().getLanguageId());
 
 		Map<Locale, String> descriptionMap = new ConcurrentHashMap<Locale, String>();
 		descriptionMap.put(defaultLocale, StringPool.BLANK);
 
 		//Build contents fields
+		//Generate random contents if the switch is true.
+		baseArticle = (fakeContentsGenerateEnable) 
+				? buildRandomContents(defaultLocale.getLanguage(),wordCount,randomWordsToAdd) 
+				: baseArticle;
 		String content = buildFields(themeDisplay.getCompanyGroupId(),locales, baseArticle);
 		
 		//Tracking progress start
 		ProgressManager progressManager = new ProgressManager();
 		progressManager.start(actionRequest);
-		
 
 		for(long groupId : groupIds ) {
 			System.out.println("Starting to create " 
@@ -148,6 +159,11 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 		System.out.println("Finished creating " + numberOfArticles + " articles");
 	}
 
+	private String buildRandomContents(String locale,int wordCount, int randomWordsToAdd) {
+		Faker faker = _commonUtil.createFaker(locale);
+		return faker.lorem().sentence(wordCount, randomWordsToAdd);
+	}
+	
 	/**
 	 * Build content field
 	 * 
