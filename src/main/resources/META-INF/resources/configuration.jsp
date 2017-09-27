@@ -17,7 +17,7 @@
                 <aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
 
 				<%
-				String urlListLabel = "URL list where the crawler fetching images from";
+				String urlListLabel = "URL list where the crawler fetching images from (multiple URLs can be configured by comma separated)";
 				String linkListLabel = "Corrected image links / custom image links";
 
 				%>

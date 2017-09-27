@@ -129,6 +129,29 @@ public class RandomizeContentGenerator {
 		return insertRandomLinksInContents(paragraphes, links, rndIndex);
 	}
 	
+	/**
+	 * Generate Random Title
+	 * 
+	 * @param locale Locale for generating contents
+	 * @param words Amount of words to be included.
+	 * @return Generated random paragraphs list
+	 */
+	public List<String> generateRandomTitle(String locale, int words) {
+		Faker faker = _commonUtil.createFaker(locale);
+		return faker.lorem().words(words);
+	}
+	
+	/**
+	 * Generate Random Title
+	 * 
+	 * @param locale Locale for generating contents
+	 * @param titleWords Amount of words to be included.
+	 * @return Generated random paragraphs string
+	 */
+	public String generateRandomTitleString(String locale, int titleWords) {
+		return String.join(" ", generateRandomTitle(locale,titleWords));
+	}	
+	
 	@Reference
 	private CommonUtil _commonUtil;
 

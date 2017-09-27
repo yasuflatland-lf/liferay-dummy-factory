@@ -24,11 +24,9 @@
                     <p>if you enter the values <code>3</code> and <code>webContent</code> the portlet will create three blank sites: <code>webContent1</code>, <code>webContent2</code>, and <code>webContent3</code>.<p>
                 </blockquote>
             
-                <ul>
-					<li>You must be signed in as an administrator in order to create web content articles<li>
-                    <li>The counter always starts at <code>1</code></li>
-					<li>If no site is selected, the default site will be <code>liferay.com</code><li>
-                </ul>
+                <p>You must be signed in as an administrator in order to create web content articles</p>
+                <p>The counter always starts at <code>1</code></p>
+				<p>If no site is selected, the default site will be <code>liferay.com</code></p>
             </div>
 
 			<%
@@ -40,6 +38,7 @@
 			String localesLabel = "Select languages";
 			String fakeContentsGenerateEnableLabel = "Generate Fake Contents";
 			String linkListsLabel = "Image links to insert into the generated contents";
+			String titleWordsLabel = "Amount of words for the title";
 			String randomAmountLabel = "Amount of links in the generated contents";
 			String totalParagraphsLabel = "Paragraphes count";
 			
@@ -102,6 +101,11 @@
 										<aui:fieldset cssClass="col-md-6">
 											<aui:input name="fakeContentsGenerateEnable" type="toggle-switch" label="<%= fakeContentsGenerateEnableLabel %>" value="<%= false %>"/>
 											<span id="<portlet:namespace />randomContents" class="hide">
+												
+												<aui:input name="titleWords" label="<%= titleWordsLabel %>" placeholder="10" >
+													<aui:validator name="digits" />
+													<aui:validator name="min">0</aui:validator>
+												</aui:input>												
 												<aui:input name="totalParagraphs" label="<%= totalParagraphsLabel %>" placeholder="10" >
 													<aui:validator name="digits" />
 													<aui:validator name="min">0</aui:validator>
@@ -110,7 +114,14 @@
 													<aui:validator name="digits" />
 													<aui:validator name="min">0</aui:validator>
 												</aui:input>												
-												<aui:input label="<%= linkListsLabel %>" rows="5" name="linkLists" type="textarea" value="<%=linkList %>" placeholder="Input URLs each row"/>
+												<label class="control-label"><%= linkListsLabel %>
+													<a aria-expanded="false" class="collapse-icon collapsed icon-question-sign" data-toggle="collapse" href="#<portlet:namespace />fakeGenInfo">
+		                    						</a>
+												</label>
+									            <div class="collapsed collapse" id="<portlet:namespace />fakeGenInfo" aria-expanded="false" >
+													<p>In terms of "Image links to insert into the generated contents" text area, you can add urls manually, but you can also generate them automatically. Please go to Configuration page of this portlet and generate image urls<p>
+									            </div>											
+												<aui:input label="" rows="5" name="linkLists" type="textarea" value="<%=linkList %>" placeholder="Input URLs each row"/>
 											</span>		
 											<span id="<portlet:namespace />manualContents">
 												<aui:input name="baseArticle" label="<%= baseArticleLabel %>" cssClass="lfr-textarea-container" type="textarea" wrap="soft" />
@@ -119,7 +130,6 @@
 										
 									</div>
 					            </div><%-- common --%>
-					            
 					            <div role="tabpanel" class="tab-pane fade" id="<portlet:namespace />detailed_contents">
 									<div class="row">
 										<aui:fieldset cssClass="col-md-12">

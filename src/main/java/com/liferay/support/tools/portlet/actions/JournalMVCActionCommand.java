@@ -74,6 +74,7 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 		String[] locales;
 		Boolean fakeContentsGenerateEnable;
 		int totalParagraphs;
+		int titleWords;
 		int randomAmount;
 		String linkLists;
 
@@ -83,6 +84,7 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 		baseArticle = ParamUtil.getString(actionRequest, "baseArticle", "");
 		folderId = ParamUtil.getLong(actionRequest, "folderId", 0);
 		totalParagraphs = ParamUtil.getInteger(actionRequest, "totalParagraphs", 0);
+		titleWords = ParamUtil.getInteger(actionRequest, "titleWords", 0);
 		randomAmount = ParamUtil.getInteger(actionRequest, "randomAmount", 0);
 		fakeContentsGenerateEnable = ParamUtil.getBoolean(actionRequest, "fakeContentsGenerateEnable", false);
 		linkLists = ParamUtil.getString(actionRequest, "linkLists", "");
@@ -104,13 +106,6 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 		Map<Locale, String> descriptionMap = new ConcurrentHashMap<Locale, String>();
 		descriptionMap.put(defaultLocale, StringPool.BLANK);
 
-		// Build contents fields
-		// Generate random contents if the switch is true.
-		baseArticle = (fakeContentsGenerateEnable) 
-				? _randomizeContentGenerator.generateRandomContents(defaultLocale.getLanguage(), totalParagraphs, randomAmount, linkLists)
-				: baseArticle;
-		String content = buildFields(themeDisplay.getCompanyGroupId(), locales, baseArticle);
-
 		// Tracking progress start
 		ProgressManager progressManager = new ProgressManager();
 		progressManager.start(actionRequest);
@@ -123,7 +118,12 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 				// Update progress
 				progressManager.trackProgress(i, numberOfArticles);
 
+				// Build title
 				StringBundler title = new StringBundler(2);
+				baseTitle = (fakeContentsGenerateEnable) 
+					? _randomizeContentGenerator.generateRandomTitleString(defaultLocale.getLanguage(), titleWords)
+					: baseTitle;
+				
 				title.append(baseTitle);
 
 				// Add number more then one article
@@ -131,6 +131,12 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 					title.append(i);
 				}
 
+				// Build contents
+				baseArticle = (fakeContentsGenerateEnable) 
+						? _randomizeContentGenerator.generateRandomContents(defaultLocale.getLanguage(), totalParagraphs, randomAmount, linkLists)
+						: baseArticle;
+				String content = buildFields(themeDisplay.getCompanyGroupId(), locales, baseArticle);
+				
 				Map<Locale, String> titleMap = new ConcurrentHashMap<Locale, String>();
 				titleMap.put(defaultLocale, title.toString());
 
@@ -161,7 +167,7 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 
 		System.out.println("Finished creating " + numberOfArticles + " articles");
 	}
-
+	
 	/**
 	 * Build content field
 	 * 
@@ -171,14 +177,14 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 	 * @return DDMStructure applied content XML strings
 	 * @throws Exception
 	 */
-	protected String buildFields(long groupId, String[] languageIds, String baseArticle) throws Exception {
+	protected String buildFields(long groupId, String[] locales, String baseArticle) throws Exception {
 		DDMStructure ddmStructure = _DDMStructureLocalService.getStructure(groupId,
 				PortalUtil.getClassNameId(JournalArticle.class), LDFPortletKeys._DDM_STRUCTURE_KEY);
 
 		Map<String, Serializable> fieldsMap = Maps.newConcurrentMap();
 		fieldsMap.put(DDM_CONTENT, baseArticle);
 
-		Fields fields = _ddmLocalUtil.toFields(ddmStructure.getStructureId(), fieldsMap, languageIds,
+		Fields fields = _ddmLocalUtil.toFields(ddmStructure.getStructureId(), fieldsMap, locales,
 				LocaleUtil.getDefault());
 
 		return _journalConverter.getContent(ddmStructure, fields);
