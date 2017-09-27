@@ -1,6 +1,5 @@
 package com.liferay.support.tools.portlet.actions;
 
-import com.github.javafaker.Faker;
 import com.google.common.collect.Maps;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
@@ -28,6 +27,7 @@ import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.utils.CommonUtil;
 import com.liferay.support.tools.utils.DDMLocalUtil;
 import com.liferay.support.tools.utils.ProgressManager;
+import com.liferay.support.tools.utils.RandomizeContentGenerator;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -60,7 +60,7 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 	 * 
 	 * @param actionRequest
 	 * @param actionResponse
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	private void createJournals(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 
@@ -73,26 +73,29 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 		long folderId = 0;
 		String[] locales;
 		Boolean fakeContentsGenerateEnable;
-		int wordCount;
-		int randomWordsToAdd;		
-		
+		int totalParagraphs;
+		int randomAmount;
+		String linkLists;
+
 		// Fetch data
 		numberOfArticles = ParamUtil.getLong(actionRequest, "numberOfArticles", 1);
 		baseTitle = ParamUtil.getString(actionRequest, "baseTitle", "");
 		baseArticle = ParamUtil.getString(actionRequest, "baseArticle", "");
 		folderId = ParamUtil.getLong(actionRequest, "folderId", 0);
-		wordCount = ParamUtil.getInteger(actionRequest, "wordCount", 0);
-		randomWordsToAdd = ParamUtil.getInteger(actionRequest, "randomWordsToAdd", 0);
+		totalParagraphs = ParamUtil.getInteger(actionRequest, "totalParagraphs", 0);
+		randomAmount = ParamUtil.getInteger(actionRequest, "randomAmount", 0);
 		fakeContentsGenerateEnable = ParamUtil.getBoolean(actionRequest, "fakeContentsGenerateEnable", false);
+		linkLists = ParamUtil.getString(actionRequest, "linkLists", "");
 
 		// Locales
 		String[] defLang = { LocaleUtil.getDefault().toString() };
 		locales = ParamUtil.getStringValues(actionRequest, "locales", defLang);
 
 		// Sites
-		String[] groupsStrIds = ParamUtil.getStringValues(actionRequest, "groupIds", new String[] {String.valueOf(themeDisplay.getScopeGroupId())});
-		groupIds = _commonUtil.convertStringToLongArray(groupsStrIds);		
-		
+		String[] groupsStrIds = ParamUtil.getStringValues(actionRequest, "groupIds",
+				new String[] { String.valueOf(themeDisplay.getScopeGroupId()) });
+		groupIds = _commonUtil.convertStringToLongArray(groupsStrIds);
+
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Group.class.getName(), actionRequest);
 
 		// Fetch default locale
@@ -101,36 +104,36 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 		Map<Locale, String> descriptionMap = new ConcurrentHashMap<Locale, String>();
 		descriptionMap.put(defaultLocale, StringPool.BLANK);
 
-		//Build contents fields
-		//Generate random contents if the switch is true.
+		// Build contents fields
+		// Generate random contents if the switch is true.
 		baseArticle = (fakeContentsGenerateEnable) 
-				? buildRandomContents(defaultLocale.getLanguage(),wordCount,randomWordsToAdd) 
+				? _randomizeContentGenerator.generateRandomContents(defaultLocale.getLanguage(), totalParagraphs, randomAmount, linkLists)
 				: baseArticle;
-		String content = buildFields(themeDisplay.getCompanyGroupId(),locales, baseArticle);
-		
-		//Tracking progress start
+		String content = buildFields(themeDisplay.getCompanyGroupId(), locales, baseArticle);
+
+		// Tracking progress start
 		ProgressManager progressManager = new ProgressManager();
 		progressManager.start(actionRequest);
 
-		for(long groupId : groupIds ) {
-			System.out.println("Starting to create " 
-					+ numberOfArticles + " articles for site id <" + _groupLocalServiceUtil.getGroup(groupId).getDescriptiveName() + ">");
+		for (long groupId : groupIds) {
+			System.out.println("Starting to create " + numberOfArticles + " articles for site id <"
+					+ _groupLocalServiceUtil.getGroup(groupId).getDescriptiveName() + ">");
 
 			for (long i = 1; i <= numberOfArticles; i++) {
-				//Update progress
+				// Update progress
 				progressManager.trackProgress(i, numberOfArticles);
-	
+
 				StringBundler title = new StringBundler(2);
 				title.append(baseTitle);
-				
-				//Add number more then one article
-				if( 1 < numberOfArticles) {
+
+				// Add number more then one article
+				if (1 < numberOfArticles) {
 					title.append(i);
 				}
-	
+
 				Map<Locale, String> titleMap = new ConcurrentHashMap<Locale, String>();
 				titleMap.put(defaultLocale, title.toString());
-	
+
 				try {
 					// Create article
 					_journalArticleLocalService.addArticle(serviceContext.getUserId(), // userId,
@@ -144,26 +147,21 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 							serviceContext // serviceContext
 					);
 				} catch (Exception e) {
-					//Finish progress
-					progressManager.finish();	
+					// Finish progress
+					progressManager.finish();
 					throw e;
 				}
-			}			
+			}
 		}
 
-		//Finish progress
-		progressManager.finish();	
+		// Finish progress
+		progressManager.finish();
 
 		SessionMessages.add(actionRequest, "success");
 
 		System.out.println("Finished creating " + numberOfArticles + " articles");
 	}
 
-	private String buildRandomContents(String locale,int wordCount, int randomWordsToAdd) {
-		Faker faker = _commonUtil.createFaker(locale);
-		return faker.lorem().sentence(wordCount, randomWordsToAdd);
-	}
-	
 	/**
 	 * Build content field
 	 * 
@@ -173,36 +171,29 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 	 * @return DDMStructure applied content XML strings
 	 * @throws Exception
 	 */
-	private String buildFields(long groupId, String[] languageIds, String baseArticle) throws Exception {
-		DDMStructure ddmStructure = 
-		_DDMStructureLocalService.getStructure(
-			groupId,
-			PortalUtil.getClassNameId(JournalArticle.class),
-			LDFPortletKeys._DDM_STRUCTURE_KEY);
-		
+	protected String buildFields(long groupId, String[] languageIds, String baseArticle) throws Exception {
+		DDMStructure ddmStructure = _DDMStructureLocalService.getStructure(groupId,
+				PortalUtil.getClassNameId(JournalArticle.class), LDFPortletKeys._DDM_STRUCTURE_KEY);
+
 		Map<String, Serializable> fieldsMap = Maps.newConcurrentMap();
 		fieldsMap.put(DDM_CONTENT, baseArticle);
 
-		Fields fields = _ddmLocalUtil.toFields(
-			ddmStructure.getStructureId(), 
-			fieldsMap, 
-			languageIds, 
-			LocaleUtil.getDefault()
-		);
+		Fields fields = _ddmLocalUtil.toFields(ddmStructure.getStructureId(), fieldsMap, languageIds,
+				LocaleUtil.getDefault());
 
 		return _journalConverter.getContent(ddmStructure, fields);
 	}
-		
+
 	@Override
 	protected void doProcessAction(ActionRequest actionRequest, ActionResponse actionResponse) {
 
 		try {
 			// Create Web Contents
 			createJournals(actionRequest, actionResponse);
-			
+
 		} catch (Exception e) {
 			hideDefaultSuccessMessage(actionRequest);
-			_log.error(e,e);
+			_log.error(e, e);
 		}
 
 		actionResponse.setRenderParameter("mvcRenderCommandName", LDFPortletKeys.COMMON);
@@ -210,19 +201,26 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private JournalConverter _journalConverter;
+	
 	@Reference
 	private JournalArticleLocalService _journalArticleLocalService;
+	
 	@Reference
 	private GroupLocalService _groupLocalServiceUtil;
+	
 	@Reference
 	private DDMStructureLocalService _DDMStructureLocalService;
+	
 	@Reference
 	private DDMLocalUtil _ddmLocalUtil;
+	
 	@Reference
 	private CommonUtil _commonUtil;
 	
+	@Reference
+	private RandomizeContentGenerator _randomizeContentGenerator;
+
 	private static final String DDM_CONTENT = "content";
 
-	
-	private static final Log _log = LogFactoryUtil.getLog(JournalMVCActionCommand.class);		
+	private static final Log _log = LogFactoryUtil.getLog(JournalMVCActionCommand.class);
 }

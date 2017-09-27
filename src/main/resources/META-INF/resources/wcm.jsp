@@ -40,9 +40,8 @@
 			String localesLabel = "Select languages";
 			String fakeContentsGenerateEnableLabel = "Generate Fake Contents";
 			String linkListsLabel = "Image links to insert into the generated contents";
-			String linkRandomNumLabel = "Amount of links in the generated contents";
-			String wordCountLabel = "Word count";
-			String randomWordsToAddLabel = "Random words to add";
+			String randomAmountLabel = "Amount of links in the generated contents";
+			String totalParagraphsLabel = "Paragraphes count";
 			
 			List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 			%>
@@ -103,15 +102,11 @@
 										<aui:fieldset cssClass="col-md-6">
 											<aui:input name="fakeContentsGenerateEnable" type="toggle-switch" label="<%= fakeContentsGenerateEnableLabel %>" value="<%= false %>"/>
 											<span id="<portlet:namespace />randomContents" class="hide">
-												<aui:input name="wordCount" label="<%= wordCountLabel %>" placeholder="0" >
+												<aui:input name="totalParagraphs" label="<%= totalParagraphsLabel %>" placeholder="10" >
 													<aui:validator name="digits" />
 													<aui:validator name="min">0</aui:validator>
 												</aui:input>												
-												<aui:input name="randomWordsToAdd" label="<%= randomWordsToAddLabel %>" placeholder="1000" >
-													<aui:validator name="digits" />
-													<aui:validator name="min">1</aui:validator>
-												</aui:input>				
-												<aui:input name="linkRandomNum" label="<%= linkRandomNumLabel %>" placeholder="4" >
+												<aui:input name="randomAmount" label="<%= randomAmountLabel %>" placeholder="4" >
 													<aui:validator name="digits" />
 													<aui:validator name="min">0</aui:validator>
 												</aui:input>												
