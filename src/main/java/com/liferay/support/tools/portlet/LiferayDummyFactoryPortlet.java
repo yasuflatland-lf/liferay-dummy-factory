@@ -1,14 +1,27 @@
 package com.liferay.support.tools.portlet;
 
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.support.tools.constants.LDFPortletKeys;
+import com.liferay.support.tools.portlet.actions.DummyFactoryConfiguration;
+
+import java.io.IOException;
+import java.util.Map;
 
 import javax.portlet.Portlet;
+import javax.portlet.PortletException;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Modified;
 
 @Component(
-	immediate = true,
+    immediate = true,
+    configurationPid = LDFPortletKeys.DUMMY_FACTORY_CONFIG,
+    configurationPolicy = ConfigurationPolicy.OPTIONAL,
 	property = {
 		"com.liferay.portlet.css-class-wrapper=dummy-factory",
 		"com.liferay.portlet.display-category=category.tools",
@@ -32,4 +45,30 @@ import org.osgi.service.component.annotations.Component;
 	service = Portlet.class
 )
 public class LiferayDummyFactoryPortlet extends MVCPortlet {
+    @Override
+    public void doView(RenderRequest renderRequest, RenderResponse renderResponse)
+        throws IOException, PortletException {
+
+        renderRequest.setAttribute(DummyFactoryConfiguration.class.getName(), _dummyFactoryConfiguration);
+
+        super.doView(renderRequest, renderResponse);
+    }
+
+	@Override
+	protected void doDispatch(
+			RenderRequest renderRequest, RenderResponse renderResponse)
+		throws IOException, PortletException {
+
+        renderRequest.setAttribute(DummyFactoryConfiguration.class.getName(), _dummyFactoryConfiguration);
+
+		super.doDispatch(renderRequest, renderResponse);
+	}
+	
+    @Activate
+    @Modified
+    protected void activate(Map<Object, Object> properties) {
+    	_dummyFactoryConfiguration = ConfigurableUtil.createConfigurable(DummyFactoryConfiguration.class, properties);
+    }
+
+    private volatile DummyFactoryConfiguration _dummyFactoryConfiguration;	
 }

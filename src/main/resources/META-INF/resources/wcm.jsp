@@ -107,15 +107,15 @@
 													<aui:validator name="digits" />
 													<aui:validator name="min">0</aui:validator>
 												</aui:input>												
-												<aui:input name="randomWordsToAdd" label="<%= randomWordsToAddLabel %>" placeholder="1" >
+												<aui:input name="randomWordsToAdd" label="<%= randomWordsToAddLabel %>" placeholder="1000" >
 													<aui:validator name="digits" />
 													<aui:validator name="min">1</aui:validator>
 												</aui:input>				
-												<aui:input name="linkRandomNum" label="<%= linkRandomNumLabel %>" placeholder="0" >
+												<aui:input name="linkRandomNum" label="<%= linkRandomNumLabel %>" placeholder="4" >
 													<aui:validator name="digits" />
 													<aui:validator name="min">0</aui:validator>
 												</aui:input>												
-												<aui:input label="<%= linkListsLabel %>" rows="5" name="linkLists" type="textarea" value="" placeholder="Input URLs each row"/>
+												<aui:input label="<%= linkListsLabel %>" rows="5" name="linkLists" type="textarea" value="<%=linkList %>" placeholder="Input URLs each row"/>
 											</span>		
 											<span id="<portlet:namespace />manualContents">
 												<aui:input name="baseArticle" label="<%= baseArticleLabel %>" cssClass="lfr-textarea-container" type="textarea" wrap="soft" />
@@ -124,19 +124,10 @@
 										
 									</div>
 					            </div><%-- common --%>
+					            
 					            <div role="tabpanel" class="tab-pane fade" id="<portlet:namespace />detailed_contents">
 									<div class="row">
 										<aui:fieldset cssClass="col-md-12">
-											<div class="row">
-												<aui:fieldset cssClass="col-md-6">
-							                		<div id="<portlet:namespace />linkLoader" class="loading-icon linear loading-icon-lg hide"></div>
-													<aui:button-row>
-														<aui:button type="button" value="Fetch links" cssClass="btn-lg btn-block btn-primary" id="fetchLinks"/>
-													</aui:button-row>											
-												</aui:fieldset>
-												<aui:fieldset cssClass="col-md-6">
-												</aui:fieldset>
-											</div>
 										</aui:fieldset>
 									</div>					            
 					            </div>
@@ -164,7 +155,6 @@
 
 <aui:script use="aui-base">
 	var processStart = A.one('#<portlet:namespace />processStart');
-	var linkLoader = A.one('#<portlet:namespace />linkLoader');
 	
 	processStart.on(
 	    'click',
@@ -174,37 +164,6 @@
 			submitForm(document.<portlet:namespace />fm);
 	    }
 	);
-	
-    var fetchLinks = A.one('#<portlet:namespace />fetchLinks');
-    
-    fetchLinks.on(
-        'click',
-        function() {
-            event.preventDefault();
-            Liferay.Util.toggleDisabled('#<portlet:namespace />fetchLinks', true);
-            linkLoader.show();
-            var data = Liferay.Util.ns(
-                '<portlet:namespace />',
-                {
-                    numberOfCrawlers: 10,
-                    maxDepthOfCrawling: 2,
-                    maxPagesToFetch: 100,
-                    urls: 'https://imgur.com/,https://www.shutterstock.com/photos'
-                }
-            );
-
-            $.ajax(
-                '<%= linkListURL.toString() %>',
-                {
-                    data: data,
-                    success: function(data) {
-			            Liferay.Util.toggleDisabled('#<portlet:namespace />fetchLinks', false);
-			            linkLoader.hide();
-                    }
-                }
-            );
-        }
-    );  
     
 	var fakeContentsGenerateEnable = A.one('#<portlet:namespace />fakeContentsGenerateEnable');
 	

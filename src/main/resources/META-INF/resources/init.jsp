@@ -12,6 +12,7 @@
 <%@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
 <%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
+<%@ page import="javax.portlet.PortletPreferences" %>
 
 <%@ page import="javax.portlet.PortletURL" %>
 <%@ page import="com.liferay.portal.kernel.util.*" %>
@@ -19,10 +20,12 @@
 <%@ page import="com.liferay.portal.kernel.portlet.*" %>
 <%@ page import="com.liferay.portal.kernel.service.*" %>
 <%@ page import="com.liferay.support.tools.constants.*" %>
+
 <%@ page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
 <%@ page import="com.liferay.support.tools.portlet.actions.PageMVCResourceCommand" %>
 <%@ page import="com.liferay.support.tools.portlet.actions.RoleMVCResourceCommand" %>
+<%@ page import="com.liferay.support.tools.portlet.actions.DummyFactoryConfiguration" %>
 
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Set" %>
@@ -50,4 +53,28 @@ _.templateSettings = {
 
 <%
 String progressId = PwdGenerator.getPassword(PwdGenerator.KEY3, 16);
+%>
+
+<%
+DummyFactoryConfiguration dummyFactoryConfiguration =
+        (DummyFactoryConfiguration)
+            renderRequest.getAttribute(DummyFactoryConfiguration.class.getName());
+
+
+    String linkList = StringPool.BLANK;
+    String urlList = StringPool.BLANK;
+
+    if (Validator.isNotNull(dummyFactoryConfiguration)) {
+
+        linkList =
+            HtmlUtil.escape(
+                portletPreferences.getValue(
+                    "linkList", dummyFactoryConfiguration.linkList()));
+        
+        urlList =
+                HtmlUtil.escape(
+                    portletPreferences.getValue(
+                        "urlList", dummyFactoryConfiguration.urlList()));        
+    }
+
 %>
