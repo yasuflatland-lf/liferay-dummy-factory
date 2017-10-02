@@ -55,6 +55,7 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 		boolean male;
 		boolean fakerEnable;
 		String password;
+		String locale;
 
 		// Fetch data
 		numberOfusers = ParamUtil.getLong(actionRequest, "numberOfusers", 0);
@@ -62,6 +63,7 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 		male = ParamUtil.getBoolean(actionRequest, "male", true);
 		fakerEnable = ParamUtil.getBoolean(actionRequest, "fakerEnable", false);
 		password = ParamUtil.getString(actionRequest, "password", "test");
+		locale = ParamUtil.getString(actionRequest, "locale", "en");
 
 		// Organization
 		String[] organizations = ParamUtil.getStringValues(actionRequest, "organizations", null);
@@ -81,21 +83,21 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Group.class.getName(), actionRequest);
 
-		//Tracking progress start
+		// Tracking progress start
 		ProgressManager progressManager = new ProgressManager();
-		progressManager.start(actionRequest, 0);
-		
+		progressManager.start(actionRequest);
+
 		System.out.println("Starting to create " + numberOfusers + " users");
 
 		for (long i = 1; i <= numberOfusers; i++) {
-			//Update progress
+			// Update progress
 			progressManager.trackProgress(i, numberOfusers);
 
 			StringBundler screenName = new StringBundler(2);
 			screenName.append(baseScreenName);
-			
-			//Add number more then one user
-			if(1 < numberOfusers) {
+
+			// Add number more then one user
+			if (1 < numberOfusers) {
 				screenName.append(i);
 			}
 
@@ -105,23 +107,39 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 
 			try {
 				// Create user and apply roles
-				_userDataService.createUserData(serviceContext, organizationIds, groupIds, roleIds, userGroupIds, male, fakerEnable,
-						password, screenName.toString(), emailAddress.toString(), baseScreenName, i);
+				_userDataService.createUserData(
+						serviceContext, 
+						organizationIds, 
+						groupIds, 
+						roleIds, 
+						userGroupIds, 
+						male,
+						fakerEnable, 
+						password, 
+						screenName.toString(), 
+						emailAddress.toString(), 
+						baseScreenName, 
+						i,
+						locale);
+				
 			} catch (Exception e) {
-				//Finish progress
-				progressManager.finish();	
+				
+				// Finish progress
+				progressManager.finish();
+				
 				if (e instanceof GroupFriendlyURLException) {
 					SessionErrors.add(actionRequest, "group-friendly-url-error");
-		            hideDefaultSuccessMessage(actionRequest);
+					hideDefaultSuccessMessage(actionRequest);
 				}
+				
 				e.printStackTrace();
 				return;
 			}
 		}
 
-		//Finish progress
-		progressManager.finish();	
-		
+		// Finish progress
+		progressManager.finish();
+
 		SessionMessages.add(actionRequest, "success");
 
 		System.out.println("Finished creating " + numberOfusers + " users");
@@ -146,6 +164,6 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private CommonUtil _commonUtil;
-
+	
 	private static final Log _log = LogFactoryUtil.getLog(UserMVCActionCommand.class);
 }

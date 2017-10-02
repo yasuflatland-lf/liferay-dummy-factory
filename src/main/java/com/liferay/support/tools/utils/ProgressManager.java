@@ -13,8 +13,8 @@ import javax.portlet.ActionRequest;
  */
 public class ProgressManager {
 
-	private double _loader = 0;
-	private double _loaderUnit = 10;
+	private double _loader = 1;
+	private double _loaderUnit = 1;
 	private ProgressTracker _progressTracker;
 	private long _threshold = 100;
 	private ActionRequest _request;
@@ -26,7 +26,7 @@ public class ProgressManager {
 	 * @param request ActionRequest
 	 * @param loaderInit 
 	 */
-	public void start(ActionRequest request, double loaderUnit) {
+	public void start(ActionRequest request) {
 		_request = request;
 		
 		//Tracking progress start
@@ -34,12 +34,6 @@ public class ProgressManager {
 		ProgressTrackerThreadLocal.setProgressTracker(_progressTracker);
 		_progressTracker.start(request);		
 		
-		if(0 >= loaderUnit) {
-			_loader = _loaderUnit;
-		} else {
-			_loader = loaderUnit;
-			_loaderUnit = loaderUnit;
-		}
 	}
 	
 	public long getThreshold() {
@@ -57,15 +51,13 @@ public class ProgressManager {
 	 * @param numberOfTotal Total number
 	 */
 	public void trackProgress(long index, long numberOfTotal) {
-		if (numberOfTotal >= _threshold) {
-			if (index == (int) (numberOfTotal * (_loader / _threshold))) {
-				System.out.println("Creating..." + (int) _loader + "% done");
-				if(null != _progressTracker ) {
-					_progressTracker.setPercent((int)_loader);
-				}
-				_loader = _loader + _loaderUnit;
+		if (index == (int) (numberOfTotal * (_loader / 100.00))) {
+			System.out.println("Creating..." + (int) _loader + "% done");
+			if(null != _progressTracker ) {
+				_progressTracker.setPercent((int)_loader);
 			}
-		}		
+			_loader = _loader + _loaderUnit;
+		}	
 	}
 	
 	/**
