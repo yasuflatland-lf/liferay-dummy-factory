@@ -17,21 +17,23 @@
                 <aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
 
 				<%
-				String urlListLabel = "URL list where the crawler fetching images from (multiple URLs can be configured by comma separated)";
-				String linkListLabel = "Corrected image links / custom image links";
+				String urlListLabel = "URL list where the crawler fetching images from (multiple URLs can be configured by comma separated, but takes longer to process.)";
+				String linkListLabel = "Corrected image links / custom image links to save";
 
 				%>
 				<div class="row">
-					<aui:fieldset cssClass="col-md-4">
-	                    <aui:input type="textarea" name="urlList" value="<%= urlList %>" rows="10" label="<%=urlListLabel %>" />
+					<aui:fieldset cssClass="col-md-12">
+	                    <aui:input type="text" name="urlList" value="<%= urlList %>" label="<%=urlListLabel %>" />
 						<button id="<portlet:namespace />fetchLinks" class="btn btn-primary loading" type="button">
 			                 <span id="<portlet:namespace />linkLoader" class="loading-icon linear hide"></span>&nbsp;Fetch links
-			            </button>																								
+			            </button>
 					</aui:fieldset>
-					<aui:fieldset cssClass="col-md-8">
-	                    <aui:input type="textarea" name="linkList" value="<%= linkList %>" rows="10" label="<%=linkListLabel %>" />
-					</aui:fieldset>
-				</div>				
+				</div>
+                <div class="row">
+                    <aui:fieldset cssClass="col-md-12">
+                        <aui:input type="textarea" name="linkList" value="<%= linkList %>" rows="10" label="<%=linkListLabel %>" />
+                    </aui:fieldset>
+                </div>
             </aui:fieldset-group>
         </div>
     </div>
@@ -47,7 +49,7 @@
     var fetchLinks = A.one('#<portlet:namespace />fetchLinks');
     var linkList = A.one('#<portlet:namespace />linkList');
     var urlList = A.one('#<portlet:namespace />urlList');
-    
+
     fetchLinks.on(
         'click',
         function() {
@@ -57,13 +59,13 @@
             var data = Liferay.Util.ns(
                 '<portlet:namespace />',
                 {
-                    numberOfCrawlers: 10,
-                    maxDepthOfCrawling: 2,
+                    numberOfCrawlers: 15,
+                    maxDepthOfCrawling: 3,
                     maxPagesToFetch: 100,
                     urls: urlList.val()
                 }
             );
-            
+
 			$.ajax(
                 '<%= linkListURL.toString() %>',
                 {
@@ -76,8 +78,8 @@
                     }
                 }
             );
-          
+
         }
-    );  
-	
+    );
+
 </aui:script>

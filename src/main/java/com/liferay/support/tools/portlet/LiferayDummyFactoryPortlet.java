@@ -1,23 +1,21 @@
 package com.liferay.support.tools.portlet;
 
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
-import com.liferay.support.tools.constants.LDFPortletKeys;
-import com.liferay.support.tools.portlet.actions.DummyFactoryConfiguration;
+import com.liferay.portal.configuration.metatype.bnd.util.*;
+import com.liferay.portal.kernel.portlet.bridges.mvc.*;
+import com.liferay.support.tools.constants.*;
+import com.liferay.support.tools.portlet.actions.*;
+import org.osgi.service.component.annotations.*;
 
-import java.io.IOException;
-import java.util.Map;
+import javax.portlet.*;
+import java.io.*;
+import java.util.*;
 
-import javax.portlet.Portlet;
-import javax.portlet.PortletException;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
-import org.osgi.service.component.annotations.Modified;
-
+/**
+ * Dummy Factory Portlet
+ *
+ * @author Yasuyuki Takeo
+ *
+ */
 @Component(
     immediate = true,
     configurationPid = LDFPortletKeys.DUMMY_FACTORY_CONFIG,
@@ -67,7 +65,8 @@ public class LiferayDummyFactoryPortlet extends MVCPortlet {
     @Activate
     @Modified
     protected void activate(Map<Object, Object> properties) {
-    	_dummyFactoryConfiguration = ConfigurableUtil.createConfigurable(DummyFactoryConfiguration.class, properties);
+
+		_dummyFactoryConfiguration = ConfigurableUtil.createConfigurable(DummyFactoryConfiguration.class, properties);
     }
 
     private volatile DummyFactoryConfiguration _dummyFactoryConfiguration;	
