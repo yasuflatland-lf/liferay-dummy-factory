@@ -48,6 +48,7 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 	private void createUsers(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 		long numberOfusers = 0;
 		String baseScreenName = "";
+		String baseDomain = "";
 		long[] organizationIds = null;
 		long[] groupIds = null;
 		long[] roleIds = null;
@@ -60,6 +61,7 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 		// Fetch data
 		numberOfusers = ParamUtil.getLong(actionRequest, "numberOfusers", 0);
 		baseScreenName = ParamUtil.getString(actionRequest, "baseScreenName", "");
+		baseDomain = ParamUtil.getString(actionRequest, "baseDomain","liferay.com");
 		male = ParamUtil.getBoolean(actionRequest, "male", true);
 		fakerEnable = ParamUtil.getBoolean(actionRequest, "fakerEnable", false);
 		password = ParamUtil.getString(actionRequest, "password", "test");
@@ -103,7 +105,7 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 
 			StringBundler emailAddress = new StringBundler(2);
 			emailAddress.append(screenName);
-			emailAddress.append("@liferay.com");
+			emailAddress.append("@").append(baseDomain);
 
 			try {
 				// Create user and apply roles
