@@ -25,7 +25,13 @@
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
 <%@ page import="com.liferay.support.tools.portlet.actions.PageMVCResourceCommand" %>
 <%@ page import="com.liferay.support.tools.portlet.actions.RoleMVCResourceCommand" %>
+<%@ page import="com.liferay.support.tools.messageboard.MBMVCResourceCommand" %>
+
 <%@ page import="com.liferay.support.tools.portlet.actions.DummyFactoryConfiguration" %>
+<%@ page import="com.liferay.dynamic.data.mapping.model.*" %>
+<%@ page import="com.liferay.journal.model.*" %>
+<%@ page import="com.liferay.journal.service.*" %>
+<%@ page import="com.liferay.dynamic.data.mapping.service.*" %>
 
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Set" %>

@@ -23,6 +23,7 @@ public class LDFPortletKeys {
 		{put(LDFPortletKeys.MODE_USERS, LDFPortletKeys.JSP_USERS);}
 		{put(LDFPortletKeys.MODE_WCM, LDFPortletKeys.JSP_WCM);}
 		{put(LDFPortletKeys.MODE_DOCUMENTS, LDFPortletKeys.JSP_DOCUMENTS);}
+		{put(LDFPortletKeys.MODE_MB, LDFPortletKeys.JSP_MB);}
     });
 	
 	// Mode parameter
@@ -36,8 +37,10 @@ public class LDFPortletKeys {
 	public static final String USERS = "/ldf/users";
 	public static final String WCM = "/ldf/wcm";
 	public static final String DOCUMENTS = "/ldf/doc";
+	public static final String MB = "/ldf/mb";
 	public static final String CMD_PAGES_FOR_A_SITE = "/ldf/page/for_a_site";
 	public static final String CMD_ROLELIST = "/ldf/role/list";
+	public static final String CMD_MB_LIST = "/ldf/mb/threads/list";
 	
 	// Mode
 	public static final String MODE_ORGANIZAION = "ORG";
@@ -46,6 +49,7 @@ public class LDFPortletKeys {
 	public static final String MODE_USERS = "USERS";
 	public static final String MODE_WCM = "WCM";
 	public static final String MODE_DOCUMENTS = "DOC";
+	public static final String MODE_MB = "MB";
 	
 	// Jsps
     public static final String JSP_ORGANIZAION = "/view.jsp";
@@ -54,9 +58,19 @@ public class LDFPortletKeys {
     public static final String JSP_USERS = "/users.jsp";
     public static final String JSP_WCM = "/wcm.jsp";
     public static final String JSP_DOCUMENTS = "/documents.jsp";	
+    public static final String JSP_MB = "/mb.jsp";	
     
     //WEB
     public static final String _DDM_STRUCTURE_KEY = "BASIC-WEB-CONTENT";
     public static final String _DDM_TEMPLATE_KEY = "BASIC-WEB-CONTENT";
     
+    //Web contents contents mode
+    public static final int WCM_SIMPLE_CONTENTS_CREATE = 0;
+    public static final int WCM_DUMMY_CONTENTS_CREATE = 1;
+    public static final int WCM_STRUCTURE_TEMPLATE_SELECT_CREATE = 2;
+    
+    //Message board contents mode
+    public static final int MB_THREAD_CREATE = 0;
+    public static final int MB_CATEGORY_CREATE = 1;
+    public static final int MB_REPLY_CREATE = 2;
 }

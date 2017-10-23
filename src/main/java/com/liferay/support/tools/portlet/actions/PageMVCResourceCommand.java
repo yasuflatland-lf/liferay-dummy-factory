@@ -50,40 +50,41 @@ public class PageMVCResourceCommand extends BaseMVCResourceCommand {
 	static public final String CMD_PAGELIST = "pagelist";
 	
 	@Override
-	protected void doServeResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse)
+	protected void doServeResource(ResourceRequest request, ResourceResponse response)
 			throws Exception {
-		String cmd = ParamUtil.getString(resourceRequest, Constants.CMD);
+		String cmd = ParamUtil.getString(request, Constants.CMD);
 		String serializedJson = "";
 		
 		if(cmd.equals(CMD_PAGELIST)) {
-			serializedJson = getSiteLists(resourceRequest,resourceResponse );
+			serializedJson = getPageLists(request,response );
 		} else {
 			_log.error("Unknown command is passed <" + cmd + ">");
 		}
 		
-		HttpServletResponse response = _portal.getHttpServletResponse(
-				resourceResponse);
+		HttpServletResponse servletResponse = _portal.getHttpServletResponse(
+				response);
 
-		response.setContentType(ContentTypes.APPLICATION_JSON);
+		servletResponse.setContentType(ContentTypes.APPLICATION_JSON);
 
-		ServletResponseUtil.write(response, serializedJson);		
+		ServletResponseUtil.write(servletResponse, serializedJson);		
 	}
 	
 	/**
-	 * Get Site lists
+	 * Get Page lists
 	 * 
-	 * Depending on the passed site groupd id, fetch all pages in the site and return JSON object list.
+	 * Depending on the passed site groupd id, 
+	 * fetch all pages in the site and return JSON object list.
 	 * 
-	 * @param resourceRequest
-	 * @param resourceResponse
+	 * @param request
+	 * @param response
 	 * @return
 	 */
-	protected String getSiteLists(ResourceRequest resourceRequest, ResourceResponse resourceResponse) {
-		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
+	protected String getPageLists(ResourceRequest request, ResourceResponse response) {
+		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 				WebKeys.THEME_DISPLAY);
 		
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
-		long siteGroupId = ParamUtil.getLong(resourceRequest, "siteGroupId", themeDisplay.getSiteGroupId());
+		long siteGroupId = ParamUtil.getLong(request, "siteGroupId", themeDisplay.getSiteGroupId());
 		
 		List<Layout> layouts = _layoutLocalService.getLayouts(
 				siteGroupId, 

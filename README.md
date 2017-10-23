@@ -9,6 +9,7 @@ Dummy Factory generates dummy data for debugging use. Please don't use this for 
 * Users
 * Web Content Articles
 * Documents
+* Message Board (Threads / Categories)
 
 ## Required environment
 * Java 1.8 or above

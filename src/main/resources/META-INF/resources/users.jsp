@@ -23,7 +23,7 @@
             <div class="collapsed collapse" id="navPillsCollapse0" aria-expanded="false" >
                 <blockquote class="blockquote-info">
                     <small>Example</small>
-                    <p>if you enter the values <code>3</code> and <code>user</code> the portlet will create three blank sites: <code>user1</code>, <code>user2</code>, and <code>user3</code>.<p>
+                    <p>if you enter the values <code>3</code> and <code>user</code> the portlet will create three users: <code>user1</code>, <code>user2</code>, and <code>user3</code>.<p>
                 </blockquote>
 
                 <ul>
