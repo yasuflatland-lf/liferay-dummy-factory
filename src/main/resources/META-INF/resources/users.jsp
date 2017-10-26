@@ -50,25 +50,15 @@
 			%>
 
 			<aui:form action="<%= userEditURL %>" method="post" name="fm" >
-				<div class="row">
-					<aui:fieldset cssClass="col-md-6">
-						<aui:input name="numberOfusers" label="<%= numberOfusersLabel %>" >
-							<aui:validator name="digits" />
-							<aui:validator name="min">1</aui:validator>
-							<aui:validator name="required" />
-						</aui:input>
-					</aui:fieldset>
-				</div>
-                <div class="row">
-                    <aui:fieldset cssClass="col-md-6">
-                        <aui:input name="baseScreenName" label="<%= baseScreenNameLabel %>" >
-                            <aui:validator name="required" />
-                        </aui:input>
-                    </aui:fieldset>
-                    <aui:fieldset cssClass="col-md-6">
-                        <aui:input name="baseDomain" label="<%= baseDomainLabel %>" value="liferay.com"/>
-                    </aui:fieldset>
-                </div>
+				<aui:input name="numberOfusers" label="<%= numberOfusersLabel %>" >
+					<aui:validator name="digits" />
+					<aui:validator name="min">1</aui:validator>
+					<aui:validator name="required" />
+				</aui:input>
+                <aui:input name="baseScreenName" label="<%= baseScreenNameLabel %>" >
+                    <aui:validator name="required" />
+                </aui:input>
+                <aui:input name="baseDomain" label="<%= baseDomainLabel %>" value="liferay.com"/>
 
 				<%
 				String defaultOption = "(None)";

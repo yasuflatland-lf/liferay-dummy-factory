@@ -32,6 +32,7 @@
 <%@ page import="com.liferay.journal.model.*" %>
 <%@ page import="com.liferay.journal.service.*" %>
 <%@ page import="com.liferay.dynamic.data.mapping.service.*" %>
+<%@ page import="com.liferay.message.boards.kernel.model.*" %>
 
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Set" %>

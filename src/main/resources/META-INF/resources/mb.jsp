@@ -94,6 +94,11 @@
 
 				<span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.MB_REPLY_CREATE) %>" class="<portlet:namespace />contentsTypeGroup" style="display:none;">
 					<aui:select name="threadId" label="<%=threadListLabel %>" >
+				        <aui:validator name="required">
+			                function() {
+		                        return (<%= String.valueOf(LDFPortletKeys.MB_REPLY_CREATE) %> == AUI.$('#<portlet:namespace />createContentsType').val());
+			                }
+				        </aui:validator>											
 					</aui:select>			
 				</span>
 													
@@ -177,8 +182,8 @@
     
     // Manage GroupID list display
 	var createContentsType = A.one('#<portlet:namespace />createContentsType');
-	createContentsType.on(
-	    'change',
+	$('#<portlet:namespace />createContentsType').on(
+	    'change load',
 	    function() {
 	    	//--------------------------------
 	    	// Contents Creation fields switch
@@ -282,7 +287,10 @@
 
 					//Load Template
 					var tmpl = _.template($('#<portlet:namespace />category_options').html());
-					var listAll = "";
+					var listAll = tmpl({
+						categoryId:"<%= String.valueOf(MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) %>",
+						categoryName:"Default"
+					});
 					_.map(data,function(n) {
 						listAll += 
 						tmpl(
