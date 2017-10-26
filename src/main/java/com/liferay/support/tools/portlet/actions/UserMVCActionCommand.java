@@ -69,19 +69,19 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 
 		// Organization
 		String[] organizations = ParamUtil.getStringValues(actionRequest, "organizations", null);
-		organizationIds = _commonUtil.convertStringToLongArray(organizations);
+		organizationIds = CommonUtil.convertStringToLongArray(organizations);
 
 		// Sites
 		String[] groups = ParamUtil.getStringValues(actionRequest, "groups", null);
-		groupIds = _commonUtil.convertStringToLongArray(groups);
+		groupIds = CommonUtil.convertStringToLongArray(groups);
 
 		// Roles
 		String[] roles = ParamUtil.getStringValues(actionRequest, "roles", null);
-		roleIds = _commonUtil.convertStringToLongArray(roles);
+		roleIds = CommonUtil.convertStringToLongArray(roles);
 
 		// User Group
 		String[] userGroups = ParamUtil.getStringValues(actionRequest, "userGroups", null);
-		userGroupIds = _commonUtil.convertStringToLongArray(userGroups);
+		userGroupIds = CommonUtil.convertStringToLongArray(userGroups);
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Group.class.getName(), actionRequest);
 
@@ -164,8 +164,5 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private UserDataService _userDataService;
 
-	@Reference
-	private CommonUtil _commonUtil;
-	
 	private static final Log _log = LogFactoryUtil.getLog(UserMVCActionCommand.class);
 }

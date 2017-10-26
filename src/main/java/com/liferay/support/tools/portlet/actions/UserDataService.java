@@ -253,12 +253,16 @@ public class UserDataService {
 
 	@Reference
 	private UserLocalService _userLocalService;
+	
 	@Reference
 	private UserGroupRoleLocalService _userGroupRoleLocalService;
+	
 	@Reference
 	private CommonUtil _commonUtil;
+	
 	@Reference
 	private RoleLocalService _roleLocalService;
+	
 	@Reference
 	private OrganizationLocalService _organizationLocalService;
 
