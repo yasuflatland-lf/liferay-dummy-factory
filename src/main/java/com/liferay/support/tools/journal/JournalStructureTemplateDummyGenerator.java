@@ -44,9 +44,9 @@ public class JournalStructureTemplateDummyGenerator extends DummyGenerator<Journ
 		
 		// Template key
 		String templateKey = 
-				_DDMTemplateLocalService.getTemplate(
-					paramContext.getDdmTemplateId()
-				).getTemplateKey();
+			_DDMTemplateLocalService.getTemplate(
+				paramContext.getDdmTemplateId()
+			).getTemplateKey();
 		
 		// Tracking progress start
 		ProgressManager progressManager = new ProgressManager();
