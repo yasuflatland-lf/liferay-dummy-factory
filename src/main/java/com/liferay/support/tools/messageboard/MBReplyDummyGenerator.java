@@ -5,9 +5,9 @@ import com.liferay.message.boards.kernel.model.MBThread;
 import com.liferay.message.boards.kernel.service.MBMessageService;
 import com.liferay.message.boards.kernel.service.MBThreadLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.*;
 import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.util.ObjectValuePair;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.*;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.CommonUtil;
 import com.liferay.support.tools.utils.ProgressManager;
@@ -34,6 +34,16 @@ public class MBReplyDummyGenerator extends DummyGenerator<MBContext> {
 	protected MBContext getContext(ActionRequest request) {
 
 		return new MBContext(request);
+	}
+
+	@Override
+	protected boolean validate(MBContext paramContext) {
+		if(Validator.isNull(paramContext.getThreadId())) {
+			_log.error("Thread ID is reqired. Please select the thread ID");
+			return false;
+		}
+
+		return true;
 	}
 
 	@Override
@@ -103,4 +113,6 @@ public class MBReplyDummyGenerator extends DummyGenerator<MBContext> {
 	
 	@Reference
 	private MBThreadLocalService _mbThreadLocalService;
+
+	private static final Log _log = LogFactoryUtil.getLog(MBReplyDummyGenerator.class);
 }

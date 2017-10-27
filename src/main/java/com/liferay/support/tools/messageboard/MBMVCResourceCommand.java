@@ -106,7 +106,7 @@ public class MBMVCResourceCommand extends BaseMVCResourceCommand {
 		List<MBCategory> categories = _mbCategoryLocalService.getCategories(
 				siteGroupId, 
 				MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID, 
-				WorkflowConstants.STATUS_ANY, 
+				WorkflowConstants.STATUS_APPROVED, 
 				QueryUtil.ALL_POS, 
 				QueryUtil.ALL_POS);
 		
@@ -152,7 +152,7 @@ public class MBMVCResourceCommand extends BaseMVCResourceCommand {
 		List<MBThread> threads = _mbThreadLocalService.getThreads(
 				siteGroupId, 
 				MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID, 
-				WorkflowConstants.STATUS_ANY, 
+				WorkflowConstants.STATUS_APPROVED, 
 				QueryUtil.ALL_POS, 
 				QueryUtil.ALL_POS);
 		

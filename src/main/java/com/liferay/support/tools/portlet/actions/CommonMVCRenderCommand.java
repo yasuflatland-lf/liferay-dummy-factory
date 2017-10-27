@@ -3,7 +3,7 @@ package com.liferay.support.tools.portlet.actions;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
-import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.*;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.utils.CommonUtil;
 
@@ -40,8 +40,12 @@ public class CommonMVCRenderCommand implements MVCRenderCommand {
 	public String render(RenderRequest renderRequest, RenderResponse renderResponse) throws PortletException {
 
 		// Get Mode
-		String mode = ParamUtil.getString(renderRequest, LDFPortletKeys.MODE,
-				LDFPortletKeys.MODE_ORGANIZAION);
+		String mode = ParamUtil.getString(
+			renderRequest,
+			LDFPortletKeys.MODE,
+			LDFPortletKeys.MODE_ORGANIZAION);
+
+		// Carry around mode
 		renderRequest.setAttribute(LDFPortletKeys.MODE, mode);
 		
 		if(_log.isDebugEnabled()) {
@@ -50,9 +54,6 @@ public class CommonMVCRenderCommand implements MVCRenderCommand {
 			.getPageFromMode()
 			.getOrDefault(mode, LDFPortletKeys.JSP_ORGANIZAION) + ">");
 		}
-		
-		// Carry around mode
-		renderRequest.setAttribute(LDFPortletKeys.MODE, mode);
 
 		return _commonUtil
 				.getPageFromMode()

@@ -13,6 +13,7 @@ import com.liferay.support.tools.utils.DDMLocalUtil;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -36,13 +37,46 @@ public class JournalUtils {
 	 * @throws Exception
 	 */
 	public String buildFields(long groupId, String[] locales, String baseArticle) throws Exception {
-		DDMStructure ddmStructure = _DDMStructureLocalService.getStructure(groupId,
-				PortalUtil.getClassNameId(JournalArticle.class), LDFPortletKeys._DDM_STRUCTURE_KEY);
+		DDMStructure ddmStructure = 
+			_DDMStructureLocalService.getStructure(
+				groupId,
+				PortalUtil.getClassNameId(JournalArticle.class), 
+				LDFPortletKeys._DDM_STRUCTURE_KEY
+			);
 
 		Map<String, Serializable> fieldsMap = Maps.newConcurrentMap();
 		fieldsMap.put(DDM_CONTENT, baseArticle);
 
-		Fields fields = _ddmLocalUtil.toFields(ddmStructure.getStructureId(), fieldsMap, locales,
+		Fields fields = _ddmLocalUtil.toFields(
+				ddmStructure.getStructureId(), 
+				fieldsMap, 
+				locales,
+				LocaleUtil.getDefault());
+
+		return _journalConverter.getContent(ddmStructure, fields);
+	}
+	
+	/**
+	 * Build content field
+	 * 
+	 * @param ddmStructure
+	 * @param serviceContext
+	 * @return
+	 * @throws Exception
+	 */
+	public String buildFields(long groupId, DDMStructure ddmStructure, String[] locales) throws Exception {
+		
+		Map<String, Serializable> fieldsMap = Maps.newConcurrentMap();
+		Set<String> fieldNames = ddmStructure.getFieldNames();
+
+		for(String fieldName : fieldNames ) {
+			fieldsMap.put(fieldName, "");
+		}
+		
+		Fields fields = _ddmLocalUtil.toFields(
+				ddmStructure.getStructureId(), 
+				fieldsMap, 
+				locales,
 				LocaleUtil.getDefault());
 
 		return _journalConverter.getContent(ddmStructure, fields);

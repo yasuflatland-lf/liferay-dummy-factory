@@ -94,12 +94,7 @@
 
 				<span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.MB_REPLY_CREATE) %>" class="<portlet:namespace />contentsTypeGroup" style="display:none;">
 					<aui:select name="threadId" label="<%=threadListLabel %>" >
-				        <aui:validator name="required">
-			                function() {
-		                        return (<%= String.valueOf(LDFPortletKeys.MB_REPLY_CREATE) %> == AUI.$('#<portlet:namespace />createContentsType').val());
-			                }
-				        </aui:validator>											
-					</aui:select>			
+					</aui:select>
 				</span>
 													
 				<span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.MB_THREAD_CREATE) %>" class="<portlet:namespace />contentsTypeGroup">
@@ -191,11 +186,7 @@
     		var cmp_str = "<portlet:namespace />contentsType" + createContentsType.val();
 
 	    	$('.<portlet:namespace />contentsTypeGroup').each(function(index){
-	    		if(cmp_str === $(this).attr("id")) {
-	    			$(this).show();
-	    		} else {
-	    			$(this).hide();
-	    		}
+				$(this).toggle((cmp_str === $(this).attr("id")));
 	    	});
 	    	
 	    	//--------------------------------

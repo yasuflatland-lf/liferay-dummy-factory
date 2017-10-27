@@ -38,6 +38,7 @@ public class LDFPortletKeys {
 	public static final String WCM = "/ldf/wcm";
 	public static final String DOCUMENTS = "/ldf/doc";
 	public static final String MB = "/ldf/mb";
+	
 	public static final String CMD_PAGES_FOR_A_SITE = "/ldf/page/for_a_site";
 	public static final String CMD_ROLELIST = "/ldf/role/list";
 	public static final String CMD_MB_LIST = "/ldf/mb/threads/list";

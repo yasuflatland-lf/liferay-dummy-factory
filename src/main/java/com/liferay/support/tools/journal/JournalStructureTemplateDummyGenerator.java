@@ -1,5 +1,6 @@
 package com.liferay.support.tools.journal;
 
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.journal.service.JournalArticleLocalService;
@@ -37,10 +38,13 @@ public class JournalStructureTemplateDummyGenerator extends DummyGenerator<Journ
 	protected void exec(ActionRequest request, JournalContext paramContext) throws Exception {
 
 		// Structure Key
-		String structureKey =
+		DDMStructure ddmStructure = 
 			_DDMStructureLocalService.getStructure(
 				paramContext.getDdmStructureId()
-			).getStructureKey();
+			);
+
+		String structureKey =
+			ddmStructure.getStructureKey();
 		
 		// Template key
 		String templateKey = 
@@ -79,9 +83,9 @@ public class JournalStructureTemplateDummyGenerator extends DummyGenerator<Journ
 				// Build contents
 				String content = 
 					_journalUtils.buildFields(
-						paramContext.getThemeDisplay().getCompanyGroupId(), 
-						paramContext.getLocales(), 
-						paramContext.getBaseArticle()
+						groupId,
+						ddmStructure, 
+						paramContext.getLocales()
 					);
 
 				Map<Locale, String> titleMap = new ConcurrentHashMap<Locale, String>();

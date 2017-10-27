@@ -105,7 +105,7 @@
 							<aui:select name="createContentsType" label="<%= createContentsTypeLabel %>" >
 								<aui:option label="Simple Contents Create" value="<%= String.valueOf(LDFPortletKeys.WCM_SIMPLE_CONTENTS_CREATE) %>" />
 								<aui:option label="Dummy Contents Create" value="<%= String.valueOf(LDFPortletKeys.WCM_DUMMY_CONTENTS_CREATE) %>" />
-								<%--<aui:option label="Structure Template Select Contents Create" value="<%= String.valueOf(LDFPortletKeys.WCM_STRUCTURE_TEMPLATE_SELECT_CREATE) %>" />  --%>
+								<aui:option label="Structure Template Select Contents Create" value="<%= String.valueOf(LDFPortletKeys.WCM_STRUCTURE_TEMPLATE_SELECT_CREATE) %>" />
 							</aui:select>
 																
 							<span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.WCM_SIMPLE_CONTENTS_CREATE) %>" class="<portlet:namespace />contentsTypeGroup">
@@ -222,28 +222,20 @@
 	var randomAmount = A.one('#<portlet:namespace />randomAmount');
 	
 	$('#<portlet:namespace />randomAmount').on(
-	    'live input',
+	    'input load',
 	    function() {
-	    	if(0 < randomAmount.val()) {
-	    		$('#<portlet:namespace />randomLink').show();
-	    	} else {
-	    		$('#<portlet:namespace />randomLink').hide();
-	    	}
+			$('#<portlet:namespace />randomLink').toggle((0 < randomAmount.val()));
 	    }
 	);
 	    
 	var createContentsType = A.one('#<portlet:namespace />createContentsType');
 	
 	$('#<portlet:namespace />createContentsType').on(
-	    'live change',
+	    'change load',
 	    function() {
 	    	$('.<portlet:namespace />contentsTypeGroup').each(function(index){
 	    		var cmp_str = "<portlet:namespace />contentsType" + createContentsType.val();
-	    		if(cmp_str === $(this).attr("id")) {
-	    			$(this).show();
-	    		} else {
-	    			$(this).hide();
-	    		}
+	    		$(this).toggle((cmp_str === $(this).attr("id")));
 	    	});
 	    }
 	);

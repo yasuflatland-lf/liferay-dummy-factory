@@ -4,7 +4,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.servlet.*;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.messageboard.MBContext;
@@ -32,20 +32,22 @@ import org.osgi.service.component.annotations.Reference;
 public class MBMVCActionCommand extends BaseMVCActionCommand {
 
 	@Override
-	protected void doProcessAction(ActionRequest request, ActionResponse response) {
+	protected void doProcessAction(ActionRequest request, ActionResponse response) throws Exception {
 
 		try {
+			response.setRenderParameter("mvcRenderCommandName", LDFPortletKeys.COMMON);
+
 			DummyGenerator<MBContext> dummyGenerator = _MBDummyFactory.create(request);
 			dummyGenerator.create(request);
 
+			SessionMessages.add(request, "success");
+
 		} catch (Exception e) {
 			hideDefaultSuccessMessage(request);
+			SessionErrors.add(request,Exception.class);
 			_log.error(e, e);
 		}
 
-		response.setRenderParameter("mvcRenderCommandName", LDFPortletKeys.COMMON);
-		SessionMessages.add(request, "success");
-		
 	}
 
 	@Reference
