@@ -14,6 +14,7 @@
 	        <aui:option label="Web Content Articles" value="<%= LDFPortletKeys.MODE_WCM %>" selected="<%= mode.equals(LDFPortletKeys.MODE_WCM) %>" />
 	        <aui:option label="Documents" value="<%= LDFPortletKeys.MODE_DOCUMENTS %>" selected="<%= mode.equals(LDFPortletKeys.MODE_DOCUMENTS) %>" />
 	        <aui:option label="Message Board" value="<%= LDFPortletKeys.MODE_MB %>" selected="<%= mode.equals(LDFPortletKeys.MODE_MB) %>" />
+	        <aui:option label="Category / Vocabulary" value="<%= LDFPortletKeys.MODE_CATEGORY %>" selected="<%= mode.equals(LDFPortletKeys.MODE_CATEGORY) %>" />
 	    </aui:select>
     </aui:form>
     

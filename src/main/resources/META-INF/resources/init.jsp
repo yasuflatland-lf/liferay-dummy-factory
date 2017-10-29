@@ -20,6 +20,8 @@
 <%@ page import="com.liferay.portal.kernel.portlet.*" %>
 <%@ page import="com.liferay.portal.kernel.service.*" %>
 <%@ page import="com.liferay.support.tools.constants.*" %>
+<%@ page import="com.liferay.asset.kernel.model.*" %>
+<%@ page import="com.liferay.asset.kernel.service.*" %>
 
 <%@ page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
