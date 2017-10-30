@@ -1,4 +1,7 @@
 ## What's Dummy Factory?
+[![Build Status](https://travis-ci.org/yasuflatland-lf/liferay-dummy-factory.svg?branch=master)](https://travis-ci.org/yasuflatland-lf/liferay-dummy-factory)
+[![Coverage Status](https://coveralls.io/repos/github/yasuflatland-lf/liferay-dummy-factory/badge.svg)](https://coveralls.io/github/yasuflatland-lf/liferay-dummy-factory)
+
 Dummy Factory generates dummy data for debugging use. Please don't use this for a production use.
 
 ## What does Dummy Factory generate?
