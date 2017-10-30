@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Yasuyuki Takeo
  *
  */
-@Component(immediate = true,service = CommonUtil.class)
+@Component(immediate = true, service = CommonUtil.class)
 public class CommonUtil {
 
 	/**
@@ -42,16 +42,15 @@ public class CommonUtil {
 	/**
 	 * Convert string array to long array
 	 * 
-	 * @param source
-	 *            String array of ids
+	 * @param source String array of ids
 	 * @return long array of ids
 	 */
-	public long[] convertStringToLongArray(String[] source) {
+	static public long[] convertStringToLongArray(String[] source) {
 		if (Validator.isNull(source) || source.length <= 0) {
 			return null;
 		}
 
-		return Arrays.stream(source).mapToLong(Long::parseLong).toArray();
+		return Arrays.stream(source).distinct().mapToLong(Long::parseLong).toArray();
 	}
 
 	/**
@@ -60,9 +59,7 @@ public class CommonUtil {
 	 * Depending on role types, the processes to apply roles are different. This
 	 * method filter either Organization / Site roles or Regular roles.
 	 * 
-	 * @param roleIds
-	 *            role ids. This can be mix of reguler / organization / site
-	 *            roles.
+	 * @param roleIds role ids. This can be mix of reguler / organization / site roles.
 	 * @return Filtered roleids in each array.
 	 * @throws PortalException
 	 */
@@ -80,8 +77,7 @@ public class CommonUtil {
 	/**
 	 * Create Faker
 	 * 
-	 * @param locale
-	 *            Language to create Faker object based on.
+	 * @param locale Language to create Faker object based on.
 	 * @return Faker object.
 	 */
 	public Faker createFaker(String locale) {

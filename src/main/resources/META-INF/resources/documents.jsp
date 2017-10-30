@@ -21,7 +21,7 @@
             <div class="collapsed collapse" id="navPillsCollapse0" aria-expanded="false" >
                 <blockquote class="blockquote-info">
                     <small>Example</small>
-                    <p>if you enter the values <code>3</code> and <code>doc</code> the portlet will create three blank sites: <code>doc1</code>, <code>doc2</code>, and <code>doc3</code>.<p>
+                    <p>if you enter the values <code>3</code> and <code>doc</code> the portlet will create three documents: <code>doc1</code>, <code>doc2</code>, and <code>doc3</code>.<p>
                 </blockquote>
             
                 <ul>

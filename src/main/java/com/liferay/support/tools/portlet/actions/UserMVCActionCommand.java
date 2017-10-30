@@ -48,6 +48,7 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 	private void createUsers(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 		long numberOfusers = 0;
 		String baseScreenName = "";
+		String baseDomain = "";
 		long[] organizationIds = null;
 		long[] groupIds = null;
 		long[] roleIds = null;
@@ -60,6 +61,7 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 		// Fetch data
 		numberOfusers = ParamUtil.getLong(actionRequest, "numberOfusers", 0);
 		baseScreenName = ParamUtil.getString(actionRequest, "baseScreenName", "");
+		baseDomain = ParamUtil.getString(actionRequest, "baseDomain","liferay.com");
 		male = ParamUtil.getBoolean(actionRequest, "male", true);
 		fakerEnable = ParamUtil.getBoolean(actionRequest, "fakerEnable", false);
 		password = ParamUtil.getString(actionRequest, "password", "test");
@@ -67,19 +69,19 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 
 		// Organization
 		String[] organizations = ParamUtil.getStringValues(actionRequest, "organizations", null);
-		organizationIds = _commonUtil.convertStringToLongArray(organizations);
+		organizationIds = CommonUtil.convertStringToLongArray(organizations);
 
 		// Sites
 		String[] groups = ParamUtil.getStringValues(actionRequest, "groups", null);
-		groupIds = _commonUtil.convertStringToLongArray(groups);
+		groupIds = CommonUtil.convertStringToLongArray(groups);
 
 		// Roles
 		String[] roles = ParamUtil.getStringValues(actionRequest, "roles", null);
-		roleIds = _commonUtil.convertStringToLongArray(roles);
+		roleIds = CommonUtil.convertStringToLongArray(roles);
 
 		// User Group
 		String[] userGroups = ParamUtil.getStringValues(actionRequest, "userGroups", null);
-		userGroupIds = _commonUtil.convertStringToLongArray(userGroups);
+		userGroupIds = CommonUtil.convertStringToLongArray(userGroups);
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(Group.class.getName(), actionRequest);
 
@@ -103,7 +105,7 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 
 			StringBundler emailAddress = new StringBundler(2);
 			emailAddress.append(screenName);
-			emailAddress.append("@liferay.com");
+			emailAddress.append("@").append(baseDomain);
 
 			try {
 				// Create user and apply roles
@@ -162,8 +164,5 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	private UserDataService _userDataService;
 
-	@Reference
-	private CommonUtil _commonUtil;
-	
 	private static final Log _log = LogFactoryUtil.getLog(UserMVCActionCommand.class);
 }

@@ -10,6 +10,13 @@ import org.osgi.service.component.annotations.*;
 import java.io.*;
 import java.util.*;
 
+/**
+ * Image Crawl Controller
+ * <p/>
+ * This class manage crawlers for fetching dummy links from Internet
+ *
+ * @author Yasuyuki Takeo
+ */
 @Component(immediate = true, service = ImageCrawlController.class)
 public class ImageCrawlController {
 

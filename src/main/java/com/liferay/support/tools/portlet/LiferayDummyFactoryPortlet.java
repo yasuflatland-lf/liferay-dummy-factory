@@ -1,14 +1,22 @@
 package com.liferay.support.tools.portlet;
 
-import com.liferay.portal.configuration.metatype.bnd.util.*;
-import com.liferay.portal.kernel.portlet.bridges.mvc.*;
-import com.liferay.support.tools.constants.*;
-import com.liferay.support.tools.portlet.actions.*;
-import org.osgi.service.component.annotations.*;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.support.tools.constants.LDFPortletKeys;
+import com.liferay.support.tools.portlet.actions.DummyFactoryConfiguration;
 
-import javax.portlet.*;
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.Map;
+
+import javax.portlet.Portlet;
+import javax.portlet.PortletException;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Modified;
 
 /**
  * Dummy Factory Portlet
@@ -57,7 +65,7 @@ public class LiferayDummyFactoryPortlet extends MVCPortlet {
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-        renderRequest.setAttribute(DummyFactoryConfiguration.class.getName(), _dummyFactoryConfiguration);
+		renderRequest.setAttribute(DummyFactoryConfiguration.class.getName(), _dummyFactoryConfiguration);
 
 		super.doDispatch(renderRequest, renderResponse);
 	}

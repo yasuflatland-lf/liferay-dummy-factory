@@ -21,7 +21,7 @@
 			<div class="collapsed collapse" id="navPillsCollapse0" aria-expanded="false" >
 				<blockquote class="blockquote-info">
 				    <small>Example</small>
-					<p>if you enter the values <code>3</code> and "page" the portlet will create three blank sites: <code>page1</code>, <code>page2</code>, and <code>page3</code>.<p>
+					<p>if you enter the values <code>3</code> and "page" the portlet will create three pages: <code>page1</code>, <code>page2</code>, and <code>page3</code>.<p>
 				</blockquote>
 			
 				<ul>
@@ -154,7 +154,7 @@
 							  }
 							);
 						});
-						var pageObj = $('#<portlet:namespace />parentLayoutId')
+						var pageObj = $('#<portlet:namespace />parentLayoutId');
 						pageObj.empty();
 						pageObj.append(listAll);
 					}

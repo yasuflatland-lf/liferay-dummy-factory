@@ -1,22 +1,14 @@
 package com.liferay.support.tools.portlet.actions;
 
-import com.liferay.portal.kernel.exception.DuplicateOrganizationException;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Organization;
-import com.liferay.portal.kernel.model.OrganizationConstants;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.service.OrganizationLocalService;
-import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionMessages;
-import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.constants.LDFPortletKeys;
-import com.liferay.support.tools.utils.ProgressManager;
+import com.liferay.support.tools.organization.OrgContext;
+import com.liferay.support.tools.organization.OrgDummyFactory;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -39,99 +31,25 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 
-	/**
-	 * Create Organizations
-	 * 
-	 * @param actionRequest
-	 * @param actionResponse
-	 * @throws PortalException 
-	 */
-	private void createOrganizations(ActionRequest actionRequest, ActionResponse actionResponse) throws PortalException{
-		//Parameber values
-		long startIndex = 1;
-		long numberOfOrganizations = 0;
-		String baseOrganizationName = "";
-		int parentOrganizationId = OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID;
-		boolean organizationSiteCreate = false;
-		
-		//Fetch data
-		startIndex = ParamUtil.getLong(actionRequest, "startIndex",1);
-		numberOfOrganizations = ParamUtil.getLong(actionRequest, "numberOfOrganizations",0);
-		baseOrganizationName = ParamUtil.getString(actionRequest, "baseOrganizationName","");
-		parentOrganizationId = ParamUtil.getInteger(actionRequest, "parentOrganizationId", OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID);
-		organizationSiteCreate = ParamUtil.getBoolean(actionRequest, "organizationSiteCreate", false);
-		
-		ServiceContext serviceContext = ServiceContextFactory
-				.getInstance(Organization.class.getName(), actionRequest);				
-
-		//Tracking progress start
-		ProgressManager progressManager = new ProgressManager();
-		progressManager.start(actionRequest);
-
-		System.out.println("Starting to create " + numberOfOrganizations + " organizations");
-
-		for (long i = startIndex; i <= numberOfOrganizations; i++) {
-			//Update progress
-			progressManager.trackProgress(i, numberOfOrganizations);
-
-			//Create Organization Name
-			StringBundler organizationName = new StringBundler(2);
-			
-			//Only basename if creating Organization is only one.
-			if(1 < numberOfOrganizations) {
-				organizationName.append(i).append(baseOrganizationName);
-			} else {
-				organizationName.append(baseOrganizationName);
-			}
-			
-			try {
-				
-				_organizationLocalService.addOrganization(
-						serviceContext.getUserId(),
-						parentOrganizationId, // parentOrganizationId
-						organizationName.toString(), // name
-						organizationSiteCreate); // site
-				
-			} catch (Exception e) {
-				if (e instanceof DuplicateOrganizationException ) {
-					_log.error("Organizations <" + organizationName.toString() + "> is duplicated. Skip : " + e.getMessage());
-				}
-				else {
-					//Finish progress
-					progressManager.finish();	
-					throw e;
-				}
-			} 
-		}
-		
-		//Finish progress
-		progressManager.finish();	
-
-		SessionMessages.add(actionRequest, "success");
-		
-		System.out.println("Finished creating " + numberOfOrganizations + " organizations");
-	}
-
 	@Override
-	protected void doProcessAction(ActionRequest actionRequest, ActionResponse actionResponse) {
+	protected void doProcessAction(ActionRequest request, ActionResponse response) {
 
 		try {
-			//Create Organization
-			createOrganizations(actionRequest, actionResponse);
-			
+			DummyGenerator<OrgContext> dummyGenerator = _orgDummyFactory.create(request);
+			dummyGenerator.create(request);
+
 		} catch (Exception e) {
-			hideDefaultSuccessMessage(actionRequest);
-			_log.error(e,e);
+			hideDefaultSuccessMessage(request);
+			_log.error(e, e);
 		}
-	
+
+		response.setRenderParameter("mvcRenderCommandName", LDFPortletKeys.COMMON);
+		SessionMessages.add(request, "success");
+		
 	}
-	
+
 	@Reference
-	private Portal _portal;
+	OrgDummyFactory _orgDummyFactory;
 	
-	@Reference
-	private OrganizationLocalService _organizationLocalService;	
-	
-	private static final Log _log = LogFactoryUtil.getLog(
-			OrganizationMVCActionCommand.class);		
+	private static final Log _log = LogFactoryUtil.getLog(MBMVCActionCommand.class);	
 }
