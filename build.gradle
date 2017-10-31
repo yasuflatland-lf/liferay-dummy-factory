@@ -2,6 +2,7 @@ apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
+apply plugin: 'jacoco'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -25,6 +26,18 @@ repositories {
 		url 'https://jitpack.io'
 	}
 }
+
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+
+	dependencies {
+		classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:latest.release'
+	}
+}
+
+apply plugin: 'com.github.kt3k.coveralls'
 
 dependencies {
 	compile 'biz.aQute.bnd:biz.aQute.bndlib:3.1.0'
@@ -87,3 +100,16 @@ dependencies {
 		exclude module: 'groovy-all'
 	}
 }
+
+test {
+	testLogging.showStandardStreams = true
+}
+
+jacocoTestReport {
+	reports {
+		xml.enabled true
+		html.enabled = true
+	}
+}
+
+check.dependsOn jacocoTestReport
