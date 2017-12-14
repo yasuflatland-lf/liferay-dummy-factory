@@ -1,4 +1,4 @@
-package com.liferay.support.tools.portlet.actions;
+package com.liferay.support.tools.user;
 
 import com.github.javafaker.Faker;
 import com.liferay.portal.kernel.exception.PortalException;

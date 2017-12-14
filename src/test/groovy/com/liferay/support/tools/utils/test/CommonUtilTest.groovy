@@ -1,6 +1,5 @@
 package com.liferay.support.tools.utils.test
 
-import com.liferay.support.tools.portlet.actions.UserDataService
 import com.liferay.support.tools.utils.CommonUtil
 import spock.lang.Specification
 import spock.lang.Unroll

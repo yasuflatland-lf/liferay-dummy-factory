@@ -14,6 +14,7 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.support.tools.constants.LDFPortletKeys;
+import com.liferay.support.tools.user.UserDataService;
 import com.liferay.support.tools.utils.CommonUtil;
 import com.liferay.support.tools.utils.ProgressManager;
 
