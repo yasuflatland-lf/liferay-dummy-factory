@@ -71,7 +71,7 @@ public class UserDataService {
 	 * @param localeStr
 	 * @throws PortalException
 	 */
-	public void createUserData(ServiceContext serviceContext, long[] organizationIds, long[] groupIds, long[] roleIds,
+	public User createUserData(ServiceContext serviceContext, long[] organizationIds, long[] groupIds, long[] roleIds,
 			long[] userGroupIds, boolean male, boolean fakerEnable, String password, String screenName,
 			String emailAddress, String baseScreenName, long index, String localeStr) throws PortalException {
 
@@ -82,9 +82,11 @@ public class UserDataService {
 		String firstName = (fakerEnable) ? faker.name().firstName() : baseScreenName;
 		String lastName = (fakerEnable) ? faker.name().lastName() : String.valueOf(index);
 
+        User user = null;
+
 		try {
 			// Create User
-			User user = _userLocalService.addUserWithWorkflow(
+			user = _userLocalService.addUserWithWorkflow(
 					serviceContext.getUserId(), 
 					serviceContext.getCompanyId(), // companyId,
 					false, // autoPassword,
@@ -127,8 +129,9 @@ public class UserDataService {
 		} catch (UserScreenNameException e) {
 			_log.error("User is duplicated. Skip : " + e.getMessage());
 		}
-	}
 
+        return user;
+	}
 
 	/**
 	 * Get Faker available locales
