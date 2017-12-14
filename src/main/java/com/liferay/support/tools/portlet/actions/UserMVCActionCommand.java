@@ -5,6 +5,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -14,6 +15,8 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.support.tools.constants.LDFPortletKeys;
+import com.liferay.support.tools.user.UserDataService;
+import com.liferay.support.tools.user.UserLayoutUtil;
 import com.liferay.support.tools.utils.CommonUtil;
 import com.liferay.support.tools.utils.ProgressManager;
 
@@ -57,6 +60,7 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 		boolean fakerEnable;
 		String password;
 		String locale;
+		boolean autoUserPreLogin;
 
 		// Fetch data
 		numberOfusers = ParamUtil.getLong(actionRequest, "numberOfusers", 0);
@@ -66,6 +70,7 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 		fakerEnable = ParamUtil.getBoolean(actionRequest, "fakerEnable", false);
 		password = ParamUtil.getString(actionRequest, "password", "test");
 		locale = ParamUtil.getString(actionRequest, "locale", "en");
+		autoUserPreLogin = ParamUtil.getBoolean(actionRequest, "autoUserPreLogin", false);
 
 		// Organization
 		String[] organizations = ParamUtil.getStringValues(actionRequest, "organizations", null);
@@ -109,7 +114,7 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 
 			try {
 				// Create user and apply roles
-				_userDataService.createUserData(
+				User user = _userDataService.createUserData(
 						serviceContext, 
 						organizationIds, 
 						groupIds, 
@@ -123,6 +128,11 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 						baseScreenName, 
 						i,
 						locale);
+
+				if(autoUserPreLogin) {
+					// Generate private / public user page
+					_userLayoutUtil.updateUserLayouts(user);
+				}
 				
 			} catch (Exception e) {
 				
@@ -163,6 +173,9 @@ public class UserMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private UserDataService _userDataService;
+
+	@Reference
+	private UserLayoutUtil _userLayoutUtil;
 
 	private static final Log _log = LogFactoryUtil.getLog(UserMVCActionCommand.class);
 }
