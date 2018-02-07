@@ -57,6 +57,7 @@ dependencies {
 	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.+'
 	compile group: 'org.reactivestreams', name: 'reactive-streams', version: '1.0.+'
 
+	compile group: "com.liferay", name: "com.liferay.application.list.api", version: "2.0.0"
 	compile group: "com.liferay", name: "com.liferay.frontend.taglib", version: "2.0.0"
 	compile group: "com.liferay", name: "com.liferay.item.selector.api", version: "2.0.0"
 	compile group: "com.liferay", name: "com.liferay.item.selector.criteria.api", version: "2.0.0"
