@@ -1,4 +1,3 @@
-
 <%@page import="com.liferay.portal.kernel.util.Validator"%>
 <%@ include file="/init.jsp" %>
 <%@ page contentType="text/html; charset=UTF-8" %>

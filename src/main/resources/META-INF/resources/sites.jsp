@@ -1,5 +1,11 @@
 <%@ include file="/init.jsp"%>
 
+<aui:nav-bar cssClass="collapse-basic-search" markupView="lexicon">
+	<aui:nav cssClass="navbar-nav">
+		<aui:nav-item label="Sites" selected="<%= true %>" />
+	</aui:nav>
+</aui:nav-bar>
+
 <div class="container-fluid-1280">
 	<liferay-ui:success key="success" message="Sites created successfully" />
 	<%@ include file="/command_select.jspf"%>
