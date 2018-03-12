@@ -24,6 +24,7 @@ repositories {
 		url "http://repository.sonatype.org/content/groups/public"
 		url "https://mvnrepository.com/artifact/com.sun/tools"
 		url 'https://jitpack.io'
+		url 'file:/[YOUR_FULLPATH_TO_LIFERAY_PORTAL_ROOT]/.m2-tmp/'
 	}
 }
 
@@ -64,10 +65,11 @@ dependencies {
 	compile group: "com.liferay", name: "com.liferay.item.selector.taglib", version: "1.0.0"
 	compile group: "com.liferay", name: "com.liferay.trash.taglib", version: "2.0.0"
 	compile group: "com.liferay", name: "com.liferay.portal.spring.extender", version: "2.0.0"
-	compile group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "2.0.0"
+	compile group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "2.0.0"
+	compile group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "default"
 	compile group: "com.liferay.portal", name: "com.liferay.util.taglib", version: "2.0.0"
-	compile group: "com.liferay", name: "com.liferay.journal.api", version: "2.0.0"
-	compile group: "com.liferay", name: "com.liferay.journal.service", version: "3.0.0"
+	compile group: "com.liferay", name: "com.liferay.journal.api", version: "3.0.0"
+	compile group: "com.liferay", name: "com.liferay.journal.service", version: "4.0.0"
 	compile group: "com.liferay", name: "com.liferay.dynamic.data.lists.service", version: "1.0.0"
 	compile group: "com.liferay", name: "com.liferay.dynamic.data.lists.api", version: "2.0.0"
 	compile group: "com.liferay", name: "com.liferay.dynamic.data.mapping.api", version: "3.0.0"

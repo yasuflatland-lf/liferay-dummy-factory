@@ -4,6 +4,14 @@
 
 Dummy Factory generates dummy data for debugging use. Please don't use this for a production use.
 
+## How to compile against master (7.1)
+1. Load master with ```git clone https://github.com/liferay/liferay-portal```
+2. Go to ```${liferay_root}/modules/apps/web-experience/journal
+3. In the directory, if you've installed blade, Run ```blade gw commitCache``` or ```../../../../gradlew commitCache``` to store the latest model jars into your gradle cache
+4. Go to your liferay workspace where you place your liferay-dummy-factory module. Open ```build.gradle``` and add your local repository. (see url 'file:/[YOUR_FULLPATH_TO_LIFERAY_PORTAL_ROOT]/.m2-tmp/' part and replace it to your local enviroment path)
+5. Start up lifeary master bundle.
+5. Run ```blade deploy``` in the ```${liferay_workspace_root}/modules/liferay-dummy-factory``` directory.
+
 ## What does Dummy Factory generate?
 
 * Organizations
