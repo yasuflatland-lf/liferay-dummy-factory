@@ -61,6 +61,7 @@
 			String randomAmountLabel = "Amount of links in the generated contents";
 			String totalParagraphsLabel = "Paragraphes count";
 			String createContentsTypeLabel = "Select create contents type";
+			String folderIdLabel = "Journal Folder ID of the target folder";
 			
 			List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 			%>
@@ -86,6 +87,10 @@
 					}
 					%>
 				</aui:select>		
+
+				<aui:select name="folderId" label="<%= folderIdLabel %>" >
+					<aui:option label="<%= defaultOption %>" value="<%= themeDisplay.getScopeGroupId() %>" selected="<%= true %>" />
+				</aui:select>							
 					
 				<aui:a href="#inputOptions" cssClass="collapse-icon collapsed icon-angle-down" title="Option" aria-expanded="false" data-toggle="collapse" >&nbsp;&nbsp;option</aui:a>
 				<div class="collapsed collapse" id="inputOptions" aria-expanded="false" >
@@ -213,6 +218,7 @@
 
 <portlet:resourceURL id="/ldf/image/list" var="linkListURL" />
 
+
 <aui:script use="aui-base, liferay-form">
 	var processStart = A.one('#<portlet:namespace />processStart');
 	
@@ -245,5 +251,51 @@
 	    	});
 	    }
 	);
+	
+	
+</aui:script>
+
+<script type="text/html" id="<portlet:namespace />journal_folders">
+    <option value="<@= folderId @>" data-group-id="<@= groupId @>" ><@= name @></option>
+</script>
+
+<aui:script use="aui-base, liferay-form">
+	
+	// Select Folder
+	var groupIds = A.one('#<portlet:namespace />groupIds');
+	
+	$('#<portlet:namespace />groupIds').on(
+	    'change load',
+	    function() {
+			Liferay.Service(
+			  '/journal.journalfolder/get-folders',
+			  {
+			    groupId: groupIds.val()
+			  },
+			  function(obj) {
+				//Load Template
+				var tmpl = _.template($('#<portlet:namespace />journal_folders').html());
+				var listAll = tmpl({
+					name:"(None)",
+					folderId:0,
+					groupId:<%=themeDisplay.getScopeGroupId() %>
+				});
+				_.map(obj,function(data) {
+					listAll +=
+					tmpl(
+					  {
+						name:data.name,
+						folderId:data.folderId,
+						groupId:data.groupId
+					  }
+					);
+				});
+				var folderListObj = $('#<portlet:namespace />folderId')
+				folderListObj.empty();
+				folderListObj.append(listAll);
+			  }
+			);
+	    }
+	);	
 	
 </aui:script>
