@@ -42,6 +42,9 @@
 			String numberOfCategoriesLabel = "Enter the number of categories / vocabralies you would like to create";
 			String baseCategoryNameLabel= "Enter the base Category / Vocabulary name";
 			List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			final String groupName = GroupConstants.GUEST;
+			final long companyId = PortalUtil.getDefaultCompanyId();
+			final long guestGroupId = GroupLocalServiceUtil.getGroup(companyId, groupName).getGroupId();
 
 			String defaultOption = "(None)";
 
@@ -63,7 +66,7 @@
 				</aui:select>
 
 				<aui:select name="group" label="<%= groupLabel %>" >
-					<aui:option label="<%= defaultOption %>" value="<%= scopeGroupdId %>" />
+					<aui:option label="<%= defaultOption %>" value="<%= guestGroupId %>" />
 					<%
 					for (Group group : groups) {
 						if (group.isSite()) {
@@ -77,8 +80,11 @@
 
 				<span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.C_CATEGORY_CREATE) %>" class="<portlet:namespace />contentsTypeGroup" >
 					<%
-					List<AssetVocabulary> assetVocabularies = AssetVocabularyLocalServiceUtil.getAssetVocabularies(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+					List<AssetVocabulary> assetVocabularies = AssetVocabularyServiceUtil.getGroupVocabularies(
+							guestGroupId, true);					
+
 					%>
+					
 					<aui:select name="vocabularyId" label="<%= vocabularyIdLabel %>" >
 						<%
 						for (AssetVocabulary assetVocabulary : assetVocabularies) {
@@ -156,7 +162,7 @@
 			<%= progressId %>.startProgress();
 			submitForm(document.<portlet:namespace />fm);
 	    }
-	);
+	)
 	
     // Manage GroupID list display
     var createContentsType = A.one('#<portlet:namespace />createContentsType');
@@ -182,53 +188,106 @@
     <option value="<@= categoryId @>" selected="<@= selected @>"><@= categoryName @></option>
 </script>
 
+<script type="text/html" id="<portlet:namespace />vocabulary_options">
+    <option value="<@= vocabularyId @>" ><@= vocabularyName @></option>
+</script>
+
 <aui:script use="aui-base">
 	
-	// Update thread list
+	// Update category list
 	function <portlet:namespace />categoryListUpdate() {
-		var data = Liferay.Util.ns(
-			'<portlet:namespace />',
-			{
-				vocabularyId: $('#<portlet:namespace />vocabularyId').val()
-			}
-		);
-
-		$.ajax(
-			'<%= categoryListURL.toString() %>',
-			{
-				data: data,
-				success: function(data) {
-
-					//Load Template
-					var tmpl = _.template($('#<portlet:namespace />category_options').html());
-					var listAll = tmpl({
-						categoryId:"<%= String.valueOf(AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) %>",
-						categoryName:"(None)",
-						selected:"true"
-					});
-					_.map(data,function(n) {
-						listAll += 
-						tmpl(
-						  {
-							categoryId:(n.categoryId) ? _.escape(n.categoryId) : "",
-							categoryName:(n.categoryName) ? _.escape(n.categoryName) : "",
-							selected:"false"
-						  }
-						);
-					});
-					var catObj = $('#<portlet:namespace />parentCategoryId');
-					catObj.empty();
-					catObj.append(listAll);
-				}
-			}
-		);	
+		var defer = $.Deferred();
+		
+		Liferay.Service(
+		  '/assetcategory/get-vocabulary-categories',
+		  {
+		    vocabularyId:$('#<portlet:namespace />vocabularyId').val() ,
+		    start: -1 ,
+		    end: -1,
+		    "+obc":"com.liferay.portlet.asset.util.comparator.AssetCategoryCreateDateComparator" 
+		  },
+		  function(data) {
+			//Load Template
+			var tmpl = _.template($('#<portlet:namespace />category_options').html());
+            var listAll = tmpl({
+                categoryId:"<%= String.valueOf(AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) %>",
+                categoryName:"(None)",
+                selected:"true"
+            });
+			
+			_.map(data,function(n) {
+				listAll += 
+				tmpl(
+				  {
+					categoryId:(n.categoryId) ? _.escape(n.categoryId) : "",
+					categoryName:(n.titleCurrentValue) ? _.escape(n.titleCurrentValue) : "",
+					selected:"false"
+				  }
+				);
+			});
+			var catObj = $('#<portlet:namespace />parentCategoryId');
+			catObj.empty();
+			catObj.append(listAll);
+			defer.resolve();				    
+		  }
+		);		
+		return defer.promise();
 	}
 	
+	// Vocabulary ID
 	$('#<portlet:namespace />vocabularyId').on(
 		'change load',
 		function(event) {
 			//Update thread list
 			<portlet:namespace />categoryListUpdate();
 		}
+	);
+	
+	// Group (Site)
+	$('#<portlet:namespace />group').on(
+		'change load',
+		function(event) {
+		
+			//Update thread list
+			<portlet:namespace />vocabularyUpdate()
+			.then(function() {
+				<portlet:namespace />categoryListUpdate();
+			});
+		}
 	);	
+	
+	// Update vocabulary list
+	function <portlet:namespace />vocabularyUpdate() {
+		var defer = $.Deferred();
+		
+		$('#<portlet:namespace />group').on(
+			'change load',
+			function(event) {
+				Liferay.Service(
+				  '/assetvocabulary/get-group-vocabularies',
+				  {
+				    groupId: $('#<portlet:namespace />group').val()
+				  },
+				  function(data) {
+				  
+					//Load Template
+					var tmpl = _.template($('#<portlet:namespace />vocabulary_options').html());
+					var listAll = "";
+					_.map(data,function(n) {
+						listAll += 
+						tmpl({
+							vocabularyId:(n.vocabularyId) ? _.escape(n.vocabularyId) : "",
+							vocabularyName:(n.titleCurrentValue) ? _.escape(n.titleCurrentValue) : ""
+						});
+					});
+					var catObj = $('#<portlet:namespace />vocabularyId');
+					catObj.empty();
+					catObj.append(listAll);	
+					defer.resolve();		    
+				  }
+				);	
+			}
+		);	
+		return defer.promise();	
+	}	
 </aui:script>
