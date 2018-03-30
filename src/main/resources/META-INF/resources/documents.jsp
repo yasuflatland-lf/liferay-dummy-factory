@@ -44,7 +44,11 @@
 			String baseDocumentDescriptionLabel = "Enter the base document description";
 			String defaultOption = "(None)";
 			String groupIdLabel = "Select a site to assign the documents to";
+			String dlFolderIdLabel = "Select a folder where the document is created";
 			List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			final String groupName = GroupConstants.GUEST;
+			final long companyId = PortalUtil.getDefaultCompanyId();
+			final long guestGroupId = GroupLocalServiceUtil.getGroup(companyId, groupName).getGroupId();			
 			%>
 
 			<aui:form action="<%= documentEditURL %>" method="post" name="fm" >
@@ -57,7 +61,7 @@
 					<aui:validator name="required" />				
 				</aui:input>
 				<aui:select name="groupId" label="<%= groupIdLabel %>"  >
-					<aui:option label="<%= defaultOption %>" value="<%= themeDisplay.getScopeGroupId() %>" selected="<%= true %>" />
+					<aui:option label="<%= defaultOption %>" value="<%= guestGroupId %>" selected="<%= true %>" />
 					<%
 					for (Group group : groups) {
 						if (group.isSite() && !group.getDescriptiveName().equals("Control Panel")) {
@@ -68,10 +72,14 @@
 					}
 					%>
 				</aui:select>		
+				<aui:select name="folderId" label="<%= dlFolderIdLabel %>" >
+					<aui:option label="<%= defaultOption %>" value="<%= String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>"/>
+				</aui:select>						
 				<aui:a href="#inputOptions" cssClass="collapse-icon collapsed icon-angle-down" title="Option" aria-expanded="false" data-toggle="collapse" >&nbsp;&nbsp;option</aui:a>
 				<div class="collapsed collapse" id="inputOptions" aria-expanded="false" >
 					<div class="row">
 						<aui:fieldset cssClass="col-md-12">
+						
 							<aui:input name="baseDocumentDescription" label="<%= baseDocumentDescriptionLabel %>" cssClass="lfr-textarea-container" type="textarea" wrap="soft" />
  						</aui:fieldset>
 					</div>
@@ -90,6 +98,10 @@
 	</aui:fieldset-group>
 </div>
 
+<script type="text/html" id="<portlet:namespace />journal_folder_options">
+    <option value="<@= folderId @>" ><@= name @></option>
+</script>
+
 <aui:script use="aui-base">
 	var processStart = A.one('#<portlet:namespace />processStart');
 	
@@ -101,4 +113,44 @@
 			submitForm(document.<portlet:namespace />fm);
 	    }
 	);
+	
+	$('#<portlet:namespace />groupId').on(
+		'change load',
+		function(event) {
+		
+			Liferay.Service(
+			  '/dlfolder/get-folders',
+			  {
+			    groupId: $('#<portlet:namespace />groupId').val(),
+			    parentFolderId: "<%= String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>",
+			    start: -1,
+			    end: -1,
+			    "+obc":"com.liferay.document.library.kernel.util.comparator.FolderIdComparator" 
+			  },
+			  function(data) {
+                //Load Template
+                var tmpl = _.template($('#<portlet:namespace />journal_folder_options').html());
+                var listAll = tmpl({
+                    folderId:"<%= String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>",
+                    name:"(None)",
+                    selected:"true"
+                });
+                
+                _.map(data,function(n) {
+                    listAll += 
+                    tmpl(
+                      {
+                        folderId:(n.folderId) ? _.escape(n.folderId) : "",
+                        name:(n.name) ? _.escape(n.name) : "",
+                        selected:"false"
+                      }
+                    );
+                });
+                var catObj = $('#<portlet:namespace />folderId');
+                catObj.empty();
+                catObj.append(listAll);             			    
+			  }
+			);		
+		}
+	);		
 </aui:script>
