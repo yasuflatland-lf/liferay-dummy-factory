@@ -22,8 +22,8 @@ Dummy Factory generates dummy data for debugging use. Please don't use this for 
 ## Usage
 1. Download jar file from [here](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/master/latest) and place it in ${liferay-home}/deploy folder. 
 2. Start Liferay bundle and login as an administrator.
-3. After the jar is properly installed, navigate to ```Application``` in the right pane and under Tool folder, Dummy Factory portlet will be found. Please place that on a page.
-4. Now you are ready to create dummy data! Enjoy! 
+3. After the jar is properly installed, navigate to ```Control Panel``` in the left pane and under ```Apps``` folder, Dummy Factory portlet will be found. Please place that on a page.
+4. Now you are ready to create dummy data! Enjoy!
 
 ## How can I compile Dummy Factory on my own?
 1. Clone this repository to your local. Please make sure you've already installed Gradle 3.0 or above and blade tool that Liferay provides.

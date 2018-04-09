@@ -1,8 +1,18 @@
 package com.liferay.support.tools.category;
 
+import com.liferay.asset.kernel.model.AssetCategory;
+import com.liferay.asset.kernel.model.AssetCategoryConstants;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
+import com.liferay.asset.kernel.service.AssetCategoryService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.ProgressManager;
 
@@ -30,6 +40,34 @@ public class CategoryDefaultDummyGenerator extends DummyGenerator<CategoryContex
 		return new CategoryContext(request);
 	}
 
+	protected String[] getCategoryProperties(ActionRequest actionRequest) {
+		int[] categoryPropertiesIndexes = StringUtil.split(
+			ParamUtil.getString(actionRequest, "categoryPropertiesIndexes"), 0);
+
+		String[] categoryProperties =
+			new String[categoryPropertiesIndexes.length];
+
+		for (int i = 0; i < categoryPropertiesIndexes.length; i++) {
+			int categoryPropertiesIndex = categoryPropertiesIndexes[i];
+
+			String key = ParamUtil.getString(
+				actionRequest, "key" + categoryPropertiesIndex);
+
+			if (Validator.isNull(key)) {
+				continue;
+			}
+
+			String value = ParamUtil.getString(
+				actionRequest, "value" + categoryPropertiesIndex);
+
+			categoryProperties[i] =
+				key + AssetCategoryConstants.PROPERTY_KEY_VALUE_SEPARATOR +
+					value;
+		}
+
+		return categoryProperties;
+	}
+	
 	@Override
 	protected void exec(ActionRequest request, CategoryContext paramContext) throws PortalException {
 
@@ -44,6 +82,11 @@ public class CategoryDefaultDummyGenerator extends DummyGenerator<CategoryContex
 			paramContext.getServiceContext().getLocale(), 
 			"Sample Description"
 		);
+		
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+				AssetCategory.class.getName(), request);
+		
+		String[] categoryProperties = getCategoryProperties(request);		
 		
 		for (long i = 1; i <= paramContext.getNumberOfCategories(); i++) {
 			//Update progress
@@ -66,15 +109,22 @@ public class CategoryDefaultDummyGenerator extends DummyGenerator<CategoryContex
 			
 			try {
 				
-				_assetCategoryLocalService.addCategory(
-						paramContext.getServiceContext().getUserId(), // userId
-						paramContext.getGroupId(), // groupId,
-						paramContext.getParentCategoryId(), // parentCategoryId,
-						titleMap, //titleMap, 
-						descriptionMap, // descriptionMap,
-						paramContext.getVocabularyId(), // vocabularyId
-						null,
-						paramContext.getServiceContext());
+				if(_log.isDebugEnabled()) {
+					_log.debug("-----");
+					_log.debug("User  ID : " + String.valueOf(paramContext.getServiceContext().getUserId()));
+					_log.debug("Group ID : " + String.valueOf(paramContext.getGroupId()));
+					_log.debug("Parent CategoryId ID : " + String.valueOf(paramContext.getParentCategoryId()));
+					_log.debug("Vocabulary ID : " + String.valueOf(paramContext.getVocabularyId()));
+				}
+				
+				_assetCategoryService.addCategory(
+						paramContext.getGroupId(), 
+						paramContext.getParentCategoryId(),
+						titleMap,
+						descriptionMap, 
+						paramContext.getVocabularyId(), 
+						categoryProperties,
+						serviceContext);
 				
 			} catch (Exception e) {
 				//Finish progress
@@ -93,5 +143,10 @@ public class CategoryDefaultDummyGenerator extends DummyGenerator<CategoryContex
 
 	@Reference
 	private AssetCategoryLocalService _assetCategoryLocalService;
+	
+	@Reference
+	private AssetCategoryService _assetCategoryService;
+
+	private static final Log _log = LogFactoryUtil.getLog(CategoryDefaultDummyGenerator.class);	
 
 }

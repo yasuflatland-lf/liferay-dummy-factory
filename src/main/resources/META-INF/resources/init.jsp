@@ -12,22 +12,22 @@
 <%@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
 <%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
-<%@ page import="javax.portlet.PortletPreferences" %>
-
-<%@ page import="javax.portlet.PortletURL" %>
 <%@ page import="com.liferay.portal.kernel.util.*" %>
+<%@ page import="com.liferay.portal.kernel.util.PropsKeys" %>
 <%@ page import="com.liferay.portal.kernel.model.*" %>
 <%@ page import="com.liferay.portal.kernel.portlet.*" %>
 <%@ page import="com.liferay.portal.kernel.service.*" %>
-<%@ page import="com.liferay.support.tools.constants.*" %>
-<%@ page import="com.liferay.asset.kernel.model.*" %>
-<%@ page import="com.liferay.asset.kernel.service.*" %>
-
+<%@ page import="com.liferay.portal.kernel.search.*" %>
 <%@ page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
+<%@ page import="com.liferay.document.library.kernel.model.*" %>
+
 <%@ page import="com.liferay.support.tools.portlet.actions.PageMVCResourceCommand" %>
 <%@ page import="com.liferay.support.tools.portlet.actions.RoleMVCResourceCommand" %>
 <%@ page import="com.liferay.support.tools.messageboard.MBMVCResourceCommand" %>
+<%@ page import="com.liferay.support.tools.constants.*" %>
+<%@ page import="com.liferay.asset.kernel.model.*" %>
+<%@ page import="com.liferay.asset.kernel.service.*" %>
 
 <%@ page import="com.liferay.support.tools.portlet.actions.DummyFactoryConfiguration" %>
 <%@ page import="com.liferay.dynamic.data.mapping.model.*" %>
@@ -35,10 +35,19 @@
 <%@ page import="com.liferay.journal.service.*" %>
 <%@ page import="com.liferay.dynamic.data.mapping.service.*" %>
 <%@ page import="com.liferay.message.boards.kernel.model.*" %>
+<%@ page import="com.liferay.trash.kernel.util.TrashUtil" %>
+<%@ page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %>
+<%@ page import="com.liferay.support.tools.document.library.EditFileEntryMVCActionCommand" %>
+<%@ page import="com.liferay.portal.util.PropsValues" %>
+
 
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.Locale" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.text.DecimalFormatSymbols" %>
+<%@ page import="javax.portlet.PortletPreferences" %>
+<%@ page import="javax.portlet.PortletURL" %>
 
 <liferay-frontend:defineObjects/>
 <liferay-theme:defineObjects/>
