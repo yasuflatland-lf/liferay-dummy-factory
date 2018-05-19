@@ -15,6 +15,7 @@
 	        <aui:option label="Documents" value="<%= LDFPortletKeys.MODE_DOCUMENTS %>" selected="<%= mode.equals(LDFPortletKeys.MODE_DOCUMENTS) %>" />
 	        <aui:option label="Message Board" value="<%= LDFPortletKeys.MODE_MB %>" selected="<%= mode.equals(LDFPortletKeys.MODE_MB) %>" />
 	        <aui:option label="Category / Vocabulary" value="<%= LDFPortletKeys.MODE_CATEGORY %>" selected="<%= mode.equals(LDFPortletKeys.MODE_CATEGORY) %>" />
+	        <aui:option label="Blogs" value="<%= LDFPortletKeys.MODE_BLOGS %>" selected="<%= mode.equals(LDFPortletKeys.MODE_BLOGS) %>" />
 	    </aui:select>
     </aui:form>
     
