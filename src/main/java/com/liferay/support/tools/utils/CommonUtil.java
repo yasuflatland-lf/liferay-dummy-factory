@@ -40,6 +40,19 @@ public class CommonUtil {
 	}
 
 	/**
+	 * Convert 
+	 * @param source
+	 * @return
+	 */
+	static public String[] convertToStringArray(String source) {
+		if(source.length() == 0) {
+			return new String[0];
+		}
+		
+		return source.split(",",0);
+	}
+	
+	/**
 	 * Convert string array to long array
 	 * 
 	 * @param source String array of ids

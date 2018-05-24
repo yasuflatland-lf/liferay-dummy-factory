@@ -72,4 +72,21 @@ class CommonUtilTest extends Specification {
             assert null != uds.createFaker(lang);
         }
     }
+	
+	@Unroll("convertToStringArray test") 
+	def "convertToStringArray test" () {
+		when:
+		def emptyStrArray = new String[0];
+		
+		then:
+		def ret = CommonUtil.convertToStringArray(input_string);
+		ret == result
+		size_ret == ret.size();
+		
+		where:
+		result                  								  | input_string    									  | size_ret
+		["http://trackbacktest.com","https://www.trackback2.com"] | "http://trackbacktest.com,https://www.trackback2.com" | 2
+		["aaa","bbb"]											  | "aaa,bbb"											  | 2
+		[]                                                        | ""           										  | 0
+	}
 }

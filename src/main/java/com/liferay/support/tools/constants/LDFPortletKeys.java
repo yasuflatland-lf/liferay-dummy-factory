@@ -25,6 +25,7 @@ public class LDFPortletKeys {
 		{put(LDFPortletKeys.MODE_DOCUMENTS, LDFPortletKeys.JSP_DOCUMENTS);}
 		{put(LDFPortletKeys.MODE_MB, LDFPortletKeys.JSP_MB);}
 		{put(LDFPortletKeys.MODE_CATEGORY, LDFPortletKeys.JSP_CATEGORY);}
+		{put(LDFPortletKeys.MODE_BLOGS, LDFPortletKeys.JSP_BLOGS);}
     });
 	
 	// Mode parameter
@@ -40,6 +41,7 @@ public class LDFPortletKeys {
 	public static final String DOCUMENTS = "/ldf/doc";
 	public static final String MB = "/ldf/mb";
 	public static final String CATEGORY = "/ldf/category";
+	public static final String BLOGS = "/ldf/blogs";
 	
 	public static final String CMD_PAGES_FOR_A_SITE = "/ldf/page/for_a_site";
 	public static final String CMD_ROLELIST = "/ldf/role/list";
@@ -55,6 +57,7 @@ public class LDFPortletKeys {
 	public static final String MODE_DOCUMENTS = "DOC";
 	public static final String MODE_MB = "MB";
 	public static final String MODE_CATEGORY = "CATEGORY";
+	public static final String MODE_BLOGS = "BLOGS";
 	
 	// Jsps
     public static final String JSP_ORGANIZAION = "/view.jsp";
@@ -65,6 +68,7 @@ public class LDFPortletKeys {
     public static final String JSP_DOCUMENTS = "/documents.jsp";	
     public static final String JSP_MB = "/mb.jsp";	
     public static final String JSP_CATEGORY = "/category.jsp";	
+    public static final String JSP_BLOGS = "/blogs.jsp";	
     
     //WEB
     public static final String _DDM_STRUCTURE_KEY = "BASIC-WEB-CONTENT";
