@@ -7,8 +7,11 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.ProgressManager;
+
+import java.util.Date;
 
 import javax.portlet.ActionRequest;
 
@@ -57,10 +60,19 @@ public class BlogsDefaultDummyGenerator extends DummyGenerator<BlogsContext> {
 				}
 				
 				_blogsEntryLocalService.addEntry(
-					paramContext.getUserId(), 
-					title.toString(),
-					paramContext.getContents(),
-					serviceContext);
+						paramContext.getUserId(), 
+						title.toString(), 
+						StringPool.BLANK, 
+						StringPool.BLANK, 
+						paramContext.getContents(),
+						new Date(), 
+						paramContext.isAllowPingbacks(), 
+						paramContext.isAllowTrackbacks(), 
+						paramContext.getAllowTrackbacks(), 
+						StringPool.BLANK, 
+						null, 
+						null,
+						serviceContext);
 			
 			} catch (Exception e) {
 				//Finish progress
