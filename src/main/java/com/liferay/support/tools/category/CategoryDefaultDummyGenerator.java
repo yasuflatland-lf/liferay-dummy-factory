@@ -92,11 +92,11 @@ public class CategoryDefaultDummyGenerator extends DummyGenerator<CategoryContex
 			//Update progress
 			progressManager.trackProgress(i, paramContext.getNumberOfCategories());
 			
-			//Create page name
+			//Create category name
 			StringBundler title = new StringBundler(2);
 			title.append(paramContext.getBaseCategoryName());
 			
-			//Add number more then one Page
+			//Add number more then one category
 			if(1 < paramContext.getNumberOfCategories()) {
 				title.append(i);
 			}
