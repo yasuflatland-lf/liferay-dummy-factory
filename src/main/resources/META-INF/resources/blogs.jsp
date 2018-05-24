@@ -43,6 +43,8 @@
 			String contentsLabel = "Enter the contents";
 			String userIdLabel = "User ID";
 			String defaultOption = "None";
+			String allowPingbacksLabel = "Arrow Pingbacks";
+			String allowTrackbacksLabel = "Please enter trackback address by comma separated strings";
 			
 			List<User> users = UserLocalServiceUtil.getCompanyUsers(themeDisplay.getCompanyId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 			final String groupName = GroupConstants.GUEST;
@@ -95,7 +97,8 @@
 				
 					<div class="row">
 						<aui:fieldset cssClass="col-md-12">
-							
+							<aui:input name="allowPingbacks" type="toggle-switch" label="<%= allowPingbacksLabel %>" value="<%= true %>"/>
+							<aui:input name="allowTrackbacks" label="<%= allowTrackbacksLabel %>" cssClass="lfr-textarea-container" rows="10" type="textarea" />
 						</aui:fieldset>
 					</div>
 				</div>					

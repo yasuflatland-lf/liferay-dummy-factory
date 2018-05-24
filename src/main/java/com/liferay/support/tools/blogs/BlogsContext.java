@@ -2,6 +2,7 @@ package com.liferay.support.tools.blogs;
 
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.support.tools.common.ParamContext;
+import com.liferay.support.tools.utils.CommonUtil;
 
 import javax.portlet.ActionRequest;
 
@@ -12,6 +13,8 @@ public class BlogsContext extends ParamContext {
 	private String contents = "";
 	private long userId = 0;
 	private long groupId = 0;
+	private String[] allowTrackbacks;
+	private boolean allowPingbacks;
 
 	public BlogsContext(ActionRequest actionRequest) {
 		//Fetch data
@@ -20,6 +23,9 @@ public class BlogsContext extends ParamContext {
 		contents = ParamUtil.getString(actionRequest, "contents","");
 		userId = ParamUtil.getLong(actionRequest, "userId",0);
 		groupId = ParamUtil.getLong(actionRequest, "groupId",0);
+		String tempPings = ParamUtil.getString(actionRequest, "allowTrackbacks","");
+		allowTrackbacks = CommonUtil.convertToStringArray(tempPings);
+		allowPingbacks = ParamUtil.getBoolean(actionRequest, "allowPingbacks", true);
 	}
 
 	public long getNumberOfPosts() {
@@ -62,4 +68,23 @@ public class BlogsContext extends ParamContext {
 		this.groupId = groupId;
 	}
 
+	public String[] getAllowTrackbacks() {
+		return allowTrackbacks;
+	}
+
+	public void setAllowTrackbacks(String[] allowTrackbacks) {
+		this.allowTrackbacks = allowTrackbacks;
+	}
+
+	public boolean isAllowTrackbacks() {
+		return (0 == this.allowTrackbacks.length) ? false : true;
+	}
+
+	public boolean isAllowPingbacks() {
+		return allowPingbacks;
+	}
+
+	public void setAllowPingbacks(boolean allowPingbacks) {
+		this.allowPingbacks = allowPingbacks;
+	}
 }
