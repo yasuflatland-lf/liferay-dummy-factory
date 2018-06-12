@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.Reference;
         "mvc.command.name=" + LDFPortletKeys.MB,
         "mvc.command.name=" + LDFPortletKeys.CATEGORY,
         "mvc.command.name=" + LDFPortletKeys.BLOGS,
+        "mvc.command.name=" + LDFPortletKeys.WIKI,
         "mvc.command.name=" + LDFPortletKeys.COMMON
     }, 
     service = MVCRenderCommand.class
