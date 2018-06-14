@@ -92,4 +92,8 @@ public class LDFPortletKeys {
     public static final int C_CATEGORY_CREATE = 0;
     public static final int C_VOCABULARY_CREATE = 1;
     
+    // Wiki Node / Page mode
+    public static final int W_NODE = 0;
+    public static final int W_PAGE = 1;
+    
 }

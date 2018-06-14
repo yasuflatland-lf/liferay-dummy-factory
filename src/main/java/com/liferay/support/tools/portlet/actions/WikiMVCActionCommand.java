@@ -50,7 +50,7 @@ public class WikiMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	@Reference
-	WikiDummyFactory _wikiDummyFactory;
+	private WikiDummyFactory _wikiDummyFactory;
 
 	private static final Log _log = LogFactoryUtil.getLog(WikiMVCActionCommand.class);
 }
