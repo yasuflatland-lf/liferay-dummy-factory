@@ -18,6 +18,9 @@ public class WikiContext extends ParamContext {
 	private String baseContentName;
 	private String baseSummaryName;
 	private boolean minorEdit;
+	private long nodeId;
+	private long resourcePrimKey;
+	private String format;
 
 	public WikiContext(ActionRequest actionRequest) {
 		// Common
@@ -30,6 +33,9 @@ public class WikiContext extends ParamContext {
 		
 		//Page
 		numberOfpages = ParamUtil.getLong(actionRequest, "numberOfpages",0);
+		nodeId = ParamUtil.getLong(actionRequest, "nodeId",0);
+		resourcePrimKey = ParamUtil.getLong(actionRequest, "resourcePrimKey",0);
+		format = ParamUtil.getString(actionRequest, "format","");
 		basePageName = ParamUtil.getString(actionRequest, "basePageName","");
 		baseContentName = ParamUtil.getString(actionRequest, "baseContentName","");
 		baseSummaryName = ParamUtil.getString(actionRequest, "baseSummaryName","");		
@@ -98,5 +104,37 @@ public class WikiContext extends ParamContext {
 
 	public void setMinorEdit(boolean minorEdit) {
 		this.minorEdit = minorEdit;
+	}
+
+	public long getCreateContentsType() {
+		return createContentsType;
+	}
+
+	public void setCreateContentsType(long createContentsType) {
+		this.createContentsType = createContentsType;
+	}
+
+	public long getNodeId() {
+		return nodeId;
+	}
+
+	public void setNodeId(long nodeId) {
+		this.nodeId = nodeId;
+	}
+
+	public long getResourcePrimKey() {
+		return resourcePrimKey;
+	}
+
+	public void setResourcePrimKey(long resourcePrimKey) {
+		this.resourcePrimKey = resourcePrimKey;
+	}
+
+	public String getFormat() {
+		return format;
+	}
+
+	public void setFormat(String format) {
+		this.format = format;
 	}	
 }

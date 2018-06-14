@@ -20,11 +20,14 @@
 <%@ page import="com.liferay.portal.kernel.search.*" %>
 <%@ page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
+<%@ page import="com.liferay.portal.kernel.workflow.*" %>
 <%@ page import="com.liferay.document.library.kernel.model.*" %>
 
 <%@ page import="com.liferay.support.tools.portlet.actions.PageMVCResourceCommand" %>
 <%@ page import="com.liferay.support.tools.portlet.actions.RoleMVCResourceCommand" %>
 <%@ page import="com.liferay.support.tools.messageboard.MBMVCResourceCommand" %>
+<%@ page import="com.liferay.support.tools.utils.WikiCommons" %>
+
 <%@ page import="com.liferay.support.tools.constants.*" %>
 <%@ page import="com.liferay.asset.kernel.model.*" %>
 <%@ page import="com.liferay.asset.kernel.service.*" %>
@@ -40,11 +43,13 @@
 <%@ page import="com.liferay.support.tools.document.library.EditFileEntryMVCActionCommand" %>
 <%@ page import="com.liferay.portal.util.PropsValues" %>
 
-
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.Date" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.Collection" %>
 <%@ page import="java.text.DecimalFormatSymbols" %>
 <%@ page import="javax.portlet.PortletPreferences" %>
 <%@ page import="javax.portlet.PortletURL" %>
