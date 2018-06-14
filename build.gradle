@@ -69,6 +69,9 @@ dependencies {
 	compile group: "com.liferay.portal", name: "com.liferay.util.taglib", version: "2.0.0"
 	compile group: "com.liferay", name: "com.liferay.journal.api", version: "3.0.0-SNAPSHOT"
 	compile group: "com.liferay", name: "com.liferay.journal.service", version: "4.0.0-SNAPSHOT"
+	compile group: "com.liferay", name: "com.liferay.wiki.api", version: "2.0.0"
+	compile group: "com.liferay", name: "com.liferay.wiki.service", version: "1.2.0"
+
 	compile group: "com.liferay", name: "com.liferay.dynamic.data.lists.service", version: "1.0.0"
 	compile group: "com.liferay", name: "com.liferay.dynamic.data.lists.api", version: "2.0.0"
 	compile group: "com.liferay", name: "com.liferay.dynamic.data.mapping.api", version: "3.0.0"
