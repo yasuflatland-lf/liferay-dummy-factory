@@ -4,6 +4,7 @@ Bundle-Version: 0.16.0
 
 Import-Package:\
 	!org.apache.tika.*,\
+	!org.apache.commons.fileupload.*,\
 	*
 
 Bundle-ClassPath:\

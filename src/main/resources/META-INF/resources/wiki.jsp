@@ -62,15 +62,57 @@
 					<aui:input name="numberOfnodes" label="<%= numberOfnodesLabel %>" >
 						<aui:validator name="digits" />
 						<aui:validator name="min">1</aui:validator>
-						<aui:validator name="required" />				
+				        <aui:validator name="required">
+			                function() {
+		                        return (<%= String.valueOf(LDFPortletKeys.W_NODE) %> == AUI.$('#<portlet:namespace />createContentsType').val());
+			                }
+				        </aui:validator>				
 					</aui:input>
 					
 					<aui:input name="baseNodeName" label="<%= baseNodeNameLabel %>" >
-						<aui:validator name="required" />				
+				        <aui:validator name="required">
+			                function() {
+		                        return (<%= String.valueOf(LDFPortletKeys.W_NODE) %> == AUI.$('#<portlet:namespace />createContentsType').val());
+			                }
+				        </aui:validator>				
 					</aui:input>
 			
 				</span>
 				<span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.W_PAGE) %>" class="<portlet:namespace />contentsTypeGroup" style="display:none;">
+					<%
+						String nodesLabel = "Available nodes";
+						String pagesLabel = "Available parent pages";
+					%>
+					
+					<aui:select name="nodeId" label="<%= nodesLabel %>" >
+						<aui:validator name="digits" />
+						<aui:validator name="min">1</aui:validator>					
+				        <aui:validator name="required">
+			                function() {
+		                        return (<%= String.valueOf(LDFPortletKeys.W_PAGE) %> == AUI.$('#<portlet:namespace />createContentsType').val());
+			                }
+				        </aui:validator>				
+					</aui:select>	
+									
+					<aui:select name="resourcePrimKey" label="<%= pagesLabel %>" >
+						<aui:option label="<%= defaultOption %>" value="0" />
+					</aui:select>	
+							
+					<%
+					WikiCommons wikiCommons = (WikiCommons)request.getAttribute(LDFPortletWebKeys.WIKI_COMMONS);
+					Map<String, String> formats = wikiCommons.getFormats(locale);
+					%>
+									
+					<aui:select changesContext="<%= true %>" name="format">
+						<%
+						for(Map.Entry<String, String> format : formats.entrySet()) {
+						%>
+							<aui:option label="<%= format.getValue() %>" value="<%= format.getKey() %>" />
+						<%
+						}
+						%>
+					</aui:select>			
+																						
 					<aui:input name="numberOfpages" label="<%= numberOfpagesLabel %>" >
 						<aui:validator name="digits" />
 						<aui:validator name="min">1</aui:validator>
@@ -80,7 +122,7 @@
 			                }
 				        </aui:validator>				
 					</aui:input>
-					
+
 					<aui:input name="basePageName" label="<%= basePageNameLabel %>" >
 				        <aui:validator name="required">
 			                function() {
@@ -109,7 +151,46 @@
 		
 </div>
 
-<aui:script use="aui-base, liferay-form">
+<script type="text/html" id="<portlet:namespace />node_options">
+    <option value="<@= nodeId @>" selected="<@= selected @>"><@= name @></option>
+</script>
+
+<script type="text/html" id="<portlet:namespace />page_options">
+    <option value="<@= resourcePrimKey @>" ><@= title @></option>
+</script>
+
+<aui:script use="aui-base, liferay-form">	
+	
+    // Manage GroupID list display
+    var createContentsType = A.one('#<portlet:namespace />createContentsType');
+
+	$('#<portlet:namespace />createContentsType').on(
+	    'change',
+	    function() {
+	    	initialUpdate();
+	    }
+	); 
+	
+	// Initialize
+	initialUpdate();
+	
+	// Initialize when a page rendered.
+	function initialUpdate() {
+    	//--------------------------------
+    	// Contents Creation fields switch
+    	//--------------------------------
+   		var cmp_str = "<portlet:namespace />contentsType" + createContentsType.val();
+    	$('.<portlet:namespace />contentsTypeGroup').each(function(index){
+			$(this).toggle((cmp_str === $(this).attr("id")));
+    	});
+    	
+		//Update thread list
+		<portlet:namespace />nodesUpdate()
+		.then(function() {
+			<portlet:namespace />pagesUpdate();
+		});	    
+	}	
+	
 	// Generate dummy data
 	$('#<portlet:namespace />processStart').on(
 	    'click',
@@ -119,19 +200,112 @@
 			submitForm(document.<portlet:namespace />fm);
 	    }
 	)
+ 
+
 	
-    // Manage GroupID list display
-    var createContentsType = A.one('#<portlet:namespace />createContentsType');
-	$('#<portlet:namespace />createContentsType').on(
+	// Group ID
+	$('#<portlet:namespace />groupId').on(
 	    'change load',
 	    function() {
-	    	//--------------------------------
-	    	// Contents Creation fields switch
-	    	//--------------------------------
-    		var cmp_str = "<portlet:namespace />contentsType" + createContentsType.val();
-	    	$('.<portlet:namespace />contentsTypeGroup').each(function(index){
-				$(this).toggle((cmp_str === $(this).attr("id")));
-	    	});
+			//Update thread list
+			<portlet:namespace />nodesUpdate()
+			.then(function() {
+				<portlet:namespace />pagesUpdate();
+			});	    
 	    }
-	);   	
+	)
+		
+	// Nodes update
+	function <portlet:namespace />nodesUpdate() {
+		var defer = $.Deferred();
+			
+		var groupId = A.one('#<portlet:namespace />groupId').val();
+		
+		Liferay.Service(
+			'/wiki.wikinode/get-nodes',
+			{
+				groupId: groupId,
+				start: -1,
+				end: -1,
+			},
+			function(data) {
+				//Load Template
+				var tmpl = _.template($('#<portlet:namespace />node_options').html());
+	            var listAll = tmpl({
+	                nodeId:"0",
+	                name:"(None)",
+	                selected:"true"
+	            });
+				
+				_.map(data,function(n) {
+					listAll += 
+					tmpl(
+					  {
+						nodeId:(n.nodeId) ? _.escape(n.nodeId) : "",
+						name:(n.name) ? _.escape(n.name) : "",
+						selected:"false"
+					  }
+					);
+				});
+				var catObj = $('#<portlet:namespace />nodeId');
+				catObj.empty();
+				catObj.append(listAll);
+				defer.resolve();	
+			}
+		);	
+		return defer.promise();
+	}	
+	
+	// Node ID
+	$('#<portlet:namespace />nodeId').on(
+	    'change',
+	    function() {
+	    	<portlet:namespace />pagesUpdate();
+	    }
+	)
+		
+	// Pages update
+	function <portlet:namespace />pagesUpdate() {
+		var defer = $.Deferred();
+
+		var groupId = A.one('#<portlet:namespace />groupId').val();
+		var nodeId = A.one('#<portlet:namespace />nodeId').val();
+
+		Liferay.Service(
+			'/wiki.wikipage/get-pages',
+			{
+				groupId: groupId,
+				nodeId: nodeId,
+				head : true,
+				status: <%= String.valueOf(WorkflowConstants.STATUS_APPROVED)  %>,
+				start: -1,
+				end: -1,
+			    "+obc":"com.liferay.wiki.util.comparator.PageTitleComparator" 
+			},
+			function(data) {
+				//Load Template
+				var tmpl = _.template($('#<portlet:namespace />page_options').html());
+	            var listAll = tmpl({
+	                resourcePrimKey:"0",
+	                title:"(None)"
+	            });
+				
+				_.map(data,function(n) {
+					listAll += 
+					tmpl(
+					  {
+						resourcePrimKey:(n.resourcePrimKey) ? _.escape(n.resourcePrimKey) : "",
+						title:(n.title) ? _.escape(n.title) : ""
+					  }
+					);
+				});
+				var catObj = $('#<portlet:namespace />resourcePrimKey');
+				catObj.empty();
+				catObj.append(listAll);
+				defer.resolve();
+			}
+		);	
+		return defer.promise();
+	}
+	
 </aui:script>
