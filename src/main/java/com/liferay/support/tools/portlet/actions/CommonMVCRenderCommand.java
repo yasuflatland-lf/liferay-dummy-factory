@@ -5,7 +5,9 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.util.*;
 import com.liferay.support.tools.constants.LDFPortletKeys;
+import com.liferay.support.tools.constants.LDFPortletWebKeys;
 import com.liferay.support.tools.utils.CommonUtil;
+import com.liferay.support.tools.utils.WikiCommons;
 
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
@@ -32,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
         "mvc.command.name=" + LDFPortletKeys.MB,
         "mvc.command.name=" + LDFPortletKeys.CATEGORY,
         "mvc.command.name=" + LDFPortletKeys.BLOGS,
+        "mvc.command.name=" + LDFPortletKeys.WIKI,
         "mvc.command.name=" + LDFPortletKeys.COMMON
     }, 
     service = MVCRenderCommand.class
@@ -50,6 +53,9 @@ public class CommonMVCRenderCommand implements MVCRenderCommand {
 		// Carry around mode
 		renderRequest.setAttribute(LDFPortletKeys.MODE, mode);
 		
+		// Component libralies
+		renderRequest.setAttribute(LDFPortletWebKeys.WIKI_COMMONS, _wikiCommons);
+
 		if(_log.isDebugEnabled()) {
 			_log.debug("mode <" + mode + ">");
 			_log.debug("jsp  <" + _commonUtil
@@ -65,6 +71,9 @@ public class CommonMVCRenderCommand implements MVCRenderCommand {
 	@Reference
 	private CommonUtil _commonUtil;
 	
+	@Reference
+	private WikiCommons _wikiCommons;
+
 	private static Log _log = LogFactoryUtil
 			.getLog(CommonMVCRenderCommand.class);	
 }
