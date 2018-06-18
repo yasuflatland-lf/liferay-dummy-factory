@@ -1,6 +1,9 @@
 package com.liferay.support.tools.utils;
 
-import com.liferay.wiki.engine.impl.WikiEngineRenderer;
+
+import com.liferay.petra.string.StringPool;
+import com.liferay.wiki.engine.WikiEngine;
+import com.liferay.wiki.engine.WikiEngineRenderer;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -24,7 +27,7 @@ public class WikiCommons {
 		Map<String,String> fmt = new LinkedHashMap<>();
 		
 		for(String format : formats) {
-			fmt.put(format,_wikiEngineRenderer.getFormatLabel(format, locale));
+			fmt.put(format,getFormatLabel(_wikiEngineRenderer, format, locale));
 		}
 		
 		return fmt;
@@ -37,5 +40,18 @@ public class WikiCommons {
 		_wikiEngineRenderer = wikiEngineRenderer;
 	}
 
+	public String getFormatLabel(
+		WikiEngineRenderer wikiEngineRenderer, String format, Locale locale) {
+
+		WikiEngine wikiEngine = wikiEngineRenderer.fetchWikiEngine(format);
+
+		if (wikiEngine != null) {
+			return wikiEngine.getFormatLabel(locale);
+		}
+
+		return StringPool.BLANK;
+	}
+	
 	private WikiEngineRenderer _wikiEngineRenderer;
+
 }
