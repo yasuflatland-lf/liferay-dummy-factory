@@ -6,6 +6,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.sites.kernel.util.SitesUtil;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.ProgressManager;
 
@@ -77,6 +78,14 @@ public class UserDefaultDummyGenerator extends DummyGenerator<UserContext> {
 				//Update Announcements Deliveries
 				_userDataService.updateAnnouncementsDeliveries(
 					user.getUserId(), paramContext.getAnnouncementsDeliveries());
+				
+				// My Profile and My Dashboard Template
+				SitesUtil.updateLayoutSetPrototypesLinks(
+					user.getGroup(), 
+					paramContext.getPublicLayoutSetPrototypeId(),
+					paramContext.getPrivateLayoutSetPrototypeId(),
+					paramContext.isPublicLayoutSetPrototypeLinkEnabled(),
+					paramContext.isPrivateLayoutSetPrototypeLinkEnabled());
 
 			}
 			catch (Exception e) {

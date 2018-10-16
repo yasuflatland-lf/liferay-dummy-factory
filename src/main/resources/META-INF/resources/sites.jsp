@@ -69,10 +69,15 @@
 				String manualMembershipLabel = "Enable manual membership";
 				String inheritContentLabel = "Enable inherit content";
 				String activeLabel = "Activate site";
+				String publicLayoutSetPrototypeIdLabel = "Site Template";
 				
 				List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 				String scopeGroupdId = String.valueOf(themeDisplay.getScopeGroupId());
 				String defaultOption = "(None)";
+				
+				List<LayoutSetPrototype> layoutSetPrototypes = LayoutSetPrototypeLocalServiceUtil.search(
+					themeDisplay.getCompanyId(), true,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);				
 				%>
 		
 				<aui:a href="#inputOptions" cssClass="collapse-icon collapsed icon-angle-down" title="Option" aria-expanded="false" data-toggle="collapse" >&nbsp;&nbsp;option</aui:a>
@@ -90,7 +95,18 @@
 									}
 								}
 								%>
-							</aui:select>							
+							</aui:select>		
+							
+							<aui:select name="publicLayoutSetPrototypeId" label="<%= publicLayoutSetPrototypeIdLabel %>" >
+								<aui:option label="<%= defaultOption %>" value="<%= 0 %>" />
+								<%
+								for (LayoutSetPrototype layoutSetPrototype : layoutSetPrototypes) {
+								%>
+									<aui:option label="<%= layoutSetPrototype.getName(locale) %>" value="<%= layoutSetPrototype.getLayoutSetPrototypeId() %>"/>
+								<%
+								}
+								%>
+							</aui:select>													
 						</aui:fieldset>
 						<aui:fieldset cssClass="col-md-6">
 							<aui:input type="toggle-switch" name="manualMembership" label="<%= manualMembershipLabel %>" value="true" />
