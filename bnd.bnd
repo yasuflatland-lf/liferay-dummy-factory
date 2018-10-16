@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Dummy Factory Portlet
 Bundle-SymbolicName: liferay.dummy.factory
-Bundle-Version: 0.17.0
+Bundle-Version: 7.0.0
 
 Import-Package:\
 	!org.apache.tika.*,\
@@ -44,4 +44,3 @@ Bundle-ClassPath:\
 	lib/reactive-streams.jar=reactive-streams-[0-9]*.jar,
 	lib/commons-fileupload.jar=commons-fileupload-[0-9]*.jar
 	
--metatype: *

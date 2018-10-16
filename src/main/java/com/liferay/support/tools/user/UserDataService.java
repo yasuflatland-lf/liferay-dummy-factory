@@ -1,6 +1,9 @@
+
 package com.liferay.support.tools.user;
 
 import com.github.javafaker.Faker;
+import com.liferay.announcements.kernel.model.AnnouncementsDelivery;
+import com.liferay.announcements.kernel.service.AnnouncementsDeliveryLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.exception.UserScreenNameException;
@@ -71,47 +74,54 @@ public class UserDataService {
 	 * @param localeStr
 	 * @throws PortalException
 	 */
-	public User createUserData(ServiceContext serviceContext, long[] organizationIds, long[] groupIds, long[] roleIds,
-			long[] userGroupIds, boolean male, boolean fakerEnable, String password, String screenName,
-			String emailAddress, String baseScreenName, long index, String localeStr) throws PortalException {
+	public User createUserData(
+		ServiceContext serviceContext, long[] organizationIds, long[] groupIds,
+		long[] roleIds, long[] userGroupIds, boolean male, boolean fakerEnable,
+		String password, String screenName, String emailAddress,
+		String baseScreenName, long index, String localeStr)
+		throws PortalException {
 
 		// For generating dummy user name
 		Faker faker = _commonUtil.createFaker(localeStr);
 
 		// Generate first / last name
-		String firstName = (fakerEnable) ? faker.name().firstName() : baseScreenName;
-		String lastName = (fakerEnable) ? faker.name().lastName() : String.valueOf(index);
+		String firstName =
+			(fakerEnable) ? faker.name().firstName() : baseScreenName;
+		String lastName =
+			(fakerEnable) ? faker.name().lastName() : String.valueOf(index);
 
-        User user = null;
+		User user = null;
 
 		try {
 			// Create User
 			user = _userLocalService.addUserWithWorkflow(
-					serviceContext.getUserId(), 
-					serviceContext.getCompanyId(), // companyId,
-					false, // autoPassword,
-					password, // password1,
-					password, // password2,
-					false, // autoScreenName,
-					screenName.toString(), emailAddress.toString(), 0, // facebookId,
-					StringPool.BLANK, // openId,
-					LocaleUtil.getDefault(), // locale,
-					firstName, // firstName,
-					StringPool.BLANK, // middleName,
-					lastName, // lastName,
-					0, // prefixId,
-					0, // suffixId,
-					male, // male
-					1, // birthdayMonth,
-					1, // birthdayDay,
-					1970, // birthdayYear,
-					StringPool.BLANK, // jobTitle,
-					groupIds,
-					organizationIds, 
-					getRegularRoleIds(roleIds), // this is only for reguler roles
-					userGroupIds, // userGroupIds,
-					false, // sendEmail
-					serviceContext // serviceContext
+				serviceContext.getUserId(), serviceContext.getCompanyId(), // companyId,
+				false, // autoPassword,
+				password, // password1,
+				password, // password2,
+				false, // autoScreenName,
+				screenName.toString(), emailAddress.toString(), 0, // facebookId,
+				StringPool.BLANK, // openId,
+				LocaleUtil.getDefault(), // locale,
+				firstName, // firstName,
+				StringPool.BLANK, // middleName,
+				lastName, // lastName,
+				0, // prefixId,
+				0, // suffixId,
+				male, // male
+				1, // birthdayMonth,
+				1, // birthdayDay,
+				1970, // birthdayYear,
+				StringPool.BLANK, // jobTitle,
+				groupIds, organizationIds, getRegularRoleIds(roleIds), // this
+																		// is
+																		// only
+																		// for
+																		// reguler
+																		// roles
+				userGroupIds, // userGroupIds,
+				false, // sendEmail
+				serviceContext // serviceContext
 			);
 
 			if (_log.isDebugEnabled()) {
@@ -126,29 +136,34 @@ public class UserDataService {
 			// Set org roles
 			setOrgRoles(user.getUserId(), organizationIds, roleIds);
 
-		} catch (UserScreenNameException e) {
+		}
+		catch (UserScreenNameException e) {
 			_log.error("User is duplicated. Skip : " + e.getMessage());
 		}
 
-        return user;
+		return user;
 	}
 
 	/**
-	 * Get Faker available locales
+	 * Get Faker available locales Filter Faker available locales based on
+	 * Liferay available locales.
 	 * 
-	 * Filter Faker available locales based on Liferay available locales.
 	 * @param locales
 	 * @return Faker available locales based on Liferay available locales.
 	 */
 	public List<Locale> getFakerAvailableLocales(Set<Locale> locales) {
+
 		List<String> fakerList = new ArrayList<>(
-				Arrays.asList("bg", "ca", "ca-CAT", "da-DK", "de", "de-AT", "de-CH", "en", "en-AU", "en-au-ocker",
-						"en-BORK", "en-CA", "en-GB", "en-IND", "en-NEP", "en-NG", "en-NZ", "en-PAK", "en-SG", "en-UG",
-						"en-US", "en-ZA", "es", "es-MX", "fa", "fi-FI", "fr", "he", "in-ID", "it", "ja", "ko", "nb-NO",
-						"nl", "pl", "pt", "pt-BR", "ru", "sk", "sv", "sv-SE", "tr", "uk", "vi", "zh-CN", "zh-TW"));
-		return locales.stream()
-				.filter(locale -> fakerList.contains(locale.getLanguage()))
-				.collect(Collectors.toList());
+			Arrays.asList(
+				"bg", "ca", "ca-CAT", "da-DK", "de", "de-AT", "de-CH", "en",
+				"en-AU", "en-au-ocker", "en-BORK", "en-CA", "en-GB", "en-IND",
+				"en-NEP", "en-NG", "en-NZ", "en-PAK", "en-SG", "en-UG", "en-US",
+				"en-ZA", "es", "es-MX", "fa", "fi-FI", "fr", "he", "in-ID",
+				"it", "ja", "ko", "nb-NO", "nl", "pl", "pt", "pt-BR", "ru",
+				"sk", "sv", "sv-SE", "tr", "uk", "vi", "zh-CN", "zh-TW"));
+		return locales.stream().filter(
+			locale -> fakerList.contains(locale.getLanguage())).collect(
+				Collectors.toList());
 	}
 
 	/**
@@ -158,7 +173,9 @@ public class UserDataService {
 	 * @return
 	 * @throws PortalException
 	 */
-	public long[] getRegularRoleIds(long[] roleIds) throws PortalException {
+	public long[] getRegularRoleIds(long[] roleIds)
+		throws PortalException {
+
 		Map<Integer, List<Role>> roles = _commonUtil.filterRoles(roleIds);
 		List<Role> regularRoles = roles.get(RoleConstants.TYPE_REGULAR);
 
@@ -167,8 +184,9 @@ public class UserDataService {
 		}
 
 		if (_log.isDebugEnabled()) {
-			String regularids = regularRoles.stream().map(r -> String.valueOf(r.getRoleId()))
-					.collect(Collectors.joining(","));
+			String regularids = regularRoles.stream().map(
+				r -> String.valueOf(r.getRoleId())).collect(
+					Collectors.joining(","));
 			_log.debug("Regular ids : " + regularids);
 		}
 
@@ -176,17 +194,16 @@ public class UserDataService {
 	}
 
 	/**
-	 * Set org roles
-	 * 
-	 * Filtering only organization roles out from role ids and asign
-	 * organization roles to a user.
+	 * Set org roles Filtering only organization roles out from role ids and
+	 * asign organization roles to a user.
 	 * 
 	 * @param userId
 	 * @param organizationIds
 	 * @param roleIds
 	 * @throws PortalException
 	 */
-	public void setOrgRoles(long userId, long[] organizationIds, long[] roleIds) throws PortalException {
+	public void setOrgRoles(long userId, long[] organizationIds, long[] roleIds)
+		throws PortalException {
 
 		Map<Integer, List<Role>> roles = _commonUtil.filterRoles(roleIds);
 		List<Role> orgRoles = roles.get(RoleConstants.TYPE_ORGANIZATION);
@@ -198,8 +215,9 @@ public class UserDataService {
 		long[] orgIds = orgRoles.stream().mapToLong(Role::getRoleId).toArray();
 
 		if (_log.isDebugEnabled()) {
-			String orgids = orgRoles.stream().map(o -> String.valueOf(o.getPrimaryKey()))
-					.collect(Collectors.joining(","));
+			String orgids = orgRoles.stream().map(
+				o -> String.valueOf(o.getPrimaryKey())).collect(
+					Collectors.joining(","));
 			_log.debug("Organization ids : " + orgids);
 		}
 
@@ -208,26 +226,28 @@ public class UserDataService {
 			return;
 		}
 
-		List<Organization> orgs = _organizationLocalService.getOrganizations(organizationIds);
-		long[] orgGroupdIds = orgs.stream().mapToLong(Organization::getGroupId).toArray();
+		List<Organization> orgs =
+			_organizationLocalService.getOrganizations(organizationIds);
+		long[] orgGroupdIds =
+			orgs.stream().mapToLong(Organization::getGroupId).toArray();
 
 		for (long orgGroupdId : orgGroupdIds) {
-			_userGroupRoleLocalService.addUserGroupRoles(userId, orgGroupdId, orgIds);
+			_userGroupRoleLocalService.addUserGroupRoles(
+				userId, orgGroupdId, orgIds);
 		}
 	}
 
 	/**
-	 * Set site roles
-	 * 
-	 * Filtering only site roles out from role ids and asign site roles to a
-	 * user.
+	 * Set site roles Filtering only site roles out from role ids and asign site
+	 * roles to a user.
 	 * 
 	 * @param userId
 	 * @param groupIds
 	 * @param roleIds
 	 * @throws PortalException
 	 */
-	public void setSiteRoles(long userId, long[] groupIds, long[] roleIds) throws PortalException {
+	public void setSiteRoles(long userId, long[] groupIds, long[] roleIds)
+		throws PortalException {
 
 		Map<Integer, List<Role>> roles = _commonUtil.filterRoles(roleIds);
 		List<Role> siteRoles = roles.get(RoleConstants.TYPE_SITE);
@@ -236,11 +256,13 @@ public class UserDataService {
 			return;
 		}
 
-		long[] siteIds = siteRoles.stream().mapToLong(Role::getRoleId).toArray();
+		long[] siteIds =
+			siteRoles.stream().mapToLong(Role::getRoleId).toArray();
 
 		if (_log.isDebugEnabled()) {
-			String siteids = siteRoles.stream().map(s -> String.valueOf(s.getRoleId()))
-					.collect(Collectors.joining(","));
+			String siteids = siteRoles.stream().map(
+				s -> String.valueOf(s.getRoleId())).collect(
+					Collectors.joining(","));
 			_log.debug("Site ids : " + siteids);
 		}
 
@@ -250,24 +272,49 @@ public class UserDataService {
 		}
 
 		for (long groupId : groupIds) {
-			_userGroupRoleLocalService.addUserGroupRoles(userId, groupId, siteIds);
+			_userGroupRoleLocalService.addUserGroupRoles(
+				userId, groupId, siteIds);
+		}
+	}
+
+	/**
+	 * Update Announcements Deliveries
+	 * 
+	 * @param userId
+	 * @param announcementsDeliveries
+	 * @throws PortalException
+	 */
+	public void updateAnnouncementsDeliveries(
+		long userId, List<AnnouncementsDelivery> announcementsDeliveries)
+		throws PortalException {
+
+		for (AnnouncementsDelivery announcementsDelivery : announcementsDeliveries) {
+
+			_announcementsDeliveryLocalService.updateDelivery(
+				userId, announcementsDelivery.getType(),
+				announcementsDelivery.isEmail(), announcementsDelivery.isSms(),
+				announcementsDelivery.isWebsite());
 		}
 	}
 
 	@Reference
+	private AnnouncementsDeliveryLocalService _announcementsDeliveryLocalService;
+
+	@Reference
 	private UserLocalService _userLocalService;
-	
+
 	@Reference
 	private UserGroupRoleLocalService _userGroupRoleLocalService;
-	
+
 	@Reference
 	private CommonUtil _commonUtil;
-	
+
 	@Reference
 	private RoleLocalService _roleLocalService;
-	
+
 	@Reference
 	private OrganizationLocalService _organizationLocalService;
 
-	private static final Log _log = LogFactoryUtil.getLog(UserDataService.class);
+	private static final Log _log =
+		LogFactoryUtil.getLog(UserDataService.class);
 }
