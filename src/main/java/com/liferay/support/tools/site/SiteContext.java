@@ -1,9 +1,9 @@
 
 package com.liferay.support.tools.site;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.support.tools.common.ParamContext;
 
 import javax.portlet.ActionRequest;

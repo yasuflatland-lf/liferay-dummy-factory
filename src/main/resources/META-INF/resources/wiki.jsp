@@ -8,16 +8,16 @@
 	
 <div class="container-fluid-1280">
 
-	<liferay-ui:success key="success" message="Wiki page / node created successfully" />
-	<%@ include file="/command_select.jspf"%>
-
-	<portlet:actionURL name="<%= LDFPortletKeys.WIKI %>" var="wikiEditURL">
-		<portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_WIKI %>" />
-		<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
-	</portlet:actionURL>	
-
 	<aui:fieldset-group markupView="lexicon">	
 		<aui:fieldset>
+		
+			<liferay-ui:success key="success" message="Wiki page / node created successfully" />
+			<%@ include file="/command_select.jspf"%>
+		
+			<portlet:actionURL name="<%= LDFPortletKeys.WIKI %>" var="wikiEditURL">
+				<portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_WIKI %>" />
+				<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
+			</portlet:actionURL>			
 
 			<%
 			String numberOfnodesLabel = "Enter the number of wiki nodes you would like to create";

@@ -7,18 +7,20 @@
 </aui:nav-bar>
 
 <div class="container-fluid-1280">
-	<liferay-ui:success key="success" message="Users created successfully" />
-	<liferay-ui:error key="group-friendly-url-error" message="The username has already been used for the name of a site or an organization. These names must be unique." />
-
-	<%@ include file="/command_select.jspf"%>
-
-	<portlet:actionURL name="<%= LDFPortletKeys.USERS %>" var="userEditURL">
-		<portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_USERS %>" />
-		<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
-	</portlet:actionURL>
 
 	<aui:fieldset-group markupView="lexicon">
 		<aui:fieldset>
+		
+			<liferay-ui:success key="success" message="Users created successfully" />
+			<liferay-ui:error key="group-friendly-url-error" message="The username has already been used for the name of a site or an organization. These names must be unique." />
+		
+			<%@ include file="/command_select.jspf"%>
+		
+			<portlet:actionURL name="<%= LDFPortletKeys.USERS %>" var="userEditURL">
+				<portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_USERS %>" />
+				<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
+			</portlet:actionURL>
+		
             <div class="entry-title form-group">
                 <h1>Create Users&nbsp;&nbsp;
                     <a aria-expanded="false" class="collapse-icon collapsed icon-question-sign" data-toggle="collapse" href="#navPillsCollapse0">
@@ -97,17 +99,24 @@
 					<div class="row">
 						<div class="col-md-12">
 						
-							<div aria-multiselectable="true" class="panel-group" id="accordion" role="tablist">
-							    <div class="panel panel-default">
-							        <div class="panel-heading" id="headingOne" role="tab">
-							            <div class="panel-title">
-							                <a aria-controls="collapseOne" aria-expanded="true" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" role="button">
-							                    Main Configration
-							                </a>
-							            </div>
-							        </div>
-							        <div aria-labelledby="headingOne" class="panel-collapse collapse in" id="collapseOne" role="tabpanel">
-							            <div class="panel-body">
+							<div aria-orientation="vertical" class="panel-group" id="accordion05" role="tablist">
+								<div class="panel panel-secondary">
+									<button aria-controls="collapseTwo" aria-expanded="false" class="btn btn-unstyled collapse-icon panel-header panel-header-link collapsed" data-parent="#accordion05" data-target="#accordion05CollapseTwo" data-toggle="collapse" id="accordion05HeadingTwo" role="tab" type="button">
+										<span class="panel-title">Main Configration</span>
+										<span class="collapse-icon-closed">
+											<svg aria-hidden="true" class="lexicon-icon lexicon-icon-angle-right">
+												<use href="/images/icons/icons.svg#angle-right"></use>
+											</svg>
+										</span>
+										<span class="collapse-icon-open">
+											<svg aria-hidden="true" class="lexicon-icon lexicon-icon-angle-down">
+												<use href="/images/icons/icons.svg#angle-down"></use>
+											</svg>
+										</span>
+									</button>
+									<div aria-labelledby="accordion05HeadingTwo" class="panel-collapse collapse" id="accordion05CollapseTwo" role="tabpanel" style="">
+										<div class="panel-body">
+
 											<br />
 											<div class="row">
 												<aui:fieldset cssClass="col-md-6">
@@ -206,25 +215,32 @@
 													
 						 						</aui:fieldset>
 											</div>
-							            </div>
-							        </div>
-							    </div>
-							    <div class="panel panel-default">
-							        <div class="panel-heading" id="headingTwo" role="tab">
-							            <div class="panel-title">
-							                <a aria-controls="collapseTwo" aria-expanded="false" class="collapsed" data-parent="#accordion" data-toggle="collapse" href="#collapseTwo" role="button">
-							                    Announcements Deliveries
-							              </a>
-							            </div>
-							        </div>
-							        <div aria-labelledby="headingTwo" class="panel-collapse collapse" id="collapseTwo" role="tabpanel">
-							            <div class="panel-body">
+
+										</div>
+									</div>
+								</div>
+								<div class="panel panel-secondary">
+									<button aria-controls="accordion05CollapseOne" aria-expanded="false" class="btn btn-unstyled collapse-icon collapse-icon-middle panel-header panel-header-link collapsed" data-parent="#accordion05" data-target="#accordion05CollapseOne" data-toggle="collapse" id="accordion05HeadingOne" role="tab" type="button">
+										<span class="panel-title">Announcements Deliveries</span>
+										<span class="collapse-icon-closed">
+											<svg aria-hidden="true" class="lexicon-icon lexicon-icon-angle-right">
+												<use href="/images/icons/icons.svg#angle-right"></use>
+											</svg>
+										</span>
+										<span class="collapse-icon-open">
+											<svg aria-hidden="true" class="lexicon-icon lexicon-icon-angle-down">
+												<use href="/images/icons/icons.svg#angle-down"></use>
+											</svg>
+										</span>
+									</button>
+									<div aria-labelledby="accordion05HeadingOne" class="panel-collapse collapse" id="accordion05CollapseOne" role="tabpanel" style="">
+										<div class="panel-body">
 											<br />
 											<%@ include file="/user/announcements.jsp" %>
-							            </div>
-							        </div>
-							    </div>
-							</div>
+										</div>
+									</div>
+								</div>
+							</div>						
 						</div>					
 					</div>
 				</div>

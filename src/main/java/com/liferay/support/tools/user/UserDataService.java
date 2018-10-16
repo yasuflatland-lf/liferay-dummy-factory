@@ -4,6 +4,7 @@ package com.liferay.support.tools.user;
 import com.github.javafaker.Faker;
 import com.liferay.announcements.kernel.model.AnnouncementsDelivery;
 import com.liferay.announcements.kernel.service.AnnouncementsDeliveryLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.exception.UserScreenNameException;
@@ -22,7 +23,6 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.support.tools.utils.CommonUtil;
 
@@ -292,8 +292,7 @@ public class UserDataService {
 
 			_announcementsDeliveryLocalService.updateDelivery(
 				userId, announcementsDelivery.getType(),
-				announcementsDelivery.isEmail(), announcementsDelivery.isSms(),
-				announcementsDelivery.isWebsite());
+				announcementsDelivery.isEmail(), announcementsDelivery.isSms());
 		}
 	}
 

@@ -1,28 +1,49 @@
 package com.liferay.support.tools.user;
 
-import aQute.bnd.annotation.ProviderType;
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationConstants;
-import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactory;
+import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactoryUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
+import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalServiceUtil;
 import com.liferay.exportimport.kernel.service.ExportImportLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.model.*;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutConstants;
+import com.liferay.portal.kernel.model.LayoutSet;
+import com.liferay.portal.kernel.model.LayoutTemplate;
+import com.liferay.portal.kernel.model.LayoutTypePortlet;
+import com.liferay.portal.kernel.model.RoleConstants;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
-import com.liferay.portal.kernel.service.*;
+import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
+import com.liferay.portal.kernel.service.LayoutSetLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Transactional;
-import com.liferay.portal.kernel.util.*;
+import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.support.tools.common.PropsValues;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+import aQute.bnd.annotation.ProviderType;
 
 /**
  * User Layout Utilities
@@ -49,121 +70,123 @@ public class UserLayoutUtil {
      * @param user
      * @throws Exception
      */
-    public void updateUserLayouts(User user) throws Exception {
-        Boolean hasPowerUserRole = null;
+	public void updateUserLayouts(User user) throws Exception {
+		Boolean hasPowerUserRole = null;
 
-        // Private layouts
+		// Private layouts
 
-        boolean addDefaultUserPrivateLayouts = false;
+		boolean addDefaultUserPrivateLayouts = false;
 
-        if (PropsValues.LAYOUT_USER_PRIVATE_LAYOUTS_ENABLED &&
-            PropsValues.LAYOUT_USER_PRIVATE_LAYOUTS_AUTO_CREATE) {
+		if (PropsValues.LAYOUT_USER_PRIVATE_LAYOUTS_ENABLED &&
+			PropsValues.LAYOUT_USER_PRIVATE_LAYOUTS_AUTO_CREATE) {
 
-            addDefaultUserPrivateLayouts = true;
+			addDefaultUserPrivateLayouts = true;
 
-            if (PropsValues.LAYOUT_USER_PRIVATE_LAYOUTS_POWER_USER_REQUIRED) {
-                if (hasPowerUserRole == null) {
-                    hasPowerUserRole = hasPowerUserRole(user);
-                }
+			if (PropsValues.LAYOUT_USER_PRIVATE_LAYOUTS_POWER_USER_REQUIRED) {
+				if (hasPowerUserRole == null) {
+					hasPowerUserRole = hasPowerUserRole(user);
+				}
 
-                if (!hasPowerUserRole.booleanValue()) {
-                    addDefaultUserPrivateLayouts = false;
-                }
-            }
-        }
+				if (!hasPowerUserRole.booleanValue()) {
+					addDefaultUserPrivateLayouts = false;
+				}
+			}
+		}
 
-        Boolean hasPrivateLayouts = null;
+		Boolean hasPrivateLayouts = null;
 
-        if (addDefaultUserPrivateLayouts) {
-            hasPrivateLayouts = LayoutLocalServiceUtil.hasLayouts(
-                user, true, false);
+		if (addDefaultUserPrivateLayouts) {
+			hasPrivateLayouts = LayoutLocalServiceUtil.hasLayouts(
+				user, true, false);
 
-            if (!hasPrivateLayouts) {
-                addDefaultUserPrivateLayouts(user);
-            }
-        }
+			if (!hasPrivateLayouts) {
+				addDefaultUserPrivateLayouts(user);
+			}
+		}
 
-        boolean deleteDefaultUserPrivateLayouts = false;
+		boolean deleteDefaultUserPrivateLayouts = false;
 
-        if (!PropsValues.LAYOUT_USER_PRIVATE_LAYOUTS_ENABLED) {
-            deleteDefaultUserPrivateLayouts = true;
-        } else if (PropsValues.LAYOUT_USER_PRIVATE_LAYOUTS_POWER_USER_REQUIRED) {
-            if (hasPowerUserRole == null) {
-                hasPowerUserRole = hasPowerUserRole(user);
-            }
+		if (!PropsValues.LAYOUT_USER_PRIVATE_LAYOUTS_ENABLED) {
+			deleteDefaultUserPrivateLayouts = true;
+		}
+		else if (PropsValues.LAYOUT_USER_PRIVATE_LAYOUTS_POWER_USER_REQUIRED) {
+			if (hasPowerUserRole == null) {
+				hasPowerUserRole = hasPowerUserRole(user);
+			}
 
-            if (!hasPowerUserRole.booleanValue()) {
-                deleteDefaultUserPrivateLayouts = true;
-            }
-        }
+			if (!hasPowerUserRole.booleanValue()) {
+				deleteDefaultUserPrivateLayouts = true;
+			}
+		}
 
-        if (deleteDefaultUserPrivateLayouts) {
-            if (hasPrivateLayouts == null) {
-                hasPrivateLayouts = LayoutLocalServiceUtil.hasLayouts(
-                    user, true, false);
-            }
+		if (deleteDefaultUserPrivateLayouts) {
+			if (hasPrivateLayouts == null) {
+				hasPrivateLayouts = LayoutLocalServiceUtil.hasLayouts(
+					user, true, false);
+			}
 
-            if (hasPrivateLayouts) {
-                deleteDefaultUserPrivateLayouts(user);
-            }
-        }
+			if (hasPrivateLayouts) {
+				deleteDefaultUserPrivateLayouts(user);
+			}
+		}
 
-        // Public pages
+		// Public pages
 
-        boolean addDefaultUserPublicLayouts = false;
+		boolean addDefaultUserPublicLayouts = false;
 
-        if (PropsValues.LAYOUT_USER_PUBLIC_LAYOUTS_ENABLED &&
-            PropsValues.LAYOUT_USER_PUBLIC_LAYOUTS_AUTO_CREATE) {
+		if (PropsValues.LAYOUT_USER_PUBLIC_LAYOUTS_ENABLED &&
+			PropsValues.LAYOUT_USER_PUBLIC_LAYOUTS_AUTO_CREATE) {
 
-            addDefaultUserPublicLayouts = true;
+			addDefaultUserPublicLayouts = true;
 
-            if (PropsValues.LAYOUT_USER_PUBLIC_LAYOUTS_POWER_USER_REQUIRED) {
-                if (hasPowerUserRole == null) {
-                    hasPowerUserRole = hasPowerUserRole(user);
-                }
+			if (PropsValues.LAYOUT_USER_PUBLIC_LAYOUTS_POWER_USER_REQUIRED) {
+				if (hasPowerUserRole == null) {
+					hasPowerUserRole = hasPowerUserRole(user);
+				}
 
-                if (!hasPowerUserRole.booleanValue()) {
-                    addDefaultUserPublicLayouts = false;
-                }
-            }
-        }
+				if (!hasPowerUserRole.booleanValue()) {
+					addDefaultUserPublicLayouts = false;
+				}
+			}
+		}
 
-        Boolean hasPublicLayouts = null;
+		Boolean hasPublicLayouts = null;
 
-        if (addDefaultUserPublicLayouts) {
-            hasPublicLayouts = LayoutLocalServiceUtil.hasLayouts(
-                user, false, false);
+		if (addDefaultUserPublicLayouts) {
+			hasPublicLayouts = LayoutLocalServiceUtil.hasLayouts(
+				user, false, false);
 
-            if (!hasPublicLayouts) {
-                addDefaultUserPublicLayouts(user);
-            }
-        }
+			if (!hasPublicLayouts) {
+				addDefaultUserPublicLayouts(user);
+			}
+		}
 
-        boolean deleteDefaultUserPublicLayouts = false;
+		boolean deleteDefaultUserPublicLayouts = false;
 
-        if (!PropsValues.LAYOUT_USER_PUBLIC_LAYOUTS_ENABLED) {
-            deleteDefaultUserPublicLayouts = true;
-        } else if (PropsValues.LAYOUT_USER_PUBLIC_LAYOUTS_POWER_USER_REQUIRED) {
-            if (hasPowerUserRole == null) {
-                hasPowerUserRole = hasPowerUserRole(user);
-            }
+		if (!PropsValues.LAYOUT_USER_PUBLIC_LAYOUTS_ENABLED) {
+			deleteDefaultUserPublicLayouts = true;
+		}
+		else if (PropsValues.LAYOUT_USER_PUBLIC_LAYOUTS_POWER_USER_REQUIRED) {
+			if (hasPowerUserRole == null) {
+				hasPowerUserRole = hasPowerUserRole(user);
+			}
 
-            if (!hasPowerUserRole.booleanValue()) {
-                deleteDefaultUserPublicLayouts = true;
-            }
-        }
+			if (!hasPowerUserRole.booleanValue()) {
+				deleteDefaultUserPublicLayouts = true;
+			}
+		}
 
-        if (deleteDefaultUserPublicLayouts) {
-            if (hasPublicLayouts == null) {
-                hasPublicLayouts = LayoutLocalServiceUtil.hasLayouts(
-                    user, false, false);
-            }
+		if (deleteDefaultUserPublicLayouts) {
+			if (hasPublicLayouts == null) {
+				hasPublicLayouts = LayoutLocalServiceUtil.hasLayouts(
+					user, false, false);
+			}
 
-            if (hasPublicLayouts) {
-                deleteDefaultUserPublicLayouts(user);
-            }
-        }
-    }
+			if (hasPublicLayouts) {
+				deleteDefaultUserPublicLayouts(user);
+			}
+		}
+	}
 
     protected void deleteDefaultUserPrivateLayouts(User user)
         throws PortalException {
@@ -297,60 +320,61 @@ public class UserLayoutUtil {
         }
     }
 
-    protected void addDefaultLayoutsByLAR(
-        long userId, long groupId, boolean privateLayout, File larFile)
-        throws PortalException {
+	protected void addDefaultLayoutsByLAR(
+			long userId, long groupId, boolean privateLayout, File larFile)
+		throws PortalException {
 
-        User user = _userLocalService.getUser(userId);
+		User user = _userLocalService.getUser(userId);
 
-        Map<String, String[]> parameterMap = new HashMap<>();
+		Map<String, String[]> parameterMap = new HashMap<>();
 
-        parameterMap.put(
-            PortletDataHandlerKeys.PERMISSIONS,
-            new String[]{Boolean.TRUE.toString()});
-        parameterMap.put(
-            PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL,
-            new String[]{Boolean.TRUE.toString()});
-        parameterMap.put(
-            PortletDataHandlerKeys.PORTLET_CONFIGURATION,
-            new String[]{Boolean.TRUE.toString()});
-        parameterMap.put(
-            PortletDataHandlerKeys.PORTLET_CONFIGURATION_ALL,
-            new String[]{Boolean.TRUE.toString()});
-        parameterMap.put(
-            PortletDataHandlerKeys.PORTLET_DATA,
-            new String[]{Boolean.TRUE.toString()});
-        parameterMap.put(
-            PortletDataHandlerKeys.PORTLET_DATA_ALL,
-            new String[]{Boolean.TRUE.toString()});
-        parameterMap.put(
-            PortletDataHandlerKeys.PORTLET_DATA_CONTROL_DEFAULT,
-            new String[]{Boolean.TRUE.toString()});
-        parameterMap.put(
-            PortletDataHandlerKeys.PORTLET_SETUP_ALL,
-            new String[]{Boolean.TRUE.toString()});
-        parameterMap.put(
-            PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL,
-            new String[]{Boolean.TRUE.toString()});
-        parameterMap.put(
-            PortletDataHandlerKeys.THEME_REFERENCE,
-            new String[]{Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PERMISSIONS,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_ARCHIVED_SETUPS_ALL,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_CONFIGURATION,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_CONFIGURATION_ALL,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_DATA,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_DATA_ALL,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_DATA_CONTROL_DEFAULT,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_SETUP_ALL,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_USER_PREFERENCES_ALL,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.THEME_REFERENCE,
+			new String[] {Boolean.TRUE.toString()});
 
-        Map<String, Serializable> importLayoutSettingsMap =
-            ExportImportConfigurationSettingsMapFactory.
-                buildImportLayoutSettingsMap(
-                    user, groupId, privateLayout, null, parameterMap);
+		Map<String, Serializable> importLayoutSettingsMap =
+			ExportImportConfigurationSettingsMapFactoryUtil.
+				buildImportLayoutSettingsMap(
+					user, groupId, privateLayout, null, parameterMap);
 
-        ExportImportConfiguration exportImportConfiguration =
-            _exportImportConfigurationLocalService.
-                addDraftExportImportConfiguration(
-                    user.getUserId(),
-                    ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT,
-                    importLayoutSettingsMap);
+		ExportImportConfiguration exportImportConfiguration =
+			ExportImportConfigurationLocalServiceUtil.
+				addDraftExportImportConfiguration(
+					user.getUserId(),
+					ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT,
+					importLayoutSettingsMap);
 
-        _exportImportLocalService.importLayouts(exportImportConfiguration, larFile);
-    }
-
+		_exportImportLocalService.importLayouts(
+			exportImportConfiguration, larFile);
+	}
+	
     protected void addDefaultUserPublicLayoutByProperties(
         long userId, long groupId)
         throws PortalException {
