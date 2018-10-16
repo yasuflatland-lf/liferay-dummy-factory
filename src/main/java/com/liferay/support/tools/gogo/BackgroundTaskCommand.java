@@ -1,7 +1,8 @@
 package com.liferay.support.tools.gogo;
 
 import com.liferay.portal.background.task.exception.NoSuchBackgroundTaskException;
-import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
+import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManagerUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -12,7 +13,6 @@ import java.util.List;
 
 import org.apache.felix.service.command.Descriptor;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * Background Task Commands
@@ -45,8 +45,9 @@ public class BackgroundTaskCommand {
 			}
 			
 			try {
-				
-				_backgroundTaskManager.deleteBackgroundTask(Long.valueOf(id));
+				BackgroundTask bkt = BackgroundTaskManagerUtil.getBackgroundTask(Long.valueOf(id));
+				BackgroundTaskManagerUtil.cleanUpBackgroundTask(
+					bkt, bkt.getStatus());				
 				
 			} catch (NoSuchBackgroundTaskException e) {
 				System.out.println("Background ID :" + id + " has been successfully deleted.");
@@ -57,9 +58,6 @@ public class BackgroundTaskCommand {
 			}
 		}
 	}
-
-	@Reference
-	private BackgroundTaskManager _backgroundTaskManager;
 
 	private static final Log _log =
 		LogFactoryUtil.getLog(BackgroundTaskCommand.class);
