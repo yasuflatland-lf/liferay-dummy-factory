@@ -20,16 +20,19 @@
 </aui:nav-bar>
 
 <div class="container-fluid-1280">
-	<liferay-ui:success key="success" message="Web contents created successfully" />
-	<%@ include file="/command_select.jspf"%>
 
-	<portlet:actionURL name="<%= LDFPortletKeys.WCM %>" var="journalEditURL">
-		<portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_WCM %>" />
-		<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
-	</portlet:actionURL>
 
 	<aui:fieldset-group markupView="lexicon">	
 		<aui:fieldset>
+		
+			<liferay-ui:success key="success" message="Web contents created successfully" />
+			<%@ include file="/command_select.jspf"%>
+		
+			<portlet:actionURL name="<%= LDFPortletKeys.WCM %>" var="journalEditURL">
+				<portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_WCM %>" />
+				<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
+			</portlet:actionURL>		
+			
             <div class="entry-title form-group">
                 <h1>Create Web Contents&nbsp;&nbsp;
                     <a aria-expanded="false" class="collapse-icon collapsed icon-question-sign" data-toggle="collapse" href="#navPillsCollapse0">

@@ -8,15 +8,16 @@
 	
 <div class="container-fluid-1280">
 
-	<liferay-ui:success key="success" message="Organizations created successfully" />
-	<%@ include file="/command_select.jspf"%>
-
-	<portlet:actionURL name="<%= LDFPortletKeys.ORGANIZAION %>" var="organizationEditURL">
-		<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
-	</portlet:actionURL>
-
 	<aui:fieldset-group markupView="lexicon">	
 		<aui:fieldset>
+		
+			<liferay-ui:success key="success" message="Organizations created successfully" />
+			<%@ include file="/command_select.jspf"%>
+		
+			<portlet:actionURL name="<%= LDFPortletKeys.ORGANIZAION %>" var="organizationEditURL">
+				<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
+			</portlet:actionURL>	
+				
 			<div class="entry-title form-group">
 				<h1>Create organizations&nbsp;&nbsp;
 					<a aria-expanded="false" class="collapse-icon collapsed icon-question-sign" data-toggle="collapse" href="#navPillsCollapse0">

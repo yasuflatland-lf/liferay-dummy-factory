@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Dummy Factory Portlet
 Bundle-SymbolicName: liferay.dummy.factory
-Bundle-Version: 0.17.0
+Bundle-Version: 7.1.0
 
 Import-Package:\
 	!org.apache.tika.*,\
@@ -25,7 +25,7 @@ Bundle-ClassPath:\
 	lib/httpclient.jar,\
 	lib/reactive-streams.jar,
 	lib/commons-fileupload.jar
-	
+
 -includeresource:\
 	lib/guava.jar=guava-[0-9]*.jar,\
 	lib/error_prone_annotations.jar=error_prone_annotations-[0-9]*.jar,\
@@ -43,5 +43,3 @@ Bundle-ClassPath:\
 	lib/httpclient.jar=httpclient-[0-9]*.jar,\
 	lib/reactive-streams.jar=reactive-streams-[0-9]*.jar,
 	lib/commons-fileupload.jar=commons-fileupload-[0-9]*.jar
-	
--metatype: *

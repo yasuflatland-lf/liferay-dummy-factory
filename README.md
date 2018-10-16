@@ -14,10 +14,12 @@ Dummy Factory generates dummy data for debugging use. Please don't use this for 
 * Documents
 * Message Board (Threads / Categories)
 * Category (Categories / Vocabularies)
+* Wiki
+* Blogs
 
 ## Required environment
 * Java 1.8 or above
-* Liferay 7.0 GA1 / Liferay DXP SP1 or above
+* Liferay 7.1 GA1 / Liferay DXP 7.1 GA1 or above
 
 ## Usage
 1. Download jar file from [here](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/master/latest) and place it in ${liferay-home}/deploy folder. 
@@ -26,9 +28,10 @@ Dummy Factory generates dummy data for debugging use. Please don't use this for 
 4. Now you are ready to create dummy data! Enjoy!
 
 ## How can I compile Dummy Factory on my own?
-1. Clone this repository to your local. Please make sure you've already installed Gradle 3.0 or above and blade tool that Liferay provides.
-2. At the root directory, run ```gradle clean assemble``` then ```liferay.dummy.factory-x.x.x.jar``` will be created under ```/build/libs/``` directory.
-3. To install onto your Liferay bundle, startup Liferay bundle on your local and run ```blade deploy```. Dummy Factory portlet will be deployed.
+1. Create a Liferay Workspace for 7.1
+2. Clone this repository to ```${liferay_workspace_home}/modules```.  Please make sure you've already installed Gradle 3.0 or above and blade tool that Liferay provides.
+3. At the root directory, run ```gradle clean assemble``` then ```liferay.dummy.factory-x.x.x.jar``` will be created under ```/build/libs/``` directory.
+4. To install onto your Liferay bundle, startup Liferay bundle on your local and run ```blade deploy```. Dummy Factory portlet will be deployed.
 
 ## Bug / Enhancement request
 Please create a issue on this repository.

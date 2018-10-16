@@ -1,9 +1,9 @@
 package com.liferay.support.tools.messageboard;
 
 import com.liferay.message.boards.kernel.model.MBCategoryConstants;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.support.tools.common.ParamContext;
 import com.liferay.support.tools.utils.CommonUtil;
