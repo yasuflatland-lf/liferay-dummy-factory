@@ -1,14 +1,15 @@
 package com.liferay.support.tools.site;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.DuplicateGroupException;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.sites.kernel.util.SitesUtil;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.ProgressManager;
 
@@ -37,7 +38,7 @@ public class SiteDefaultDummyGenerator extends DummyGenerator<SiteContext> {
 	}
 
 	@Override
-	protected void exec(ActionRequest request, SiteContext paramContext) throws PortalException {
+	protected void exec(ActionRequest request, SiteContext paramContext) throws Exception {
 
 		//Tracking progress start
 		ProgressManager progressManager = new ProgressManager();
@@ -70,7 +71,7 @@ public class SiteDefaultDummyGenerator extends DummyGenerator<SiteContext> {
 			
 			try {
 				
-				_groupLocalService.addGroup(
+				Group liveGroup = _groupLocalService.addGroup(
 					paramContext.getServiceContext().getUserId(), //userId
 					paramContext.getParentGroupId(), // parentGroupId
 					null, // className
@@ -86,6 +87,14 @@ public class SiteDefaultDummyGenerator extends DummyGenerator<SiteContext> {
 					paramContext.isInheritContent(), //inheritContent
 					paramContext.isActive(), //active
 					paramContext.getServiceContext()); //serviceContext
+				
+				// Set Site Template if it's selected.
+				SitesUtil.updateLayoutSetPrototypesLinks(
+					liveGroup, 
+					paramContext.getPublicLayoutSetPrototypeId(),
+					0,
+					paramContext.isPublicLayoutSetPrototypeLinkEnabled(),
+					false);				
 				
 			} catch (Exception e) {
 				if (e instanceof DuplicateGroupException ) {

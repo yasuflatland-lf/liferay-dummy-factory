@@ -2,12 +2,9 @@
 package com.liferay.support.tools.user;
 
 import com.github.javafaker.Faker;
-<<<<<<< HEAD
-import com.liferay.petra.string.StringPool;
-=======
 import com.liferay.announcements.kernel.model.AnnouncementsDelivery;
 import com.liferay.announcements.kernel.service.AnnouncementsDeliveryLocalService;
->>>>>>> 0de30d6... User Refactoring and adding announcements delivery options.
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.exception.UserScreenNameException;
@@ -295,8 +292,7 @@ public class UserDataService {
 
 			_announcementsDeliveryLocalService.updateDelivery(
 				userId, announcementsDelivery.getType(),
-				announcementsDelivery.isEmail(), announcementsDelivery.isSms(),
-				announcementsDelivery.isWebsite());
+				announcementsDelivery.isEmail(), announcementsDelivery.isSms());
 		}
 	}
 

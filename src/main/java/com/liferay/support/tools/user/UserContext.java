@@ -58,6 +58,19 @@ public class UserContext extends ParamContext {
 		// Announcements Deliveries
 		announcementsDeliveries = getAnnouncementsDeliveries(actionRequest);
 
+		// Site Templates for My Profile and My Dashboard
+		publicLayoutSetPrototypeId =
+			ParamUtil.getLong(actionRequest, "publicLayoutSetPrototypeId");
+
+		setPublicLayoutSetPrototypeLinkEnabled(
+			(0 == publicLayoutSetPrototypeId) ? false : true);
+
+		privateLayoutSetPrototypeId =
+			ParamUtil.getLong(actionRequest, "privateLayoutSetPrototypeId");
+
+		setPrivateLayoutSetPrototypeLinkEnabled(
+			(0 == privateLayoutSetPrototypeId) ? false : true);
+
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			Group.class.getName(), actionRequest);
 		setServiceContext(serviceContext);
@@ -224,6 +237,51 @@ public class UserContext extends ParamContext {
 		this.announcementsDeliveries = announcementsDeliveries;
 	}
 
+	public long getPublicLayoutSetPrototypeId() {
+
+		return publicLayoutSetPrototypeId;
+	}
+
+	public void setPublicLayoutSetPrototypeId(long publicLayoutSetPrototypeId) {
+
+		this.publicLayoutSetPrototypeId = publicLayoutSetPrototypeId;
+	}
+
+	public long getPrivateLayoutSetPrototypeId() {
+
+		return privateLayoutSetPrototypeId;
+	}
+
+	public void setPrivateLayoutSetPrototypeId(
+		long privateLayoutSetPrototypeId) {
+
+		this.privateLayoutSetPrototypeId = privateLayoutSetPrototypeId;
+	}
+
+	public boolean isPublicLayoutSetPrototypeLinkEnabled() {
+
+		return publicLayoutSetPrototypeLinkEnabled;
+	}
+
+	public void setPublicLayoutSetPrototypeLinkEnabled(
+		boolean publicLayoutSetPrototypeLinkEnabled) {
+
+		this.publicLayoutSetPrototypeLinkEnabled =
+			publicLayoutSetPrototypeLinkEnabled;
+	}
+
+	public boolean isPrivateLayoutSetPrototypeLinkEnabled() {
+
+		return privateLayoutSetPrototypeLinkEnabled;
+	}
+
+	public void setPrivateLayoutSetPrototypeLinkEnabled(
+		boolean privateLayoutSetPrototypeLinkEnabled) {
+
+		this.privateLayoutSetPrototypeLinkEnabled =
+			privateLayoutSetPrototypeLinkEnabled;
+	}
+
 	private long numberOfusers = 0;
 	private String baseScreenName = "";
 	private String baseDomain = "";
@@ -238,5 +296,9 @@ public class UserContext extends ParamContext {
 	private boolean autoUserPreLogin;
 	private List<AnnouncementsDelivery> announcementsDeliveries =
 		new ArrayList<>();
+	private long publicLayoutSetPrototypeId;
+	private long privateLayoutSetPrototypeId;
+	private boolean publicLayoutSetPrototypeLinkEnabled;
+	private boolean privateLayoutSetPrototypeLinkEnabled;
 
 }
