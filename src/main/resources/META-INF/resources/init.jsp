@@ -11,17 +11,18 @@
 <%@ taglib uri="http://liferay.com/tld/trash" prefix="liferay-trash" %>
 <%@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 
-<%@ page import="com.liferay.portal.kernel.util.ParamUtil" %>
 <%@ page import="com.liferay.portal.kernel.util.*" %>
-<%@ page import="com.liferay.portal.kernel.util.PropsKeys" %>
 <%@ page import="com.liferay.portal.kernel.model.*" %>
 <%@ page import="com.liferay.portal.kernel.portlet.*" %>
 <%@ page import="com.liferay.portal.kernel.service.*" %>
 <%@ page import="com.liferay.portal.kernel.search.*" %>
 <%@ page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %>
+<%@ page import="com.liferay.portal.kernel.dao.search.*" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
 <%@ page import="com.liferay.portal.kernel.workflow.*" %>
 <%@ page import="com.liferay.document.library.kernel.model.*" %>
+<%@ page import="com.liferay.taglib.search.ResultRow" %>
+<%@ page import="com.liferay.taglib.search.SearchEntry" %>
 
 <%@ page import="com.liferay.support.tools.portlet.actions.PageMVCResourceCommand" %>
 <%@ page import="com.liferay.support.tools.portlet.actions.RoleMVCResourceCommand" %>
@@ -42,7 +43,10 @@
 <%@ page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %>
 <%@ page import="com.liferay.support.tools.document.library.EditFileEntryMVCActionCommand" %>
 <%@ page import="com.liferay.portal.util.PropsValues" %>
+<%@ page import="com.liferay.announcements.kernel.model.*" %>
+<%@ page import="com.liferay.portlet.announcements.model.impl.*" %>
 
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Set" %>
