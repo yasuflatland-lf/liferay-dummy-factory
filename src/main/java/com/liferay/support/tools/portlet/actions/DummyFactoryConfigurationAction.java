@@ -99,7 +99,7 @@ public class DummyFactoryConfigurationAction extends DefaultConfigurationAction 
 	protected boolean validate(String linkList, List<String> errors) {
 		boolean valid = true;
 
-		if (Validator.isNotNull(linkList)) {
+		if (null != linkList) {
 
 			String urls[] = linkList.split(",");
 			
