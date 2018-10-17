@@ -100,6 +100,8 @@ dependencies {
 	testCompile 'org.codehaus.groovy:groovy-all:2.4.+'
 	testCompile group: 'cglib', name: 'cglib-nodep', version:'latest.integration'
 	testCompile group: 'junit', name: 'junit', version:'4.12'
+	testCompile group: 'org.apache.tika', name: 'tika-core', version: '1.19.1'
+	testCompile group: 'org.apache.tika', name: 'tika-parsers', version: '1.19.1'
 
 	testCompile group: 'org.hamcrest', name: 'hamcrest-core', version:'latest.integration'
 	testCompile group: 'org.objenesis', name: 'objenesis', version:'latest.integration'
