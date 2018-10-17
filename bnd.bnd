@@ -1,9 +1,8 @@
 Bundle-Name: Liferay Dummy Factory Portlet
 Bundle-SymbolicName: liferay.dummy.factory
-Bundle-Version: 7.0.0
+Bundle-Version: 7.0.1
 
 Import-Package:\
-	!org.apache.tika.*,\
 	!org.apache.commons.fileupload.*,\
 	*
 
