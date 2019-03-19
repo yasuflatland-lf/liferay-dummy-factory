@@ -10,6 +10,7 @@
 <%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 <%@ taglib uri="http://liferay.com/tld/trash" prefix="liferay-trash" %>
 <%@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
+<%@ taglib uri="http://liferay.com/tld/clay" prefix="clay" %>
 
 <%@ page import="com.liferay.portal.kernel.util.*" %>
 <%@ page import="com.liferay.portal.kernel.model.*" %>
@@ -45,6 +46,7 @@
 <%@ page import="com.liferay.portal.util.PropsValues" %>
 <%@ page import="com.liferay.announcements.kernel.model.*" %>
 <%@ page import="com.liferay.portlet.announcements.model.impl.*" %>
+<%@ page import="com.liferay.support.tools.display.context.*" %>
 
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
@@ -61,7 +63,6 @@
 <liferay-frontend:defineObjects/>
 <liferay-theme:defineObjects/>
 <portlet:defineObjects/>
-
 <%
 	PortletURL portletURL = PortletURLUtil.clone(renderResponse.createRenderURL(), liferayPortletResponse);
 	String redirect = ParamUtil.getString(request, "redirect");
@@ -105,3 +106,8 @@ DummyFactoryConfiguration dummyFactoryConfiguration =
     }
 
 %>
+
+<%
+DummyFactoryDisplayContext dummyFactoryDisplayContext = new DummyFactoryDisplayContext(request, liferayPortletRequest, liferayPortletResponse, portletPreferences);
+%>
+

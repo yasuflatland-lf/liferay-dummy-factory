@@ -20,6 +20,7 @@
 	        <aui:option label="Category / Vocabulary" value="<%= LDFPortletKeys.MODE_CATEGORY %>" selected="<%= mode.equals(LDFPortletKeys.MODE_CATEGORY) %>" />
 	        <aui:option label="Blogs" value="<%= LDFPortletKeys.MODE_BLOGS %>" selected="<%= mode.equals(LDFPortletKeys.MODE_BLOGS) %>" />
 	        <aui:option label="Wiki" value="<%= LDFPortletKeys.MODE_WIKI %>" selected="<%= mode.equals(LDFPortletKeys.MODE_WIKI) %>" />
+	        <aui:option label="Company" value="<%= LDFPortletKeys.MODE_COMPANY %>" selected="<%= mode.equals(LDFPortletKeys.MODE_COMPANY) %>" />
 	    </aui:select>
     </aui:form>
     
