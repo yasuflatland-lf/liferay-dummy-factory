@@ -22,13 +22,17 @@ Dummy Factory generates dummy data for debugging use. Please don't use this for 
 * Liferay 7.1 GA1 / Liferay DXP 7.1 GA1 or above
 
 ## Usage
+### For 7.1
 1. Download jar file from [here](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/master/latest) and place it in ${liferay-home}/deploy folder. 
 2. Start Liferay bundle and login as an administrator.
 3. After the jar is properly installed, navigate to ```Control Panel``` in the left pane and under ```Apps``` folder, Dummy Factory portlet will be found. Please place that on a page.
 4. Now you are ready to create dummy data! Enjoy!
 
+### For 7.0
+Please download file from[here](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.0.x/latest) and follow the same steps above.
+
 ## How can I compile Dummy Factory on my own?
-1. Create a Liferay Workspace for 7.1
+1. Create a Liferay Workspace for 7.1 (or 7.0 for 7.0.x branch)
 2. Clone this repository to ```${liferay_workspace_home}/modules```.  Please make sure you've already installed Gradle 3.0 or above and blade tool that Liferay provides.
 3. At the root directory, run ```gradle clean assemble``` then ```liferay.dummy.factory-x.x.x.jar``` will be created under ```/build/libs/``` directory.
 4. To install onto your Liferay bundle, startup Liferay bundle on your local and run ```blade deploy```. Dummy Factory portlet will be deployed.

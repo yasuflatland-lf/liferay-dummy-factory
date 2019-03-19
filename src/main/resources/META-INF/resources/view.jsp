@@ -1,10 +1,9 @@
 <%@ include file="/init.jsp"%>
 
-<aui:nav-bar cssClass="collapse-basic-search" markupView="lexicon">
-	<aui:nav cssClass="navbar-nav">
-		<aui:nav-item label="Organization" selected="<%= true %>" />
-	</aui:nav>
-</aui:nav-bar>
+<clay:navigation-bar
+	inverted="<%= true %>"
+	navigationItems='<%= dummyFactoryDisplayContext.getNavigationBarItems("Organization") %>'
+/>
 	
 <div class="container-fluid-1280">
 
