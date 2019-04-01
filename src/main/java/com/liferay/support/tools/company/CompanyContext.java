@@ -1,9 +1,11 @@
 package com.liferay.support.tools.company;
 
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.support.tools.common.ParamContext;
 
 import javax.portlet.ActionRequest;
+import javax.servlet.ServletContext;
 
 public class CompanyContext extends ParamContext {
 
@@ -14,6 +16,7 @@ public class CompanyContext extends ParamContext {
 	private boolean	system;
 	private int		maxUsers;
 	private boolean	active;
+	private ServletContext servletContext;
 
 	public CompanyContext(ActionRequest actionRequest) {
 		// Fetch data
@@ -25,6 +28,10 @@ public class CompanyContext extends ParamContext {
 		system = ParamUtil.getBoolean( actionRequest, "system", false );
 		maxUsers = ParamUtil.getInteger( actionRequest, "maxUsers", 0 );
 		active = ParamUtil.getBoolean( actionRequest, "active", true );
+		
+		servletContext =
+				(ServletContext)actionRequest.getAttribute(WebKeys.CTX);
+		
 	}
 
 	public long getNumberOfCompanies() {
@@ -81,6 +88,14 @@ public class CompanyContext extends ParamContext {
 
 	public void setActive( boolean active ) {
 		this.active = active;
+	}
+
+	public ServletContext getServletContext() {
+		return servletContext;
+	}
+
+	public void setServletContext( ServletContext servletContext ) {
+		this.servletContext = servletContext;
 	}
 
 }

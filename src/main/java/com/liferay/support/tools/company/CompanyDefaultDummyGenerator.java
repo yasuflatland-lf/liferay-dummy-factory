@@ -1,8 +1,10 @@
 package com.liferay.support.tools.company;
 
 import com.liferay.petra.string.StringBundler;
+import com.liferay.portal.instances.service.PortalInstancesLocalService;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.ProgressManager;
@@ -58,13 +60,16 @@ public class CompanyDefaultDummyGenerator extends DummyGenerator<CompanyContext>
 					_log.debug("-----");
 				}
 				
-				_companyLocalService.addCompany(
+				Company company = _companyLocalService.addCompany(
 						webId.toString(), 
 						virtualHostname.toString(), 
 						mx.toString(), 
 						paramContext.isSystem(),
 						paramContext.getMaxUsers(), 
 						paramContext.isActive()); 
+				
+				_portalInstancesLocalService.initializePortalInstance(
+					paramContext.getServletContext(), company.getWebId());				
 			
 			} catch (Exception e) {
 				//Finish progress
@@ -83,6 +88,9 @@ public class CompanyDefaultDummyGenerator extends DummyGenerator<CompanyContext>
 	@Reference
 	private CompanyLocalService _companyLocalService;
 	
+	@Reference
+	private PortalInstancesLocalService _portalInstancesLocalService;
+
 	private static final Log _log = LogFactoryUtil.getLog(CompanyDefaultDummyGenerator.class);	
 	
 }
