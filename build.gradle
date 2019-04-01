@@ -72,6 +72,7 @@ dependencies {
 	compile group: "com.liferay", name: "com.liferay.item.selector.taglib", version: "1.0.0"
 	compile group: "com.liferay", name: "com.liferay.trash.taglib", version: "2.0.0"
 	compile group: "com.liferay", name: "com.liferay.portal.spring.extender", version: "2.0.0"
+	compile group: "com.liferay", name: "com.liferay.portal.instances.api", version: "2.0.0"
 	compile group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.0.0"
 	compile group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "3.0.0"
 	compile group: "com.liferay.portal", name: "com.liferay.util.taglib", version: "3.0.0"
