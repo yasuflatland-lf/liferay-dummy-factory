@@ -52,6 +52,7 @@
 			String descriptionLabel = "Description";
 			String threadListLabel = "Thread list";
 			String categoryIdLabel = "Categories";
+			String formatLabel = "format";
 			
 			List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 			%>
@@ -130,6 +131,11 @@
 								<aui:validator name="number" />
 								<aui:validator name="min">0</aui:validator>
 							</aui:input>
+							<aui:select name="format" label="<%= formatLabel %>" >
+								<aui:option label="bbcode" value="<%= String.valueOf(LDFPortletKeys.MB_FORMAT_BBCODE) %>" />
+								<aui:option label="HTML" value="<%= String.valueOf(LDFPortletKeys.MB_FORMAT_BBCODE) %>" />
+							</aui:select>
+							
 							<aui:input name="anonymous" type="toggle-switch" label="<%= anonymousLabel %>" value="<%= false %>"/>
 							<aui:input name="allowPingbacks" type="toggle-switch" label="<%= allowPingbacksLabel %>" value="<%= false %>"/>
 						</aui:fieldset>

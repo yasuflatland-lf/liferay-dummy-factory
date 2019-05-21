@@ -6,6 +6,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.support.tools.common.ParamContext;
+import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.utils.CommonUtil;
 
 import javax.portlet.ActionRequest;
@@ -25,7 +26,9 @@ public class MBContext extends ParamContext {
 	private String description = "";
 	private long threadId = 0;
 	private long siteGroupId = 0;
-	
+	private String format;
+
+
 	public MBContext(ActionRequest actionRequest) {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
@@ -43,6 +46,7 @@ public class MBContext extends ParamContext {
 		description = ParamUtil.getString(actionRequest, "description","dummy description");
 		threadId = ParamUtil.getLong(actionRequest, "threadId",0);
 		siteGroupId = ParamUtil.getLong(actionRequest, "siteGroupId",themeDisplay.getScopeGroupId());
+		format = ParamUtil.getString(actionRequest, "format",LDFPortletKeys.MB_FORMAT_BBCODE);
 		
 		// Sites
 		String[] groupsStrIds = ParamUtil.getStringValues(actionRequest, "groupIds",
@@ -153,5 +157,8 @@ public class MBContext extends ParamContext {
 	public void setSiteGroupId(long siteGroupId) {
 		this.siteGroupId = siteGroupId;
 	}
-
+	
+	public String getFormat() {
+		return format;
+	}	
 }
