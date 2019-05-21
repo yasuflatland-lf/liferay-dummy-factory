@@ -86,11 +86,19 @@ public class LDFPortletKeys {
     public static final int WCM_SIMPLE_CONTENTS_CREATE = 0;
     public static final int WCM_DUMMY_CONTENTS_CREATE = 1;
     public static final int WCM_STRUCTURE_TEMPLATE_SELECT_CREATE = 2;
+
+    //
+    //Message board 
+    //
     
-    //Message board contents mode
+    // contents mode
     public static final int MB_THREAD_CREATE = 0;
     public static final int MB_CATEGORY_CREATE = 1;
     public static final int MB_REPLY_CREATE = 2;
+    
+    // format
+    public static final String MB_FORMAT_BBCODE = "bbcode";
+    public static final String MB_FORMAT_HTML = "html";
     
     //Categroy / Vocabulary contents mode
     public static final int C_CATEGORY_CREATE = 0;

@@ -71,7 +71,7 @@ public class MBThreadDummyGenerator extends DummyGenerator<MBContext> {
 							paramContext.getCategoryId(), // categoryId,
 							actualSubject.toString(), // subject,
 							paramContext.getBody(), // body,
-							MBMessageConstants.DEFAULT_FORMAT, // format,
+							paramContext.getFormat(), // format,
 							inputStreamOVPs, // inputStreamOVPs,
 							paramContext.isAnonymous(), // anonymous,
 							paramContext.getPriority(), // priority,
