@@ -1,13 +1,15 @@
 package com.liferay.support.tools.messageboard;
 
-import com.liferay.message.boards.kernel.model.MBMessageConstants;
 import com.liferay.message.boards.kernel.model.MBThread;
 import com.liferay.message.boards.kernel.service.MBMessageService;
 import com.liferay.message.boards.kernel.service.MBThreadLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.*;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.util.*;
+import com.liferay.portal.kernel.util.ObjectValuePair;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.CommonUtil;
 import com.liferay.support.tools.utils.ProgressManager;
@@ -80,7 +82,7 @@ public class MBReplyDummyGenerator extends DummyGenerator<MBContext> {
 						thread.getRootMessageId(), // parentMessageId
 						actualSubject.toString(), // subject,
 						paramContext.getBody(), // body,
-						MBMessageConstants.DEFAULT_FORMAT, // format,
+						paramContext.getFormat(), // format,
 						inputStreamOVPs, // inputStreamOVPs,
 						paramContext.isAnonymous(), // anonymous,
 						paramContext.getPriority(), // priority,

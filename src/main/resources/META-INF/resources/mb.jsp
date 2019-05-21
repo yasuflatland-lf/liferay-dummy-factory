@@ -55,6 +55,9 @@
 			String formatLabel = "format";
 			
 			List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			final String groupName = GroupConstants.GUEST;
+			final long companyId = PortalUtil.getDefaultCompanyId();
+			final long guestGroupId = GroupLocalServiceUtil.getGroup(companyId, groupName).getGroupId();			
 			%>
 
 			<aui:form action="<%= journalEditURL %>" method="post" name="fm" >
@@ -72,7 +75,7 @@
 					
 				<span id="<portlet:namespace />groupIdsWrap">
 					<aui:select name="groupIds" label="<%= groupIdLabel %>" multiple="<%= true %>" >
-						<aui:option label="<%= defaultOption %>" value="<%= themeDisplay.getScopeGroupId() %>" selected="<%= true %>" />
+						<aui:option label="<%= defaultOption %>" value="<%= guestGroupId %>" selected="<%= true %>" />
 						<%
 						for (Group group : groups) {
 							if (group.isSite() && !group.getDescriptiveName().equals("Control Panel")) {
@@ -86,7 +89,7 @@
 				</span>
 				<span id="<portlet:namespace />siteGroupIdWrap" style="display:none;">
 					<aui:select name="siteGroupId" label="<%= groupIdLabel %>" >
-						<aui:option label="<%= defaultOption %>" value="<%= themeDisplay.getScopeGroupId() %>" selected="<%= true %>" />
+						<aui:option label="<%= defaultOption %>" value="<%= guestGroupId %>" selected="<%= true %>" />
 						<%
 						for (Group group : groups) {
 							if (group.isSite() && !group.getDescriptiveName().equals("Control Panel")) {
