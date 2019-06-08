@@ -63,7 +63,7 @@ public class DummyFactoryDisplayContext {
 					);
 					navigationItem
 							.setLabel( LanguageUtil.get( _request, label ) );
-				} );
+				});
 			}
 		};
 	}

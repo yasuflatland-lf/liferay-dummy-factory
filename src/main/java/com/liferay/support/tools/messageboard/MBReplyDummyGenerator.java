@@ -1,8 +1,9 @@
 package com.liferay.support.tools.messageboard;
 
-import com.liferay.message.boards.kernel.model.MBThread;
-import com.liferay.message.boards.kernel.service.MBMessageService;
-import com.liferay.message.boards.kernel.service.MBThreadLocalService;
+import com.liferay.message.boards.constants.MBMessageConstants;
+import com.liferay.message.boards.model.MBThread;
+import com.liferay.message.boards.service.MBMessageService;
+import com.liferay.message.boards.service.MBThreadLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;

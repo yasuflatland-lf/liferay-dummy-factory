@@ -1,6 +1,6 @@
 package com.liferay.support.tools.messageboard;
 
-import com.liferay.message.boards.kernel.model.MBCategoryConstants;
+import com.liferay.message.boards.constants.MBCategoryConstants;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
