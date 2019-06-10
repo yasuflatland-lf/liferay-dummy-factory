@@ -40,7 +40,6 @@
 <%@ page import="com.liferay.journal.service.*" %>
 <%@ page import="com.liferay.dynamic.data.mapping.service.*" %>
 <%@ page import="com.liferay.message.boards.model.*" %>
-<%@ page import="com.liferay.trash.kernel.util.TrashUtil" %>
 <%@ page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %>
 <%@ page import="com.liferay.support.tools.document.library.EditFileEntryMVCActionCommand" %>
 <%@ page import="com.liferay.portal.util.PropsValues" %>

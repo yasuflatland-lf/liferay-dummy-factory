@@ -7,8 +7,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
 
@@ -50,9 +48,6 @@ public class DummyFactoryDisplayContext {
 	 * @return NavigationItem List
 	 */
 	public List<NavigationItem> getNavigationBarItems( String label ) {
-		ThemeDisplay themeDisplay = (ThemeDisplay) _request
-				.getAttribute( WebKeys.THEME_DISPLAY );
-
 		return new NavigationItemList() {
 			{
 				add( navigationItem -> {
