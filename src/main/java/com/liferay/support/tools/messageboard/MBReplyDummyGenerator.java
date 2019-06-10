@@ -1,6 +1,5 @@
 package com.liferay.support.tools.messageboard;
 
-import com.liferay.message.boards.constants.MBMessageConstants;
 import com.liferay.message.boards.model.MBThread;
 import com.liferay.message.boards.service.MBMessageService;
 import com.liferay.message.boards.service.MBThreadLocalService;

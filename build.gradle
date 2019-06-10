@@ -67,6 +67,7 @@ dependencies {
 	compile group: "com.liferay", name: "com.liferay.application.list.api", version: "4.0.0"
 	compile group: "com.liferay", name: "com.liferay.frontend.taglib", version: "4.0.0"
 	compile group: "com.liferay", name: "com.liferay.frontend.taglib.clay", version: "2.0.0"
+	compile group: "com.liferay", name: "com.liferay.frontend.taglib.util", version: "2.0.0"
 	compile group: "com.liferay", name: "com.liferay.item.selector.api", version: "4.0.0"
 	compile group: "com.liferay", name: "com.liferay.item.selector.criteria.api", version: "4.0.0"
 	compile group: "com.liferay", name: "com.liferay.item.selector.taglib", version: "3.0.0"

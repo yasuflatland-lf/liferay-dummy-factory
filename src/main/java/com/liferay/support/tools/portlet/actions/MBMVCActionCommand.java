@@ -4,7 +4,8 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
-import com.liferay.portal.kernel.servlet.*;
+import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.messageboard.MBContext;
@@ -12,6 +13,7 @@ import com.liferay.support.tools.messageboard.MBDummyFactory;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.MutableRenderParameters;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -35,7 +37,8 @@ public class MBMVCActionCommand extends BaseMVCActionCommand {
 	protected void doProcessAction(ActionRequest request, ActionResponse response) throws Exception {
 
 		try {
-			response.setRenderParameter("mvcRenderCommandName", LDFPortletKeys.COMMON);
+			MutableRenderParameters mutableRenderParameters = response.getRenderParameters();
+			mutableRenderParameters.setValues("mvcRenderCommandName", LDFPortletKeys.COMMON);
 
 			DummyGenerator<MBContext> dummyGenerator = _MBDummyFactory.create(request);
 			dummyGenerator.create(request);

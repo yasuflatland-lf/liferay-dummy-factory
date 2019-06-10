@@ -12,6 +12,7 @@ import com.liferay.support.tools.journal.JournalDummyFactory;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.MutableRenderParameters;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -43,7 +44,8 @@ public class JournalMVCActionCommand extends BaseMVCActionCommand {
 			_log.error(e, e);
 		}
 
-		response.setRenderParameter("mvcRenderCommandName", LDFPortletKeys.COMMON);
+		MutableRenderParameters mutableRenderParameters = response.getRenderParameters();
+		mutableRenderParameters.setValues("mvcRenderCommandName", LDFPortletKeys.COMMON);
 		SessionMessages.add(request, "success");
 
 	}

@@ -63,30 +63,18 @@
 <liferay-frontend:defineObjects/>
 <liferay-theme:defineObjects/>
 <portlet:defineObjects/>
+
 <%
 	PortletURL portletURL = PortletURLUtil.clone(renderResponse.createRenderURL(), liferayPortletResponse);
 	String redirect = ParamUtil.getString(request, "redirect");
 	//Mode
 	String mode = ParamUtil.getString(request, LDFPortletKeys.MODE, LDFPortletKeys.MODE_ORGANIZAION);
-%>
-
-<aui:script use="aui-base">
-//Convert bracket for Lodash template to avoid overraping jsp tag.
-_.templateSettings = {
-    interpolate: /\<\@\=(.+?)\@\>/gim,
-    evaluate: /\<\@([\s\S]+?)\@\>/gim,
-    escape: /\<\@\-(.+?)\@\>/gim
-};
-</aui:script>
-
-<%
-String progressId = PwdGenerator.getPassword(PwdGenerator.KEY3, 16);
-%>
-
-<%
-DummyFactoryConfiguration dummyFactoryConfiguration =
-        (DummyFactoryConfiguration)
-            renderRequest.getAttribute(DummyFactoryConfiguration.class.getName());
+	//String progressId = PwdGenerator.getPassword(PwdGenerator.KEY3, 16);
+	String progressId = PortalUtil.generateRandomKey(request, "progressId");
+	
+	DummyFactoryConfiguration dummyFactoryConfiguration =
+	        (DummyFactoryConfiguration)
+	            renderRequest.getAttribute(DummyFactoryConfiguration.class.getName());
 
 
     String linkList = StringPool.BLANK;
@@ -105,9 +93,16 @@ DummyFactoryConfiguration dummyFactoryConfiguration =
                         "urlList", dummyFactoryConfiguration.urlList()));        
     }
 
+	DummyFactoryDisplayContext dummyFactoryDisplayContext = new DummyFactoryDisplayContext(request, liferayPortletRequest, liferayPortletResponse, portletPreferences);
 %>
 
-<%
-DummyFactoryDisplayContext dummyFactoryDisplayContext = new DummyFactoryDisplayContext(request, liferayPortletRequest, liferayPortletResponse, portletPreferences);
-%>
+
+<aui:script use="aui-base">
+//Convert bracket for Lodash template to avoid overraping jsp tag.
+_.templateSettings = {
+    interpolate: /\<\@\=(.+?)\@\>/gim,
+    evaluate: /\<\@([\s\S]+?)\@\>/gim,
+    escape: /\<\@\-(.+?)\@\>/gim
+};
+</aui:script>
 
