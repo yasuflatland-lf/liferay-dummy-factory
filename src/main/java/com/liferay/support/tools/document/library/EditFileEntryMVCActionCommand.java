@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.lock.DuplicateLockException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
@@ -66,7 +65,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.support.tools.constants.LDFPortletKeys;
-import com.liferay.trash.kernel.util.TrashUtil;
 
 import java.io.InputStream;
 import java.util.HashSet;
@@ -266,8 +264,6 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
 		if (fileEntry.isRepositoryCapabilityProvided(TrashCapability.class)) {
 			fileEntry = _dlTrashService.moveFileEntryToTrash(fileEntryId);
-
-			TrashUtil.addTrashSessionMessages(actionRequest, (TrashedModel) fileEntry.getModel());
 		}
 
 		hideDefaultSuccessMessage(actionRequest);
@@ -497,7 +493,8 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 				SessionErrors.add(actionRequest, e.getClass());
 			}
 
-			actionResponse.setRenderParameter("mvcPath", "/error.jsp");
+			MutableRenderParameters mutableRenderParameters = actionResponse.getRenderParameters();
+			mutableRenderParameters.setValue("mvcPath", "/error.jsp");
 		} else {
 			Throwable cause = e.getCause();
 

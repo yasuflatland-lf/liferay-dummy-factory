@@ -6,6 +6,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.sites.kernel.util.SitesUtil;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.ProgressManager;
@@ -70,6 +71,11 @@ public class UserDefaultDummyGenerator extends DummyGenerator<UserContext> {
 					paramContext.getBaseScreenName(), i,
 					paramContext.getLocale());
 
+				if(Validator.isNull(user)) {
+					_log.error("Skip the user <" + screenName.toString() + ">");
+					continue;
+				}
+				
 				if (paramContext.isAutoUserPreLogin()) {
 					// Generate private / public user page
 					_userLayoutUtil.updateUserLayouts(user);

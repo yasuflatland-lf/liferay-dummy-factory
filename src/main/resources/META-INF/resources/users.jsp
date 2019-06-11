@@ -57,6 +57,7 @@
 			%>
 
 			<aui:form action="<%= userEditURL %>" method="post" name="fm" >
+				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
 				<aui:input name="numberOfusers" label="<%= numberOfusersLabel %>" >
 					<aui:validator name="digits" />
 					<aui:validator name="min">1</aui:validator>
@@ -250,6 +251,7 @@
 			<liferay-ui:upload-progress
 				id="<%= progressId %>"
 				message="creating..."
+				height="10"
 			/>
 		</aui:fieldset>
 	</aui:fieldset-group>
