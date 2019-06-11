@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.lock.DuplicateLockException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
@@ -66,7 +65,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.support.tools.constants.LDFPortletKeys;
-import com.liferay.trash.kernel.util.TrashUtil;
 
 import java.io.InputStream;
 import java.util.HashSet;
@@ -74,6 +72,7 @@ import java.util.Set;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.MutableRenderParameters;
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -142,7 +141,8 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
 			if (cmd.equals(Constants.ADD_TEMP) 		|| 
 				cmd.equals(Constants.DELETE_TEMP)) {
-				actionResponse.setRenderParameter("mvcPath", "/null.jsp");
+				MutableRenderParameters mutableRenderParameters = actionResponse.getRenderParameters();
+				mutableRenderParameters.setValue("mvcPath", "/null.jsp");
 			} else {
 				String redirect = ParamUtil.getString(actionRequest, "redirect");
 				int workflowAction = ParamUtil.getInteger(actionRequest, "workflowAction",
@@ -182,16 +182,18 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 			actionRequest, portletConfig.getPortletName(), themeDisplay.getLayout(),
 			PortletRequest.RENDER_PHASE);
 
-		portletURL.setParameter(
+		MutableRenderParameters mutableRenderParameters = portletURL.getRenderParameters();
+	
+		mutableRenderParameters.setValues(
 			"mvcRenderCommandName", "/df/document/edit_file_entry");
-		portletURL.setParameter(Constants.CMD, Constants.UPDATE, false);
-		portletURL.setParameter("redirect", redirect, false);
-		portletURL.setParameter(
-			"groupId", String.valueOf(fileEntry.getGroupId()), false);
-		portletURL.setParameter(
-			"fileEntryId", String.valueOf(fileEntry.getFileEntryId()), false);
-		portletURL.setParameter(
-			"version", String.valueOf(fileEntry.getVersion()), false);
+		mutableRenderParameters.setValues(Constants.CMD, Constants.UPDATE);
+		mutableRenderParameters.setValues("redirect", redirect);
+		mutableRenderParameters.setValues(
+			"groupId", String.valueOf(fileEntry.getGroupId()));
+		mutableRenderParameters.setValues(
+			"fileEntryId", String.valueOf(fileEntry.getFileEntryId()));
+		mutableRenderParameters.setValues(
+			"version", String.valueOf(fileEntry.getVersion()));
 		portletURL.setWindowState(actionRequest.getWindowState());
 
 		return portletURL.toString();
@@ -262,8 +264,6 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
 		if (fileEntry.isRepositoryCapabilityProvided(TrashCapability.class)) {
 			fileEntry = _dlTrashService.moveFileEntryToTrash(fileEntryId);
-
-			TrashUtil.addTrashSessionMessages(actionRequest, (TrashedModel) fileEntry.getModel());
 		}
 
 		hideDefaultSuccessMessage(actionRequest);
@@ -309,7 +309,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
 			JSONPortletResponseUtil.writeJSON(actionRequest, actionResponse, jsonObject);
 		} finally {
-			StreamUtil.cleanUp(inputStream);
+			StreamUtil.cleanUp(true, inputStream);
 		}
 	}
 
@@ -382,7 +382,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
 			return fileEntry;
 		} finally {
-			StreamUtil.cleanUp(inputStream);
+			StreamUtil.cleanUp(true,inputStream);
 		}
 	}
 
@@ -493,7 +493,8 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 				SessionErrors.add(actionRequest, e.getClass());
 			}
 
-			actionResponse.setRenderParameter("mvcPath", "/error.jsp");
+			MutableRenderParameters mutableRenderParameters = actionResponse.getRenderParameters();
+			mutableRenderParameters.setValue("mvcPath", "/error.jsp");
 		} else {
 			Throwable cause = e.getCause();
 

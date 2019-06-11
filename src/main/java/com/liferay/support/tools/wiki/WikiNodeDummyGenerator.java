@@ -5,7 +5,6 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.ProgressManager;
-import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.service.WikiNodeLocalService;
 
 import javax.portlet.ActionRequest;
@@ -49,7 +48,7 @@ public class WikiNodeDummyGenerator extends DummyGenerator<WikiContext> {
 			}
 
 			try {
-				WikiNode node = _wikiNodeLocalService.addNode(
+				_wikiNodeLocalService.addNode(
 						paramContext.getServiceContext().getUserId(),
 						name.toString(), 
 						name.toString(), 

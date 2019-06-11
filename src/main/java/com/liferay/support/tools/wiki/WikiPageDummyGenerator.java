@@ -74,9 +74,9 @@ public class WikiPageDummyGenerator extends DummyGenerator<WikiContext> {
 		System.out.println("Starting to create " + paramContext.getNumberOfpages() + " pages");
 
 		// Get Default format
-		String format;
+		
 		try {
-			format = getDefaultFormat(paramContext);
+			getDefaultFormat(paramContext);
 		} catch (Exception e) {
 			//Finish progress
 			progressManager.finish();	

@@ -71,6 +71,9 @@
 			String folderIdLabel = "Journal Folder ID of the target folder";
 			
 			List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			final String groupName = GroupConstants.GUEST;
+			final long companyId = PortalUtil.getDefaultCompanyId();
+			final long guestGroupId = GroupLocalServiceUtil.getGroup(companyId, groupName).getGroupId();
 			%>
 
 			<aui:form action="<%= journalEditURL %>" method="post" name="fm" >
@@ -83,7 +86,7 @@
 					<aui:validator name="required" />				
 				</aui:input>
 				<aui:select name="groupIds" label="<%= groupIdLabel %>" multiple="<%= true %>" >
-					<aui:option label="<%= defaultOption %>" value="<%= themeDisplay.getScopeGroupId() %>" selected="<%= true %>" />
+					<aui:option label="<%= defaultOption %>" value="<%= guestGroupId %>" selected="<%= true %>" />
 					<%
 					for (Group group : groups) {
 						if (group.isSite() && !group.getDescriptiveName().equals("Control Panel")) {
@@ -96,7 +99,7 @@
 				</aui:select>		
 
 				<aui:select name="folderId" label="<%= folderIdLabel %>" >
-					<aui:option label="<%= defaultOption %>" value="<%= themeDisplay.getScopeGroupId() %>" selected="<%= true %>" />
+					<aui:option label="<%= defaultOption %>" data-group-id="<%= guestGroupId %>" value="<%= JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID %>" selected="<%= true %>" />
 				</aui:select>							
 					
 				<aui:a href="#inputOptions" cssClass="collapse-icon collapsed icon-angle-down" title="Option" aria-expanded="false" data-toggle="collapse" >&nbsp;&nbsp;option</aui:a>

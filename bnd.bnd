@@ -1,44 +1,29 @@
 Bundle-Name: Liferay Dummy Factory Portlet
 Bundle-SymbolicName: liferay.dummy.factory
-Bundle-Version: 7.1.5
+Bundle-Version: 7.2.0
 
 Import-Package:\
 	!org.apache.commons.fileupload.*,\
+	!com.google.*,\
+	!com.sun.*,\
+	!org.apache.commons.*,\
+	!org.checkerframework.*,\
 	*
 
-Bundle-ClassPath:\
-	.,\
-	lib/guava.jar,\
-	lib/error_prone_annotations.jar,\
-	lib/commons-digester.jar,\
-	lib/commons-validator.jar,\
-	lib/commons-io.jar,\
-	lib/commons-lang3.jar,\
-	lib/generex.jar,\
-	lib/automaton.jar,\
-	lib/javafaker.jar,\
-	lib/crawler4j.jar,\
-	lib/je.jar,\
-	lib/rxjava.jar,\
-	lib/httpcore-osgi.jar,\
-	lib/httpclient.jar,\
-	lib/reactive-streams.jar,\
-	lib/commons-fileupload.jar
-
 -includeresource:\
-	lib/guava.jar=guava-[0-9]*.jar,\
-	lib/error_prone_annotations.jar=error_prone_annotations-[0-9]*.jar,\
-	lib/commons-digester.jar=commons-digester-[0-9]*.jar,\
-	lib/commons-validator.jar=commons-validator-[0-9]*.jar,\
-	lib/commons-io.jar=commons-io-[0-9]*.jar,\
-	lib/commons-lang3.jar=commons-lang[0-9]*.jar,\
-	lib/generex.jar=generex-[0-9]*.jar,\
-	lib/automaton.jar=automaton-[0-9]*.jar,\
-	lib/javafaker.jar=javafaker-[0-9]*.jar,\
-	lib/crawler4j.jar=crawler4j-[0-9]*.jar,\
-	lib/je.jar=je-[0-9]*.jar,\
-	lib/rxjava.jar=rxjava-[0-9]*.jar,\
-	lib/httpcore-osgi.jar=httpcore-osgi-[0-9]*.jar,\
-	lib/httpclient.jar=httpclient-[0-9]*.jar,\
-	lib/reactive-streams.jar=reactive-streams-[0-9]*.jar,\
-	lib/commons-fileupload.jar=commons-fileupload-[0-9]*.jar
+	@guava-*.jar,\
+	@error_prone_annotations-*.jar,\
+	@commons-digester-*.jar,\
+	@commons-validator-*.jar,\
+	@commons-io-*.jar,\
+	@commons-lang*.jar,\
+	@generex-*.jar,\
+	@automaton-*.jar,\
+	@javafaker-*.jar,\
+	@crawler4j-*.jar,\
+	@je-*.jar,\
+	@rxjava-*.jar,\
+	@httpcore-osgi-*.jar,\
+	@httpclient-*.jar,\
+	@reactive-streams-*.jar,\
+	@commons-fileupload-*.jar
