@@ -50,6 +50,8 @@
 			%>
 
 			<aui:form action="<%= pageEditURL %>" method="post" name="fm">
+				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
+			
 				<aui:input name="numberOfpages" label="<%= numberOfPagesLabel %>" >
 					<aui:validator name="digits" />
 					<aui:validator name="min">1</aui:validator>
@@ -99,10 +101,16 @@
 					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary" id="processStart"/>
 				</aui:button-row>	
 			</aui:form>	
+<%
+// Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
+String progressSessionKey = ProgressTracker.PERCENT + progressId;
+request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
+%>			
 			<liferay-ui:upload-progress
 				id="<%= progressId %>"
 				message="creating..."
-			/>				
+				height="20"
+			/>			
 		</aui:fieldset>
 	</aui:fieldset-group>
 </div>

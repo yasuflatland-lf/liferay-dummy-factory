@@ -49,10 +49,6 @@
                 <p>The counter always starts at <code>1</code></p>
 				<p>If no site is selected, the default site will be <code>liferay.com</code></p>
 				<p>If no site is selected, the default site will be <code>liferay.com</code></p>
-				
-				
-				
-				
             </div>
 
 			<%
@@ -77,6 +73,8 @@
 			%>
 
 			<aui:form action="<%= journalEditURL %>" method="post" name="fm" >
+				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
+			
 				<aui:input name="numberOfArticles" label="<%= numberOfArticlesLabel %>" >
 					<aui:validator name="digits" />
 					<aui:validator name="min">1</aui:validator>
@@ -217,9 +215,15 @@
 				</aui:button-row>	
 			</aui:form>	
 			
+<%
+// Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
+String progressSessionKey = ProgressTracker.PERCENT + progressId;
+request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
+%>			
 			<liferay-ui:upload-progress
 				id="<%= progressId %>"
 				message="creating..."
+				height="20"
 			/>	
 						
 		</aui:fieldset>

@@ -248,16 +248,22 @@
 					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary" id="processStart"/>
 				</aui:button-row>
 			</aui:form>
+<%
+// Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
+String progressSessionKey = ProgressTracker.PERCENT + progressId;
+request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
+%>			
 			<liferay-ui:upload-progress
 				id="<%= progressId %>"
 				message="creating..."
-				height="10"
+				height="20"
 			/>
 		</aui:fieldset>
 	</aui:fieldset-group>
 </div>
 
 <aui:script use="aui-base">
+
 	var processStart = A.one('#<portlet:namespace />processStart');
 
 	processStart.on(

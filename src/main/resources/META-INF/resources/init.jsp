@@ -40,6 +40,7 @@
 <%@ page import="com.liferay.journal.service.*" %>
 <%@ page import="com.liferay.dynamic.data.mapping.service.*" %>
 <%@ page import="com.liferay.message.boards.model.*" %>
+<%@ page import="com.liferay.message.boards.constants.*" %>
 <%@ page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %>
 <%@ page import="com.liferay.support.tools.document.library.EditFileEntryMVCActionCommand" %>
 <%@ page import="com.liferay.portal.util.PropsValues" %>
@@ -68,7 +69,8 @@
 	String redirect = ParamUtil.getString(request, "redirect");
 	//Mode
 	String mode = ParamUtil.getString(request, LDFPortletKeys.MODE, LDFPortletKeys.MODE_ORGANIZAION);
-	//String progressId = PwdGenerator.getPassword(PwdGenerator.KEY3, 16);
+	
+	// Generate Progress ID
 	String progressId = PortalUtil.generateRandomKey(request, "progressId");
 	
 	DummyFactoryConfiguration dummyFactoryConfiguration =

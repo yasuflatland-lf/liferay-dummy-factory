@@ -61,7 +61,8 @@
 			%>
 
 			<aui:form action="<%= categoryEditURL %>" method="post" name="fm">
-			
+				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
+				
 				<aui:select name="createContentsType" label="<%= createContentsTypeLabel %>" >
 					<aui:option label="Category" value="<%= String.valueOf(LDFPortletKeys.C_CATEGORY_CREATE) %>" />
 					<aui:option label="Vocabulary" value="<%= String.valueOf(LDFPortletKeys.C_VOCABULARY_CREATE) %>" />
@@ -147,9 +148,15 @@
 					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary" id="processStart"/>
 				</aui:button-row>
 			</aui:form>
+<%
+// Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
+String progressSessionKey = ProgressTracker.PERCENT + progressId;
+request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
+%>			
 			<liferay-ui:upload-progress
 				id="<%= progressId %>"
 				message="creating..."
+				height="20"
 			/>
 		</aui:fieldset>
 	</aui:fieldset-group>
