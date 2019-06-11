@@ -1,6 +1,6 @@
 dist: xenial
 language: java
-jdk: oraclejdk8
+jdk: openjdk8
 env:
   - CI=true
 before_script:
