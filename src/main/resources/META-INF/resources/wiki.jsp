@@ -26,7 +26,7 @@
 			
 			String numberOfpagesLabel = "Enter the number of wiki pages you would like to create";
 			String basePageNameLabel = "Enter the base name for the page";
-			String baseContentNameLabel = "Enter the base ontent for the page";
+			String baseContentNameLabel = "Enter the base content for the page";
 			String baseSummaryNameLabel = "Enter the base summary for the page";
 			String minorEditLabel = "Create this page as minor edit";			
 
@@ -38,7 +38,9 @@
 			
 			%>
 
-			<aui:form action="<%= wikiEditURL %>" method="post" name="fm" >
+			<aui:form action="<%= wikiEditURL %>" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
+				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
+			
 				<aui:select name="createContentsType" label="<%= createContentsTypeLabel %>" >
 					<aui:option selected="true" label="Wiki Node" value="<%= String.valueOf(LDFPortletKeys.W_NODE) %>" />
 					<aui:option label="Wiki Page" value="<%= String.valueOf(LDFPortletKeys.W_PAGE) %>" />
@@ -140,14 +142,19 @@
 				</aui:button-row>	
 			</aui:form>	
 			
+<%
+// Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
+String progressSessionKey = ProgressTracker.PERCENT + progressId;
+request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
+%>			
 			<liferay-ui:upload-progress
 				id="<%= progressId %>"
 				message="creating..."
-			/>	
+				height="20"
+			/>
 				
 		</aui:fieldset>	
 	</aui:fieldset-group>
-		
 </div>
 
 <script type="text/html" id="<portlet:namespace />node_options">
@@ -157,6 +164,13 @@
 <script type="text/html" id="<portlet:namespace />page_options">
     <option value="<@= resourcePrimKey @>" ><@= title @></option>
 </script>
+
+<aui:script>
+	function <portlet:namespace />execCommand() {
+		<%= progressId %>.startProgress();
+		submitForm(document.<portlet:namespace />fm);
+	}
+</aui:script>
 
 <aui:script use="aui-base, liferay-form">	
 	
@@ -189,18 +203,6 @@
 			<portlet:namespace />pagesUpdate();
 		});	    
 	}	
-	
-	// Generate dummy data
-	$('#<portlet:namespace />processStart').on(
-	    'click',
-	    function() {
-	    	event.preventDefault();
-			<%= progressId %>.startProgress();
-			submitForm(document.<portlet:namespace />fm);
-	    }
-	)
- 
-
 	
 	// Group ID
 	$('#<portlet:namespace />groupId').on(

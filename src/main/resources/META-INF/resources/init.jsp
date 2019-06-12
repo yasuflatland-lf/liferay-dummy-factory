@@ -17,11 +17,14 @@
 <%@ page import="com.liferay.portal.kernel.portlet.*" %>
 <%@ page import="com.liferay.portal.kernel.service.*" %>
 <%@ page import="com.liferay.portal.kernel.search.*" %>
+<%@ page import="com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil" %>
 <%@ page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %>
 <%@ page import="com.liferay.portal.kernel.dao.search.*" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
 <%@ page import="com.liferay.portal.kernel.workflow.*" %>
 <%@ page import="com.liferay.document.library.kernel.model.*" %>
+<%@ page import="com.liferay.document.library.configuration.*" %>
+
 <%@ page import="com.liferay.taglib.search.ResultRow" %>
 <%@ page import="com.liferay.taglib.search.SearchEntry" %>
 
@@ -40,6 +43,7 @@
 <%@ page import="com.liferay.journal.service.*" %>
 <%@ page import="com.liferay.dynamic.data.mapping.service.*" %>
 <%@ page import="com.liferay.message.boards.model.*" %>
+<%@ page import="com.liferay.message.boards.constants.*" %>
 <%@ page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %>
 <%@ page import="com.liferay.support.tools.document.library.EditFileEntryMVCActionCommand" %>
 <%@ page import="com.liferay.portal.util.PropsValues" %>
@@ -68,7 +72,8 @@
 	String redirect = ParamUtil.getString(request, "redirect");
 	//Mode
 	String mode = ParamUtil.getString(request, LDFPortletKeys.MODE, LDFPortletKeys.MODE_ORGANIZAION);
-	//String progressId = PwdGenerator.getPassword(PwdGenerator.KEY3, 16);
+	
+	// Generate Progress ID
 	String progressId = PortalUtil.generateRandomKey(request, "progressId");
 	
 	DummyFactoryConfiguration dummyFactoryConfiguration =

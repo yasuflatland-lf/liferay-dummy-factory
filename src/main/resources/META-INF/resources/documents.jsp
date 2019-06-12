@@ -53,7 +53,9 @@
 			final long guestGroupId = GroupLocalServiceUtil.getGroup(companyId, groupName).getGroupId();
 			%>
 
-			<aui:form action="<%= documentEditURL %>" method="post" name="fm" >
+			<aui:form action="<%= documentEditURL %>" method="post" name="fm"  onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
+				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
+			
 				<aui:input name="numberOfDocuments" label="<%= numberOfDocumentsLabel %>" >
 					<aui:validator name="digits" />
 					<aui:validator name="min">1</aui:validator>
@@ -113,6 +115,7 @@
 									Date expirationDate = new Date(System.currentTimeMillis() + PropsValues.SESSION_TIMEOUT * Time.MINUTE);
 
 									Ticket ticket = TicketLocalServiceUtil.addTicket(user.getCompanyId(), User.class.getName(), user.getUserId(), TicketConstants.TYPE_IMPERSONATE, null, expirationDate, new ServiceContext());
+									DLConfiguration dlConfiguration = ConfigurationProviderUtil.getSystemConfiguration(DLConfiguration.class);
 									%>
 
 									<aui:script use="liferay-upload">
@@ -126,8 +129,8 @@
 
 												decimalSeparator: '<%= decimalFormatSymbols.getDecimalSeparator() %>',
 												deleteFile: '<%=delteFileEntryURL%>&ticketKey=<%= ticket.getKey() %><liferay-ui:input-permissions-params modelName="<%= DLFileEntryConstants.getClassName() %>" />',
-												fileDescription: '<%= StringUtil.merge(PrefsPropsUtil.getStringArray(PropsKeys.DL_FILE_EXTENSIONS, StringPool.COMMA)) %>',
-												maxFileSize: '<%= PrefsPropsUtil.getLong(PropsKeys.DL_FILE_MAX_SIZE) %> B',
+												fileDescription: '<%= StringUtil.merge(dlConfiguration.fileExtensions()) %>',
+												maxFileSize: '<%= dlConfiguration.fileMaxSize() %> B',
 												metadataContainer: '#<portlet:namespace />commonFileMetadataContainer',
 												metadataExplanationContainer: '#<portlet:namespace />metadataExplanationContainer',
 												namespace: '<portlet:namespace />',
@@ -163,9 +166,15 @@
 				</aui:button-row>
 			</aui:form>
 
+<%
+// Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
+String progressSessionKey = ProgressTracker.PERCENT + progressId;
+request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
+%>			
 			<liferay-ui:upload-progress
 				id="<%= progressId %>"
 				message="creating..."
+				height="20"
 			/>
 
 		</aui:fieldset>
@@ -176,18 +185,14 @@
     <option value="<@= folderId @>" ><@= name @></option>
 </script>
 
+<aui:script>
+	function <portlet:namespace />execCommand() {
+		<%= progressId %>.startProgress();
+		submitForm(document.<portlet:namespace />fm);
+	}
+</aui:script>
+
 <aui:script use="aui-base">
-	var processStart = A.one('#<portlet:namespace />processStart');
-
-	processStart.on(
-	    'click',
-	    function() {
-	    	event.preventDefault();
-			<%= progressId %>.startProgress();
-			submitForm(document.<portlet:namespace />fm);
-	    }
-	);
-
 	$('#<portlet:namespace />groupId').on(
 		'change load',
 		function(event) {

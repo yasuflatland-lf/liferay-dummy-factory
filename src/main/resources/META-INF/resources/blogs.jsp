@@ -54,7 +54,8 @@
 
 			%>
 
-			<aui:form action="<%= blogsEditURL %>" method="post" name="fm" >
+			<aui:form action="<%= blogsEditURL %>" method="post" name="fm"  onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
+				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
 				<aui:input name="numberOfPosts" label="<%= numberOfPostsLabel %>" >
 					<aui:validator name="digits" />
 					<aui:validator name="min">1</aui:validator>
@@ -107,24 +108,24 @@
 				</aui:button-row>	
 			</aui:form>	
 			
+<%
+// Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
+String progressSessionKey = ProgressTracker.PERCENT + progressId;
+request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
+%>			
 			<liferay-ui:upload-progress
 				id="<%= progressId %>"
 				message="creating..."
-			/>	
+				height="20"
+			/>
 						
 		</aui:fieldset>
 	</aui:fieldset-group>
 </div>
 
-<aui:script use="aui-base">
-	// Generate dummy data
-	$('#<portlet:namespace />processStart').on(
-	    'click',
-	    function() {
-	    	event.preventDefault();
-			<%= progressId %>.startProgress();
-			submitForm(document.<portlet:namespace />fm);
-	    }
-	)
-	
+<aui:script>
+	function <portlet:namespace />execCommand() {
+		<%= progressId %>.startProgress();
+		submitForm(document.<portlet:namespace />fm);
+	}
 </aui:script>

@@ -60,7 +60,9 @@
 			final long guestGroupId = GroupLocalServiceUtil.getGroup(companyId, groupName).getGroupId();			
 			%>
 
-			<aui:form action="<%= journalEditURL %>" method="post" name="fm" >
+			<aui:form action="<%= journalEditURL %>" method="post" name="fm"  onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
+				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
+			
 				<aui:input name="numberOfMB" label="<%= numberOfMBLabel %>" >
 					<aui:validator name="digits" />
 					<aui:validator name="min">1</aui:validator>
@@ -167,10 +169,16 @@
 				</aui:button-row>	
 			</aui:form>	
 			
+<%
+// Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
+String progressSessionKey = ProgressTracker.PERCENT + progressId;
+request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
+%>			
 			<liferay-ui:upload-progress
 				id="<%= progressId %>"
 				message="creating..."
-			/>	
+				height="20"
+			/>
 						
 		</aui:fieldset>
 	</aui:fieldset-group>
@@ -178,18 +186,14 @@
 
 <portlet:resourceURL id="/ldf/image/list" var="linkListURL" />
 
+<aui:script>
+	function <portlet:namespace />execCommand() {
+		<%= progressId %>.startProgress();
+		submitForm(document.<portlet:namespace />fm);
+	}
+</aui:script>
+
 <aui:script use="aui-base">
-	// Generate dummy data
-	var processStart = A.one('#<portlet:namespace />processStart');
-	processStart.on(
-	    'click',
-	    function() {
-	    	event.preventDefault();
-			<%= progressId %>.startProgress();
-			submitForm(document.<portlet:namespace />fm);
-	    }
-	);
-    
     // Manage GroupID list display
 	var createContentsType = A.one('#<portlet:namespace />createContentsType');
 	$('#<portlet:namespace />createContentsType').on(

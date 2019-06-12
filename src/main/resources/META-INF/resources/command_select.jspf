@@ -8,7 +8,7 @@
 	    <h1>What kind of data do you want to create?</h1>
 	</div>
 			
-    <aui:form name="commandChanger" action="<%=commandURL%>">
+    <aui:form name="commandChanger" method="post" action="<%=commandURL%>">
 	    <aui:select name="mode" label="" onChange='<%= renderResponse.getNamespace() + "modeChange();"%>'> 
 	        <aui:option label="Organizations" value="<%= LDFPortletKeys.MODE_ORGANIZAION %>" selected="<%= mode.equals(LDFPortletKeys.MODE_ORGANIZAION) %>"/>
 	        <aui:option label="Sites" value="<%= LDFPortletKeys.MODE_SITES %>" selected="<%= mode.equals(LDFPortletKeys.MODE_SITES) %>"/>

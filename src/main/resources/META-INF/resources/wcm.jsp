@@ -49,10 +49,6 @@
                 <p>The counter always starts at <code>1</code></p>
 				<p>If no site is selected, the default site will be <code>liferay.com</code></p>
 				<p>If no site is selected, the default site will be <code>liferay.com</code></p>
-				
-				
-				
-				
             </div>
 
 			<%
@@ -76,7 +72,9 @@
 			final long guestGroupId = GroupLocalServiceUtil.getGroup(companyId, groupName).getGroupId();
 			%>
 
-			<aui:form action="<%= journalEditURL %>" method="post" name="fm" >
+			<aui:form action="<%= journalEditURL %>" method="post" name="fm"  onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
+				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
+			
 				<aui:input name="numberOfArticles" label="<%= numberOfArticlesLabel %>" >
 					<aui:validator name="digits" />
 					<aui:validator name="min">1</aui:validator>
@@ -217,9 +215,15 @@
 				</aui:button-row>	
 			</aui:form>	
 			
+<%
+// Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
+String progressSessionKey = ProgressTracker.PERCENT + progressId;
+request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
+%>			
 			<liferay-ui:upload-progress
 				id="<%= progressId %>"
 				message="creating..."
+				height="20"
 			/>	
 						
 		</aui:fieldset>
@@ -228,19 +232,14 @@
 
 <portlet:resourceURL id="/ldf/image/list" var="linkListURL" />
 
+<aui:script>
+	function <portlet:namespace />execCommand() {
+		<%= progressId %>.startProgress();
+		submitForm(document.<portlet:namespace />fm);
+	}
+</aui:script>
 
-<aui:script use="aui-base, liferay-form">
-	var processStart = A.one('#<portlet:namespace />processStart');
-	
-	processStart.on(
-	    'click',
-	    function() {
-	    	event.preventDefault();
-			<%= progressId %>.startProgress();
-			submitForm(document.<portlet:namespace />fm);
-	    }
-	);
-    
+<aui:script use="aui-base,liferay-form">
 	var randomAmount = A.one('#<portlet:namespace />randomAmount');
 	
 	$('#<portlet:namespace />randomAmount').on(
@@ -269,7 +268,7 @@
     <option value="<@= folderId @>" data-group-id="<@= groupId @>" ><@= name @></option>
 </script>
 
-<aui:script use="aui-base, liferay-form">
+<aui:script use="aui-base,liferay-form">
 	
 	// Select Folder
 	var groupIds = A.one('#<portlet:namespace />groupIds');

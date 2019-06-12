@@ -42,7 +42,9 @@
 			String organizationSiteCreateLabel = "Creating organization site";
 			%>
 
-			<aui:form action="<%= organizationEditURL %>" method="post" name="fm" >
+			<aui:form action="<%= organizationEditURL %>" method="post" name="fm"  onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
+				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
+			
 				<aui:input name="<%= Constants.CMD %>" type="hidden" />
 				<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 				<aui:input name="numberOfOrganizations" label="<%= numberOfOrganizationsLabel %>" >
@@ -84,25 +86,26 @@
 				</aui:button-row>	
 			</aui:form>	
 			
+<%
+// Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
+String progressSessionKey = ProgressTracker.PERCENT + progressId;
+request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
+%>			
 			<liferay-ui:upload-progress
 				id="<%= progressId %>"
 				message="creating..."
-			/>	
+				height="20"
+			/>
 				
 		</aui:fieldset>	
 	</aui:fieldset-group>
 		
 </div>
 
-<aui:script use="aui-base">
-	var processStart = A.one('#<portlet:namespace />processStart');
-	
-	processStart.on(
-	    'click',
-	    function() {
-	    	event.preventDefault();
-			<%= progressId %>.startProgress();
-			submitForm(document.<portlet:namespace />fm);
-	    }
-	);
+
+<aui:script>
+	function <portlet:namespace />execCommand() {
+		<%= progressId %>.startProgress();
+		submitForm(document.<portlet:namespace />fm);
+	}
 </aui:script>
