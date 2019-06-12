@@ -26,7 +26,7 @@
 			
 			String numberOfpagesLabel = "Enter the number of wiki pages you would like to create";
 			String basePageNameLabel = "Enter the base name for the page";
-			String baseContentNameLabel = "Enter the base ontent for the page";
+			String baseContentNameLabel = "Enter the base content for the page";
 			String baseSummaryNameLabel = "Enter the base summary for the page";
 			String minorEditLabel = "Create this page as minor edit";			
 
@@ -38,7 +38,7 @@
 			
 			%>
 
-			<aui:form action="<%= wikiEditURL %>" method="post" name="fm" >
+			<aui:form action="<%= wikiEditURL %>" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
 				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
 			
 				<aui:select name="createContentsType" label="<%= createContentsTypeLabel %>" >
@@ -155,7 +155,6 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 				
 		</aui:fieldset>	
 	</aui:fieldset-group>
-		
 </div>
 
 <script type="text/html" id="<portlet:namespace />node_options">
@@ -165,6 +164,13 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 <script type="text/html" id="<portlet:namespace />page_options">
     <option value="<@= resourcePrimKey @>" ><@= title @></option>
 </script>
+
+<aui:script>
+	function <portlet:namespace />execCommand() {
+		<%= progressId %>.startProgress();
+		submitForm(document.<portlet:namespace />fm);
+	}
+</aui:script>
 
 <aui:script use="aui-base, liferay-form">	
 	
@@ -197,18 +203,6 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 			<portlet:namespace />pagesUpdate();
 		});	    
 	}	
-	
-	// Generate dummy data
-	$('#<portlet:namespace />processStart').on(
-	    'click',
-	    function() {
-	    	event.preventDefault();
-			<%= progressId %>.startProgress();
-			submitForm(document.<portlet:namespace />fm);
-	    }
-	)
- 
-
 	
 	// Group ID
 	$('#<portlet:namespace />groupId').on(

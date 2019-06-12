@@ -2,6 +2,7 @@ package com.liferay.support.tools.document.library;
 
 import com.liferay.asset.kernel.exception.AssetCategoryException;
 import com.liferay.asset.kernel.exception.AssetTagException;
+import com.liferay.document.library.configuration.DLConfiguration;
 import com.liferay.document.library.kernel.antivirus.AntivirusScannerException;
 import com.liferay.document.library.kernel.exception.DuplicateFileEntryException;
 import com.liferay.document.library.kernel.exception.DuplicateFolderNameException;
@@ -15,6 +16,7 @@ import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
 import com.liferay.document.library.kernel.exception.NoSuchFolderException;
 import com.liferay.document.library.kernel.exception.SourceFileNameException;
 import com.liferay.document.library.kernel.model.DLFileEntry;
+import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLTrashService;
 import com.liferay.document.library.kernel.util.DLUtil;
@@ -26,6 +28,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.lock.DuplicateLockException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
@@ -49,14 +52,13 @@ import com.liferay.portal.kernel.upload.LiferayFileItemException;
 import com.liferay.portal.kernel.upload.UploadException;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.upload.UploadRequestSizeException;
+import com.liferay.portal.kernel.upload.UploadServletRequestConfigurationHelper;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.PrefsPropsUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
@@ -339,8 +341,18 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 		String title = ParamUtil.getString(uploadPortletRequest, "title");
 		String description = ParamUtil.getString(uploadPortletRequest, "description");
 		String changeLog = ParamUtil.getString(uploadPortletRequest, "changeLog");
-		boolean majorVersion = ParamUtil.getBoolean(uploadPortletRequest, "majorVersion");
+		DLVersionNumberIncrease dlVersionNumberIncrease =
+				DLVersionNumberIncrease.valueOf(
+					uploadPortletRequest.getParameter("versionIncrease"),
+					DLVersionNumberIncrease.AUTOMATIC);
 
+		boolean updateVersionDetails = ParamUtil.getBoolean(
+			uploadPortletRequest, "updateVersionDetails");
+
+		if (!updateVersionDetails) {
+			dlVersionNumberIncrease = DLVersionNumberIncrease.AUTOMATIC;
+		}
+			
 		if (folderId > 0) {
 			Folder folder = _dlAppService.getFolder(folderId);
 
@@ -377,7 +389,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
 				// Update file entry
 				fileEntry = _dlAppService.updateFileEntry(fileEntryId, sourceFileName, contentType, title, description,
-						changeLog, majorVersion, inputStream, size, serviceContext);
+						changeLog, dlVersionNumberIncrease, inputStream, size, serviceContext);
 			}
 
 			return fileEntry;
@@ -436,6 +448,8 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 				int errorType = 0;
 
 				ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+				
+				DLConfiguration dlConfiguration = ConfigurationProviderUtil.getSystemConfiguration(DLConfiguration.class);
 
 				if (e instanceof AntivirusScannerException) {
 					AntivirusScannerException ase = (AntivirusScannerException) e;
@@ -455,10 +469,10 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 					errorMessage = themeDisplay.translate("please-enter-a-file-with-a-valid-file-name");
 					errorType = ServletResponseConstants.SC_FILE_NAME_EXCEPTION;
 				} else if (e instanceof FileSizeException) {
-					long fileMaxSize = PrefsPropsUtil.getLong(PropsKeys.DL_FILE_MAX_SIZE);
+					long fileMaxSize = dlConfiguration.fileMaxSize();
 
 					if (fileMaxSize == 0) {
-						fileMaxSize = PrefsPropsUtil.getLong(PropsKeys.UPLOAD_SERVLET_REQUEST_IMPL_MAX_SIZE);
+						fileMaxSize = _uploadServletRequestConfigurationHelper.getMaxSize();
 					}
 
 					errorMessage = themeDisplay.translate(
@@ -547,7 +561,15 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 	protected void setDLTrashService(DLTrashService dlTrashService) {
 		_dlTrashService = dlTrashService;
 	}
+	
+	@Reference(unbind = "-")
+	protected void setUploadServletRequestConfigurationHelper(UploadServletRequestConfigurationHelper uploadServletRequestConfigurationHelper) {
+		_uploadServletRequestConfigurationHelper = uploadServletRequestConfigurationHelper;
+	}	
 
+	private UploadServletRequestConfigurationHelper
+		_uploadServletRequestConfigurationHelper;
+	
 	private DLAppService _dlAppService;
 	private DLTrashService _dlTrashService;
 	
