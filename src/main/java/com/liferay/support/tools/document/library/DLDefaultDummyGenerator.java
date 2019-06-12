@@ -110,7 +110,7 @@ public class DLDefaultDummyGenerator extends DummyGenerator<DLContext> {
 		}
 
 		// Delete all temp files
-		//deleteAllTempFileEntries(paramContext.getTempFileEntries());
+		deleteAllTempFileEntries(paramContext.getTempFileEntries());
 		deleteAllFilesInFolder(request, paramContext);
 		
 		//Finish progress
@@ -175,5 +175,5 @@ public class DLDefaultDummyGenerator extends DummyGenerator<DLContext> {
 	
 	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;
-
+	
 }

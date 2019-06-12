@@ -17,11 +17,14 @@
 <%@ page import="com.liferay.portal.kernel.portlet.*" %>
 <%@ page import="com.liferay.portal.kernel.service.*" %>
 <%@ page import="com.liferay.portal.kernel.search.*" %>
+<%@ page import="com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil" %>
 <%@ page import="com.liferay.portal.kernel.dao.orm.QueryUtil" %>
 <%@ page import="com.liferay.portal.kernel.dao.search.*" %>
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
 <%@ page import="com.liferay.portal.kernel.workflow.*" %>
 <%@ page import="com.liferay.document.library.kernel.model.*" %>
+<%@ page import="com.liferay.document.library.configuration.*" %>
+
 <%@ page import="com.liferay.taglib.search.ResultRow" %>
 <%@ page import="com.liferay.taglib.search.SearchEntry" %>
 

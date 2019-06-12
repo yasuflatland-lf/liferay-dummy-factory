@@ -115,6 +115,7 @@
 									Date expirationDate = new Date(System.currentTimeMillis() + PropsValues.SESSION_TIMEOUT * Time.MINUTE);
 
 									Ticket ticket = TicketLocalServiceUtil.addTicket(user.getCompanyId(), User.class.getName(), user.getUserId(), TicketConstants.TYPE_IMPERSONATE, null, expirationDate, new ServiceContext());
+									DLConfiguration dlConfiguration = ConfigurationProviderUtil.getSystemConfiguration(DLConfiguration.class);
 									%>
 
 									<aui:script use="liferay-upload">
@@ -128,8 +129,8 @@
 
 												decimalSeparator: '<%= decimalFormatSymbols.getDecimalSeparator() %>',
 												deleteFile: '<%=delteFileEntryURL%>&ticketKey=<%= ticket.getKey() %><liferay-ui:input-permissions-params modelName="<%= DLFileEntryConstants.getClassName() %>" />',
-												fileDescription: '<%= StringUtil.merge(PrefsPropsUtil.getStringArray(PropsKeys.DL_FILE_EXTENSIONS, StringPool.COMMA)) %>',
-												maxFileSize: '<%= PrefsPropsUtil.getLong(PropsKeys.DL_FILE_MAX_SIZE) %> B',
+												fileDescription: '<%= StringUtil.merge(dlConfiguration.fileExtensions()) %>',
+												maxFileSize: '<%= dlConfiguration.fileMaxSize() %> B',
 												metadataContainer: '#<portlet:namespace />commonFileMetadataContainer',
 												metadataExplanationContainer: '#<portlet:namespace />metadataExplanationContainer',
 												namespace: '<portlet:namespace />',
