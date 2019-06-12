@@ -72,7 +72,7 @@
 			final long guestGroupId = GroupLocalServiceUtil.getGroup(companyId, groupName).getGroupId();
 			%>
 
-			<aui:form action="<%= journalEditURL %>" method="post" name="fm" >
+			<aui:form action="<%= journalEditURL %>" method="post" name="fm"  onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
 				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
 			
 				<aui:input name="numberOfArticles" label="<%= numberOfArticlesLabel %>" >
@@ -232,19 +232,14 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 
 <portlet:resourceURL id="/ldf/image/list" var="linkListURL" />
 
+<aui:script>
+	function <portlet:namespace />execCommand() {
+		<%= progressId %>.startProgress();
+		submitForm(document.<portlet:namespace />fm);
+	}
+</aui:script>
 
-<aui:script use="aui-base, liferay-form">
-	var processStart = A.one('#<portlet:namespace />processStart');
-	
-	processStart.on(
-	    'click',
-	    function() {
-	    	event.preventDefault();
-			<%= progressId %>.startProgress();
-			submitForm(document.<portlet:namespace />fm);
-	    }
-	);
-    
+<aui:script use="aui-base,liferay-form">
 	var randomAmount = A.one('#<portlet:namespace />randomAmount');
 	
 	$('#<portlet:namespace />randomAmount').on(
@@ -273,7 +268,7 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
     <option value="<@= folderId @>" data-group-id="<@= groupId @>" ><@= name @></option>
 </script>
 
-<aui:script use="aui-base, liferay-form">
+<aui:script use="aui-base,liferay-form">
 	
 	// Select Folder
 	var groupIds = A.one('#<portlet:namespace />groupIds');

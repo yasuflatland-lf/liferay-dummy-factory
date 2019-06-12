@@ -56,7 +56,7 @@
 
 			%>
 
-			<aui:form action="<%= userEditURL %>" method="post" name="fm" >
+			<aui:form action="<%= userEditURL %>" method="post" name="fm" onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
 				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
 				<aui:input name="numberOfusers" label="<%= numberOfusersLabel %>" >
 					<aui:validator name="digits" />
@@ -262,18 +262,11 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 	</aui:fieldset-group>
 </div>
 
-<aui:script use="aui-base">
-
-	var processStart = A.one('#<portlet:namespace />processStart');
-
-	processStart.on(
-	    'click',
-	    function() {
-	    	event.preventDefault();
-			<%= progressId %>.startProgress();
-			submitForm(document.<portlet:namespace />fm);
-	    }
-	);
+<aui:script>
+	function <portlet:namespace />execCommand() {
+		<%= progressId %>.startProgress();
+		submitForm(document.<portlet:namespace />fm);
+	}
 </aui:script>
 
 <portlet:resourceURL id="<%=LDFPortletKeys.CMD_ROLELIST %>" var="roleListURL" />

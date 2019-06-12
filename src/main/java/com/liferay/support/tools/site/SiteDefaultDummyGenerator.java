@@ -3,6 +3,7 @@ package com.liferay.support.tools.site;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.DuplicateGroupException;
+import com.liferay.portal.kernel.exception.GroupKeyException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
@@ -99,6 +100,11 @@ public class SiteDefaultDummyGenerator extends DummyGenerator<SiteContext> {
 			} catch (Exception e) {
 				if (e instanceof DuplicateGroupException ) {
 					_log.error("Site <" + siteName.toString() + "> is duplicated. Skip : " + e.getMessage());
+					continue;
+				}
+				else if(e instanceof GroupKeyException) {
+					_log.error(e.getMessage() + " Site name maybe not acceptable.");
+					continue;
 				}
 				else {
 					//Finish progress

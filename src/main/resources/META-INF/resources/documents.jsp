@@ -53,7 +53,7 @@
 			final long guestGroupId = GroupLocalServiceUtil.getGroup(companyId, groupName).getGroupId();
 			%>
 
-			<aui:form action="<%= documentEditURL %>" method="post" name="fm" >
+			<aui:form action="<%= documentEditURL %>" method="post" name="fm"  onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
 				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
 			
 				<aui:input name="numberOfDocuments" label="<%= numberOfDocumentsLabel %>" >
@@ -185,18 +185,14 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
     <option value="<@= folderId @>" ><@= name @></option>
 </script>
 
+<aui:script>
+	function <portlet:namespace />execCommand() {
+		<%= progressId %>.startProgress();
+		submitForm(document.<portlet:namespace />fm);
+	}
+</aui:script>
+
 <aui:script use="aui-base">
-	var processStart = A.one('#<portlet:namespace />processStart');
-
-	processStart.on(
-	    'click',
-	    function() {
-	    	event.preventDefault();
-			<%= progressId %>.startProgress();
-			submitForm(document.<portlet:namespace />fm);
-	    }
-	);
-
 	$('#<portlet:namespace />groupId').on(
 		'change load',
 		function(event) {
