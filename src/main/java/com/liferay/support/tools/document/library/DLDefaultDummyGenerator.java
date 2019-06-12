@@ -1,5 +1,6 @@
 package com.liferay.support.tools.document.library;
 
+import com.liferay.document.library.kernel.exception.DuplicateFileEntryException;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
@@ -8,6 +9,8 @@ import com.liferay.document.library.kernel.service.DLFolderLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -99,13 +102,18 @@ public class DLDefaultDummyGenerator extends DummyGenerator<DLContext> {
 						tf.getContentStream(), //file,
 						tf.getSize(),
 						paramContext.getServiceContext());
-
 				}
 				
 			} catch (Exception e) {
-				//Finish progress
-				progressManager.finish();	
-				throw e;
+				
+				if(e instanceof DuplicateFileEntryException) {
+					_log.error(e.getMessage() + " Skip creation.");
+					continue;
+				} else {
+					//Finish progress
+					progressManager.finish();	
+					throw e;
+				}
 			}
 		}
 
@@ -175,5 +183,7 @@ public class DLDefaultDummyGenerator extends DummyGenerator<DLContext> {
 	
 	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;
+	
+	private static final Log _log = LogFactoryUtil.getLog(DLDefaultDummyGenerator.class);
 	
 }
