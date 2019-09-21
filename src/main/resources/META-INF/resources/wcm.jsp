@@ -25,6 +25,7 @@
 		<aui:fieldset>
 		
 			<liferay-ui:success key="success" message="Web contents created successfully" />
+			<liferay-ui:error exception="<%= Exception.class %>" message="Error occured. Please see console log" />
 			<%@ include file="/command_select.jspf"%>
 		
 			<portlet:actionURL name="<%= LDFPortletKeys.WCM %>" var="journalEditURL">
@@ -65,6 +66,8 @@
 			String totalParagraphsLabel = "Paragraphes count";
 			String createContentsTypeLabel = "Select create contents type";
 			String folderIdLabel = "Journal Folder ID of the target folder";
+			String neverExpireLabel = "Never Expired";
+			String neverReviewLabel = "Never Review";
 			
 			List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 			final String groupName = GroupConstants.GUEST;
@@ -120,6 +123,9 @@
 								}
 								%>
 							</aui:select>
+							<aui:input type="toggle-switch" name="neverExpire" label="<%= neverExpireLabel %>" value="true" />
+							<aui:input type="toggle-switch" name="neverReview" label="<%= neverReviewLabel %>" value="true" />
+							
 							
 							<aui:select name="createContentsType" label="<%= createContentsTypeLabel %>" >
 								<aui:option label="Simple Contents Create" value="<%= String.valueOf(LDFPortletKeys.WCM_SIMPLE_CONTENTS_CREATE) %>" />
