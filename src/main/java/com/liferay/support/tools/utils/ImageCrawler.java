@@ -1,5 +1,9 @@
 package com.liferay.support.tools.utils;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.support.tools.portlet.actions.UserMVCActionCommand;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,10 +22,10 @@ import edu.uci.ics.crawler4j.url.WebURL;
  */
 public class ImageCrawler extends WebCrawler {
 
-	private static final Pattern imgPatterns = Pattern.compile(".*(\\.(gif|jpe?g|png|tiff?))$");
+	private static final Pattern PATTERNS = Pattern.compile(".*(\\.(gif|jpe?g|png|tiff?))$");
 
 	private static String crawlDomain;
-	
+
 	public static void configure(String domain) {
 		crawlDomain = domain;
 	}
@@ -30,7 +34,7 @@ public class ImageCrawler extends WebCrawler {
 	public boolean shouldVisit(Page referringPage, WebURL url) {
 		String href = url.getURL().toLowerCase();
 
-		if (imgPatterns.matcher(href).matches()) {
+		if (PATTERNS.matcher(href).matches()) {
 			return true;
 		}
 
@@ -46,8 +50,9 @@ public class ImageCrawler extends WebCrawler {
 		String url = page.getWebURL().getURL();
 
 		// We are only interested in processing images which are bigger than 10k
-		if (!imgPatterns.matcher(url).matches() || !((page.getParseData() instanceof BinaryParseData)
-				|| (page.getContentData().length < (10 * 1024)))) {
+		if (!PATTERNS.matcher(url).matches() || 
+			!((page.getParseData() instanceof BinaryParseData) ||
+			(page.getContentData().length < (10 * 1024)))) {
 			return;
 		}
 
@@ -55,12 +60,12 @@ public class ImageCrawler extends WebCrawler {
 		System.out.println("Fetched URL : " + url);
 	}
 
-    @Override
-    public Object getMyLocalData() {
-        return gatheredURLs;
-    }
-    
+	@Override
+	public Object getMyLocalData() {
+		return gatheredURLs;
+	}
+
 	private List<String> gatheredURLs = Collections.synchronizedList(new ArrayList<>());
-    
+	
 
 }

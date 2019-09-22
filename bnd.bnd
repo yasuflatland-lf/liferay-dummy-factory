@@ -7,7 +7,8 @@ Import-Package:\
 	!org.apache.commons.fileupload.*,\
 	!com.google.*,\
 	!com.sun.*,\
-	!org.apache.commons.*,\
+	!org.apache.commons.beanutils.*,\
+	!org.apache.commons.codec.*,\
 	!org.checkerframework.*,\
 	*
 

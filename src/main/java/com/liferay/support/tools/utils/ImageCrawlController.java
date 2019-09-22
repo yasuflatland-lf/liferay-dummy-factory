@@ -1,14 +1,20 @@
 package com.liferay.support.tools.utils;
 
-import com.google.common.collect.*;
-import com.google.common.io.*;
-import edu.uci.ics.crawler4j.crawler.*;
-import edu.uci.ics.crawler4j.fetcher.*;
-import edu.uci.ics.crawler4j.robotstxt.*;
-import org.osgi.service.component.annotations.*;
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.osgi.service.component.annotations.Component;
+
+import edu.uci.ics.crawler4j.crawler.CrawlConfig;
+import edu.uci.ics.crawler4j.crawler.CrawlController;
+import edu.uci.ics.crawler4j.fetcher.PageFetcher;
+import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
+import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 
 /**
  * Image Crawl Controller
@@ -26,8 +32,13 @@ public class ImageCrawlController {
 
         CrawlConfig config = new CrawlConfig();
 
+
+        // Set the folder where intermediate crawl data is stored (e.g. list of urls that are extracted from previously
+        // fetched pages and need to be crawled later).
         File tempDir = Files.createTempDir();
         config.setCrawlStorageFolder(tempDir.getAbsolutePath());
+        
+        config.setPolitenessDelay(1000);
         config.setMaxDepthOfCrawling(maxDepthOfCrawling);
         config.setMaxPagesToFetch(maxPagesToFetch);
 
@@ -36,6 +47,9 @@ public class ImageCrawlController {
 		 * true to make sure they are included in the crawl.
 		 */
         config.setIncludeBinaryContentInCrawling(true);
+        
+        // Enable SSL
+        config.setIncludeHttpsPages(true);
 
         PageFetcher     pageFetcher     = new PageFetcher(config);
         RobotstxtConfig robotstxtConfig = new RobotstxtConfig();
@@ -58,7 +72,7 @@ public class ImageCrawlController {
             List<String> urlLists = (List<String>) (localData);
             gatheredURLs.addAll(urlLists);
         }
-
+        
     }
 
     public List<String> getURL() {

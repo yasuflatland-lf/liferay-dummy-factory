@@ -77,7 +77,9 @@ public class ImageLinksMVCResourceCommand extends BaseMVCResourceCommand {
 
 		String serializedJson = createReturnJson(resourceRequest, resourceResponse, result);
 		
-		ServletResponseUtil.write(response, serializedJson);		
+		ServletResponseUtil.write(response, serializedJson);	
+		
+		return;
 	}
 
 	/**
