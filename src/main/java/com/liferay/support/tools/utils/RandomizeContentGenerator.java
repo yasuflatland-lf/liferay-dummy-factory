@@ -81,8 +81,10 @@ public class RandomizeContentGenerator {
             if (idx < rndIndex.size() &&
                 paraLine == rndIndex.get(idx)) {
 
-                sb.append(generateImageLink(links.get(rndIndex.get(idx))));
-                sb.append(LDFPortletKeys.EOL);
+            	if(rndIndex.get(idx) < links.size() ) {
+                    sb.append(generateImageLink(links.get(rndIndex.get(idx))));
+                    sb.append(LDFPortletKeys.EOL);
+            	}
                 ++idx;
             }
             ++paraLine;
