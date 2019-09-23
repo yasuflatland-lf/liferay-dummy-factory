@@ -23,15 +23,13 @@
 				<div class="row">
 					<aui:fieldset cssClass="col-md-12">
 	                    <aui:input type="text" name="urlList" value="<%= urlList %>" label="<%=urlListLabel %>" />
-						<button id="<portlet:namespace />fetchLinks" class="btn btn-primary loading" type="button">
-			                 <span id="<portlet:namespace />linkLoader" class="loading-icon linear hide"></span>&nbsp;Fetch links
-			            </button>
 					</aui:fieldset>
 				</div>
                 <div class="row">
                     <aui:fieldset cssClass="col-md-12">
                         <aui:input type="textarea" name="linkList" value="<%= linkList %>" rows="10" label="<%=linkListLabel %>" />
                     </aui:fieldset>
+                    <span id="<portlet:namespace />linkLoader" class="loading-animation hide"></span>
                 </div>
             </aui:fieldset-group>
         </div>
@@ -40,6 +38,9 @@
         <aui:button type="submit"></aui:button>
     </aui:button-row>
 </aui:form>
+
+<aui:button name="fetchLinks" cssClass="btn btn-primary" value="Fetch links" />
+
 
 <portlet:resourceURL id="/ldf/image/list" var="linkListURL" />
 
@@ -51,7 +52,7 @@
 
     fetchLinks.on(
         'click',
-        function() {
+        function(event) {
             event.preventDefault();
             Liferay.Util.toggleDisabled('#<portlet:namespace />fetchLinks', true);
             linkLoader.show();

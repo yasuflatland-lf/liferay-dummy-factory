@@ -1,9 +1,5 @@
 package com.liferay.support.tools.utils;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.support.tools.portlet.actions.UserMVCActionCommand;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
