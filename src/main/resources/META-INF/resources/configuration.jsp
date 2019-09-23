@@ -18,7 +18,6 @@
 				<%
 				String urlListLabel = "URL list where the crawler fetching images from (multiple URLs can be configured by comma separated, but takes longer to process.)";
 				String linkListLabel = "Corrected image links / custom image links to save";
-
 				%>
 				<div class="row">
 					<aui:fieldset cssClass="col-md-12">
@@ -39,7 +38,7 @@
     </aui:button-row>
 </aui:form>
 
-<aui:button name="fetchLinks" cssClass="btn btn-primary" value="Fetch links" />
+
 
 
 <portlet:resourceURL id="/ldf/image/list" var="linkListURL" />

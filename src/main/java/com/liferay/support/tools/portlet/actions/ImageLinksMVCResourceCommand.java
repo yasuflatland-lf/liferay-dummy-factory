@@ -66,7 +66,7 @@ public class ImageLinksMVCResourceCommand extends BaseMVCResourceCommand {
 			maxPagesToFetch >= 0 ) {
 			
 			// Run image links crawler
-			//result = run(numberOfCrawlers, maxDepthOfCrawling, maxPagesToFetch, urls);
+			result = run(numberOfCrawlers, maxDepthOfCrawling, maxPagesToFetch, urls);
 		}
 		
 		JSONObject jsonObject = createReturnJson(resourceRequest, resourceResponse, result);

@@ -160,21 +160,29 @@
 									<aui:validator name="digits" />
 									<aui:validator name="min">0</aui:validator>
 								</aui:input>			
-								<div id="<portlet:namespace />randomLink" style="display:none;">
+								<%
+								String urlListLabel = "URL list where the crawler fetching images from (multiple URLs can be configured by comma separated, but takes longer to process.)";
+								String linkListLabel = "Corrected image links / custom image links to save";
+								%>
+								
+								<div id="<portlet:namespace />randomLink">
 									<label class="control-label"><%= linkListsLabel %>
 										<a aria-expanded="false" class="collapse-icon collapsed icon-question-sign" data-toggle="collapse" href="#<portlet:namespace />fakeGenInfo">
-	                  						</a>
+	                  					</a>
 									</label>
 						            <div class="collapsed collapse" id="<portlet:namespace />fakeGenInfo" aria-expanded="false" >
-										<p>In terms of "Image links to insert into the generated contents" text area, you can add urls manually, but you can also generate them automatically. Please go to Configuration page of this portlet and generate image urls<p>
-						            </div>											
-									<aui:input label="" rows="5" name="linkLists" type="textarea" value="<%=linkList %>" placeholder="Input URLs each row">
+										<p>In terms of "Image links to insert into the generated contents" text area, you can add urls manually, but you can also generate them automatically to click Fetch links button.<p>
+						            </div>			
+	           	                    <aui:input type="text" name="urlList" value="https://www.shutterstock.com/photos" label="<%=urlListLabel %>" />
+									<aui:input rows="5" name="linkLists" type="textarea" value="" placeholder="Input URLs each row" label="<%=linkListLabel %>">
 								        <aui:validator name="required">
 							                function() {
 						                        return (0 < AUI.$('#<portlet:namespace />randomAmount').val);
 							                }
 								        </aui:validator>				
 									</aui:input>
+									<aui:button name="fetchLinks" cssClass="btn btn-primary" value="Fetch links" />
+									<span id="<portlet:namespace />linkLoader" class="loading-animation hide"></span>
 								</div>									
 							</span>		
 								
@@ -235,8 +243,6 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 		</aui:fieldset>
 	</aui:fieldset-group>
 </div>
-
-<portlet:resourceURL id="/ldf/image/list" var="linkListURL" />
 
 <aui:script>
 	function <portlet:namespace />execCommand() {
@@ -313,4 +319,46 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 	    }
 	);	
 	
+</aui:script>
+
+<portlet:resourceURL id="/ldf/image/list" var="linkListURL" />
+
+<aui:script use="aui-base">
+	var linkLoader = A.one('#<portlet:namespace />linkLoader');
+    var fetchLinks = A.one('#<portlet:namespace />fetchLinks');
+    var linkLists = $('#<portlet:namespace />linkLists');
+    var urlList = A.one('#<portlet:namespace />urlList');
+
+    fetchLinks.on(
+        'click',
+        function(event) {
+            event.preventDefault();
+            Liferay.Util.toggleDisabled('#<portlet:namespace />fetchLinks', true);
+            linkLoader.show();
+            var data = Liferay.Util.ns(
+                '<portlet:namespace />',
+                {
+                    numberOfCrawlers: 15,
+                    maxDepthOfCrawling: 3,
+                    maxPagesToFetch: 100,
+                    urls: urlList.val()
+                }
+            );
+
+			$.ajax(
+                '<%= linkListURL.toString() %>',
+                {
+                    data: data,
+                    success: function(data) {
+                    	var currentText = linkLists.val();
+                    	linkLists.val(currentText + data.urlstr);
+			            Liferay.Util.toggleDisabled('#<portlet:namespace />fetchLinks', false);
+			            linkLoader.hide();
+                    }
+                }
+            );
+
+        }
+    );
+
 </aui:script>
