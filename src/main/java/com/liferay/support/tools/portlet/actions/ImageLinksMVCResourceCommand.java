@@ -158,6 +158,6 @@ public class ImageLinksMVCResourceCommand extends BaseMVCResourceCommand {
 	@Reference
 	private Portal _portal;
 	
-	private static final Log _log = LogFactoryUtil.getLog(UserMVCActionCommand.class);
+	private static final Log _log = LogFactoryUtil.getLog(ImageLinksMVCResourceCommand.class);
 
 }
