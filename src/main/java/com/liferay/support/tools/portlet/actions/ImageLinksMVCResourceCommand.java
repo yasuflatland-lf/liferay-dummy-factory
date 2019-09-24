@@ -50,7 +50,9 @@ public class ImageLinksMVCResourceCommand extends BaseMVCResourceCommand {
 		int numberOfCrawlers = ParamUtil.getInteger(resourceRequest, "numberOfCrawlers", -1);
 		int maxDepthOfCrawling = ParamUtil.getInteger(resourceRequest, "maxDepthOfCrawling", -1);
 		int maxPagesToFetch = ParamUtil.getInteger(resourceRequest, "maxPagesToFetch", -1);
-		String tmpUrls = ParamUtil.getString(resourceRequest, "urls", "https://www.shutterstock.com/photos");
+		int randomAmount = ParamUtil.getInteger(resourceRequest, "randomAmount", 10);
+		
+		String tmpUrls = ParamUtil.getString(resourceRequest, "urls", "https://imgur.com/search?q=flower");
 		String[] strArray = tmpUrls.split(",");
 		List<String> urls = new ArrayList<>(Arrays.asList(strArray));
 		List<String> result = Lists.newArrayList();
@@ -66,7 +68,7 @@ public class ImageLinksMVCResourceCommand extends BaseMVCResourceCommand {
 			maxPagesToFetch >= 0 ) {
 			
 			// Run image links crawler
-			result = run(numberOfCrawlers, maxDepthOfCrawling, maxPagesToFetch, urls);
+			result = run(numberOfCrawlers, maxDepthOfCrawling, maxPagesToFetch, urls, randomAmount);
 		}
 		
 		JSONObject jsonObject = createReturnJson(resourceRequest, resourceResponse, result);
@@ -83,9 +85,10 @@ public class ImageLinksMVCResourceCommand extends BaseMVCResourceCommand {
 	 * @param maxDepthOfCrawling Page link depth for crawling
 	 * @param maxPagesToFetch Max pages to fetch
 	 * @param urls Target site top page urls
+	 * @param randomAmount amount of data to fetch
 	 * @throws Exception
 	 */
-	public List<String> run(int numberOfCrawlers, int maxDepthOfCrawling, int maxPagesToFetch, List<String> urls)
+	public List<String> run(int numberOfCrawlers, int maxDepthOfCrawling, int maxPagesToFetch, List<String> urls, int randomAmount)
 			throws Exception {
 
 		System.out.println("Image link crawling start");
@@ -93,7 +96,7 @@ public class ImageLinksMVCResourceCommand extends BaseMVCResourceCommand {
 		List<Observable<List<String>>> obsList = Lists.newArrayList();
 		for (String url : urls) {
 			obsList.add(Observable.<List<String>>create(emitter -> {
-				_imageCrawlController.exec(numberOfCrawlers, maxDepthOfCrawling, maxPagesToFetch, url);
+				_imageCrawlController.exec(numberOfCrawlers, maxDepthOfCrawling, maxPagesToFetch, url, randomAmount);
 				List<String> results = _imageCrawlController.getURL();
 				emitter.onNext(results);
 				emitter.onComplete();

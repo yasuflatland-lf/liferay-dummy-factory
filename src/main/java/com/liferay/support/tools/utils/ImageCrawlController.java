@@ -26,9 +26,19 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 @Component(immediate = true, service = ImageCrawlController.class)
 public class ImageCrawlController {
 
+	/**
+	 * Exec Crawling
+	 * 
+	 * @param numberOfCrawlers
+	 * @param maxDepthOfCrawling
+	 * @param maxPagesToFetch
+	 * @param domain
+	 * @param randomAmount
+	 * @throws Exception
+	 */
     public void exec(
         int numberOfCrawlers, int maxDepthOfCrawling, int maxPagesToFetch,
-        String domain) throws Exception {
+        String domain, int randomAmount) throws Exception {
 
         CrawlConfig config = new CrawlConfig();
 
@@ -58,7 +68,7 @@ public class ImageCrawlController {
 
         controller.addSeed(domain);
 
-        ImageCrawler.configure(domain);
+        ImageCrawler.configure(domain, randomAmount);
 
         //Start crawling
         controller.startNonBlocking(ImageCrawler.class, numberOfCrawlers);

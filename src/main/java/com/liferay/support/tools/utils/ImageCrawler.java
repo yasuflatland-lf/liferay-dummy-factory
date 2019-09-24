@@ -3,6 +3,7 @@ package com.liferay.support.tools.utils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
 import edu.uci.ics.crawler4j.crawler.Page;
@@ -20,10 +21,10 @@ public class ImageCrawler extends WebCrawler {
 
 	private static final Pattern PATTERNS = Pattern.compile(".*(\\.(gif|jpe?g|png|tiff?))$");
 
-	private static String crawlDomain;
-
-	public static void configure(String domain) {
-		crawlDomain = domain;
+	public static void configure(String domain, long amount) {
+		_crawlDomain = domain;
+		_amount.set(amount);
+		_imgCount.set(0);
 	}
 
 	@Override
@@ -34,7 +35,7 @@ public class ImageCrawler extends WebCrawler {
 			return true;
 		}
 
-		if (href.startsWith(crawlDomain)) {
+		if (href.startsWith(_crawlDomain)) {
 			return true;
 		}
 
@@ -52,7 +53,14 @@ public class ImageCrawler extends WebCrawler {
 			return;
 		}
 
+		if(_amount.get() <= _imgCount.get() ) {
+			myController.shutdown();
+			return;
+		}
+
 		gatheredURLs.add(url);
+		_imgCount.incrementAndGet();
+		
 		System.out.println("Fetched URL : " + url);
 	}
 
@@ -60,6 +68,10 @@ public class ImageCrawler extends WebCrawler {
 	public Object getMyLocalData() {
 		return gatheredURLs;
 	}
+	
+	private static String _crawlDomain;
+	private static AtomicLong _amount = new AtomicLong();
+	private static AtomicLong _imgCount = new AtomicLong();
 
 	private List<String> gatheredURLs = Collections.synchronizedList(new ArrayList<>());
 	
