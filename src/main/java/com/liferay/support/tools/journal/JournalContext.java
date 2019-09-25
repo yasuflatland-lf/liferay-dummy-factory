@@ -31,6 +31,8 @@ public class JournalContext extends ParamContext {
 	private long ddmTemplateId;
 	private Locale defaultLocale;
 	private Map<Locale, String> descriptionMap;
+	private boolean neverExpire;
+	private boolean neverReview;
 
 	/**
 	 * Constructor
@@ -68,6 +70,9 @@ public class JournalContext extends ParamContext {
 
 		descriptionMap = new ConcurrentHashMap<Locale, String>();
 		descriptionMap.put(defaultLocale, StringPool.BLANK);
+		
+		neverExpire = ParamUtil.getBoolean(actionRequest, "neverExpire", false);
+		neverReview = ParamUtil.getBoolean(actionRequest, "neverReview", false);
 	}
 
 	public long getNumberOfArticles() {
@@ -189,4 +194,20 @@ public class JournalContext extends ParamContext {
 	public void setDescriptionMap(Map<Locale, String> descriptionMap) {
 		this.descriptionMap = descriptionMap;
 	}
+	
+	public boolean isNeverExpire() {
+		return neverExpire;
+	}
+
+	public void setNeverExpire(boolean neverExpire) {
+		this.neverExpire = neverExpire;
+	}
+
+	public boolean isNeverReview() {
+		return neverReview;
+	}
+
+	public void setNeverReview(boolean neverReview) {
+		this.neverReview = neverReview;
+	}	
 }

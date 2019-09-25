@@ -1,10 +1,10 @@
 package com.liferay.support.tools.journal;
 
+import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.utils.ProgressManager;
 
@@ -24,7 +24,7 @@ import org.osgi.service.component.annotations.Reference;
  *
  */
 @Component(immediate = true, service = JournalSimpleDummyGenerator.class)
-public class JournalSimpleDummyGenerator extends DummyGenerator<JournalContext> {
+public class JournalSimpleDummyGenerator extends JournalStructureBaseDummyGenerator {
 
 	@Override
 	protected JournalContext getContext(ActionRequest request) throws PortalException {
@@ -78,7 +78,7 @@ public class JournalSimpleDummyGenerator extends DummyGenerator<JournalContext> 
 
 				try {
 					// Create article
-					_journalArticleLocalService.addArticle(
+					JournalArticle createdArticle = _journalArticleLocalService.addArticle(
 						paramContext.getServiceContext().getUserId(), 	// userId,
 						groupId, 										// groupId,
 						paramContext.getFolderId(),						// folderId
@@ -89,6 +89,10 @@ public class JournalSimpleDummyGenerator extends DummyGenerator<JournalContext> 
 						LDFPortletKeys._DDM_TEMPLATE_KEY, 				// ddmTemplateKey,
 						paramContext.getServiceContext()				// serviceContext
 					);
+					
+					// Update never expired and never reviewed
+					updateArticle(createdArticle, paramContext);
+					
 				} catch (Throwable e) {
 					// Finish progress
 					progressManager.finish();

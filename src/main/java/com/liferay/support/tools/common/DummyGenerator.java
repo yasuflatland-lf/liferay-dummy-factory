@@ -38,7 +38,13 @@ public abstract class DummyGenerator<T extends ParamContext> {
 		paramContext.setThemeDisplay(themeDisplay);
 		paramContext.setServiceContext(serviceContext);
 
+		TimeKeeper timeKeeper = new TimeKeeper();
+		timeKeeper.start();
+		
 		exec(request, paramContext);
+		
+		timeKeeper.stop();
+		timeKeeper.outputTime();
 	}
 
 	/**

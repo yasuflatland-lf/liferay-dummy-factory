@@ -3,11 +3,11 @@ package com.liferay.support.tools.journal;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
+import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.ProgressManager;
 
 import java.util.Locale;
@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.Reference;
  *
  */
 @Component(immediate = true, service = JournalStructureTemplateDummyGenerator.class)
-public class JournalStructureTemplateDummyGenerator extends DummyGenerator<JournalContext> {
+public class JournalStructureTemplateDummyGenerator extends JournalStructureBaseDummyGenerator {
 
 	@Override
 	protected JournalContext getContext(ActionRequest request) throws PortalException {
@@ -96,7 +96,7 @@ public class JournalStructureTemplateDummyGenerator extends DummyGenerator<Journ
 
 				try {
 					// Create article
-					_journalArticleLocalService.addArticle(
+					JournalArticle createdArticle = _journalArticleLocalService.addArticle(
 						paramContext.getServiceContext().getUserId(), 	// userId,
 						groupId, 										// groupId,
 						paramContext.getFolderId(),						// folderId
@@ -107,6 +107,9 @@ public class JournalStructureTemplateDummyGenerator extends DummyGenerator<Journ
 						templateKey, 									// ddmTemplateKey,
 						paramContext.getServiceContext()				// serviceContext
 					);
+					
+					// Update never expired and never reviewed
+					updateArticle(createdArticle, paramContext);
 					
 				} catch (Throwable e) {
 					// Finish progress
