@@ -51,7 +51,6 @@ public class PageMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	PageDummyFactory _pageDummyFactory;
-
 	
-	private static final Log _log = LogFactoryUtil.getLog(DocumentMVCActionCommand.class);		
+	private static final Log _log = LogFactoryUtil.getLog(PageMVCActionCommand.class);		
 }

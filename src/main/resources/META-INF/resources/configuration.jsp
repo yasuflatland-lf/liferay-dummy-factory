@@ -11,74 +11,7 @@
 <aui:form action="<%= configurationActionURL %>" method="post" name="fm">
     <div class="portlet-configuration-body-content">
         <div class="container-fluid-1280">
-            <aui:fieldset-group markupView="lexicon">
-                <aui:input name="<%= Constants.CMD %>" type="hidden" value="<%= Constants.UPDATE %>" />
-                <aui:input name="redirect" type="hidden" value="<%= configurationRenderURL %>" />
-
-				<%
-				String urlListLabel = "URL list where the crawler fetching images from (multiple URLs can be configured by comma separated, but takes longer to process.)";
-				String linkListLabel = "Corrected image links / custom image links to save";
-
-				%>
-				<div class="row">
-					<aui:fieldset cssClass="col-md-12">
-	                    <aui:input type="text" name="urlList" value="<%= urlList %>" label="<%=urlListLabel %>" />
-						<button id="<portlet:namespace />fetchLinks" class="btn btn-primary loading" type="button">
-			                 <span id="<portlet:namespace />linkLoader" class="loading-icon linear hide"></span>&nbsp;Fetch links
-			            </button>
-					</aui:fieldset>
-				</div>
-                <div class="row">
-                    <aui:fieldset cssClass="col-md-12">
-                        <aui:input type="textarea" name="linkList" value="<%= linkList %>" rows="10" label="<%=linkListLabel %>" />
-                    </aui:fieldset>
-                </div>
-            </aui:fieldset-group>
+			<p>No Configrations for now. If you have a usecase to use a configration, please cleate a issue <a href="https://github.com/yasuflatland-lf/liferay-dummy-factory/issues">here</a></p>		
         </div>
     </div>
-    <aui:button-row>
-        <aui:button type="submit"></aui:button>
-    </aui:button-row>
 </aui:form>
-
-<portlet:resourceURL id="/ldf/image/list" var="linkListURL" />
-
-<aui:script use="aui-base">
-	var linkLoader = A.one('#<portlet:namespace />linkLoader');
-    var fetchLinks = A.one('#<portlet:namespace />fetchLinks');
-    var linkList = A.one('#<portlet:namespace />linkList');
-    var urlList = A.one('#<portlet:namespace />urlList');
-
-    fetchLinks.on(
-        'click',
-        function() {
-            event.preventDefault();
-            Liferay.Util.toggleDisabled('#<portlet:namespace />fetchLinks', true);
-            linkLoader.show();
-            var data = Liferay.Util.ns(
-                '<portlet:namespace />',
-                {
-                    numberOfCrawlers: 15,
-                    maxDepthOfCrawling: 3,
-                    maxPagesToFetch: 100,
-                    urls: urlList.val()
-                }
-            );
-
-			$.ajax(
-                '<%= linkListURL.toString() %>',
-                {
-                    data: data,
-                    success: function(data) {
-                    	var currentText = linkList.val();
-                    	linkList.val(currentText + data.urlstr);
-			            Liferay.Util.toggleDisabled('#<portlet:namespace />fetchLinks', false);
-			            linkLoader.hide();
-                    }
-                }
-            );
-
-        }
-    );
-
-</aui:script>

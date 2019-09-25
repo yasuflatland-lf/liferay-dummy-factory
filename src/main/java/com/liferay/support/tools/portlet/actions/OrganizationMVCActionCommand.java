@@ -53,5 +53,5 @@ public class OrganizationMVCActionCommand extends BaseMVCActionCommand {
 	@Reference
 	OrgDummyFactory _orgDummyFactory;
 	
-	private static final Log _log = LogFactoryUtil.getLog(MBMVCActionCommand.class);	
+	private static final Log _log = LogFactoryUtil.getLog(OrganizationMVCActionCommand.class);	
 }

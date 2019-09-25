@@ -13,8 +13,8 @@ class RandomizeContentGeneratorTest extends Specification {
         _rcg._commonUtil = new CommonUtil();
     }
 
-    @Unroll("generateRandomContents test")
-    def "generateRandomContents test"() {
+    @Unroll("generateRandomParagraphes test")
+    def "generateRandomParagraphes test"() {
         when:
         def retTxt = _rcg.generateRandomParagraphes(dbg_locale, sentenceCount)
 
@@ -44,7 +44,7 @@ class RandomizeContentGeneratorTest extends Specification {
     }
 
     @Unroll("insertRandomLinksInContents test <#param1> <#param2> <#param3> <#param4>")
-    def "insertRandomLinksInContents test"() {
+    def "insertRandomLinksInContents_test"() {
         when:
         List<String> paragraphes = new ArrayList<>();
         param1.each { s ->
@@ -74,5 +74,7 @@ class RandomizeContentGeneratorTest extends Specification {
         ["hoge", "fuga", "bar", "gegege"] | ["--aa--", "--bb--", "--cc--"] | [2]    | ["--cc--"]
         ["hoge", "fuga", "bar", "gegege"] | ["--aa--", "--bb--", "--cc--"] | [0, 2] | ["--aa--", "--cc--"]
         ["hoge", "fuga", "bar", "gegege"] | ["--aa--", "--bb--", "--cc--"] | [1, 2] | ["--bb--", "--cc--"]
+        ["hoge", "fuga", "bar", "gegege"] | ["--aa--"]                     | [1, 2] | [""]
+        ["hoge", "fuga", "bar", "gegege"] | ["--aa--"]                     | [0, 2] | ["--aa--"]
     }
 }

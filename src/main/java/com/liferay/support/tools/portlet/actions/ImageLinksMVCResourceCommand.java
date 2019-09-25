@@ -6,10 +6,9 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
-import com.liferay.portal.kernel.servlet.ServletResponseUtil;
-import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.support.tools.constants.LDFPortletKeys;
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
-import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -52,7 +50,9 @@ public class ImageLinksMVCResourceCommand extends BaseMVCResourceCommand {
 		int numberOfCrawlers = ParamUtil.getInteger(resourceRequest, "numberOfCrawlers", -1);
 		int maxDepthOfCrawling = ParamUtil.getInteger(resourceRequest, "maxDepthOfCrawling", -1);
 		int maxPagesToFetch = ParamUtil.getInteger(resourceRequest, "maxPagesToFetch", -1);
-		String tmpUrls = ParamUtil.getString(resourceRequest, "urls", "https://www.shutterstock.com/photos");
+		int randomAmount = ParamUtil.getInteger(resourceRequest, "randomAmount", 10);
+		
+		String tmpUrls = ParamUtil.getString(resourceRequest, "urls", "https://imgur.com/search?q=flower");
 		String[] strArray = tmpUrls.split(",");
 		List<String> urls = new ArrayList<>(Arrays.asList(strArray));
 		List<String> result = Lists.newArrayList();
@@ -68,16 +68,14 @@ public class ImageLinksMVCResourceCommand extends BaseMVCResourceCommand {
 			maxPagesToFetch >= 0 ) {
 			
 			// Run image links crawler
-			result = run(numberOfCrawlers, maxDepthOfCrawling, maxPagesToFetch, urls);
+			result = run(numberOfCrawlers, maxDepthOfCrawling, maxPagesToFetch, urls, randomAmount);
 		}
-
-		HttpServletResponse response = _portal.getHttpServletResponse(resourceResponse);
-
-		response.setContentType(ContentTypes.APPLICATION_JSON);
-
-		String serializedJson = createReturnJson(resourceRequest, resourceResponse, result);
 		
-		ServletResponseUtil.write(response, serializedJson);		
+		JSONObject jsonObject = createReturnJson(resourceRequest, resourceResponse, result);
+		
+		JSONPortletResponseUtil.writeJSON(
+				resourceRequest, resourceResponse, jsonObject);
+
 	}
 
 	/**
@@ -87,9 +85,10 @@ public class ImageLinksMVCResourceCommand extends BaseMVCResourceCommand {
 	 * @param maxDepthOfCrawling Page link depth for crawling
 	 * @param maxPagesToFetch Max pages to fetch
 	 * @param urls Target site top page urls
+	 * @param randomAmount amount of data to fetch
 	 * @throws Exception
 	 */
-	public List<String> run(int numberOfCrawlers, int maxDepthOfCrawling, int maxPagesToFetch, List<String> urls)
+	public List<String> run(int numberOfCrawlers, int maxDepthOfCrawling, int maxPagesToFetch, List<String> urls, int randomAmount)
 			throws Exception {
 
 		System.out.println("Image link crawling start");
@@ -97,7 +96,7 @@ public class ImageLinksMVCResourceCommand extends BaseMVCResourceCommand {
 		List<Observable<List<String>>> obsList = Lists.newArrayList();
 		for (String url : urls) {
 			obsList.add(Observable.<List<String>>create(emitter -> {
-				_imageCrawlController.exec(numberOfCrawlers, maxDepthOfCrawling, maxPagesToFetch, url);
+				_imageCrawlController.exec(numberOfCrawlers, maxDepthOfCrawling, maxPagesToFetch, url, randomAmount);
 				List<String> results = _imageCrawlController.getURL();
 				emitter.onNext(results);
 				emitter.onComplete();
@@ -133,7 +132,7 @@ public class ImageLinksMVCResourceCommand extends BaseMVCResourceCommand {
 	 * @param urls URL string list
 	 * @return json URL strings
 	 */
-	protected String createReturnJson(ResourceRequest resourceRequest, ResourceResponse resourceResponse, List<String> urls) {
+	protected JSONObject createReturnJson(ResourceRequest resourceRequest, ResourceResponse resourceResponse, List<String> urls) {
 
 		JSONObject rootJSONObject = JSONFactoryUtil.createJSONObject();
 		
@@ -150,15 +149,15 @@ public class ImageLinksMVCResourceCommand extends BaseMVCResourceCommand {
 		}
 		rootJSONObject.put("urllist", jsonArray);
 
-		return rootJSONObject.toJSONString();
+		return rootJSONObject;
 	}
-	
+
 	@Reference
 	private ImageCrawlController _imageCrawlController;
 
 	@Reference
 	private Portal _portal;
 	
-	private static final Log _log = LogFactoryUtil.getLog(UserMVCActionCommand.class);
+	private static final Log _log = LogFactoryUtil.getLog(ImageLinksMVCResourceCommand.class);
 
 }

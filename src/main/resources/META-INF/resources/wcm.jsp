@@ -25,6 +25,7 @@
 		<aui:fieldset>
 		
 			<liferay-ui:success key="success" message="Web contents created successfully" />
+			<liferay-ui:error exception="<%= Exception.class %>" message="Error occured. Please see console log" />
 			<%@ include file="/command_select.jspf"%>
 		
 			<portlet:actionURL name="<%= LDFPortletKeys.WCM %>" var="journalEditURL">
@@ -61,10 +62,11 @@
 			String fakeContentsGenerateEnableLabel = "Generate Fake Contents";
 			String linkListsLabel = "Image links to insert into the generated contents";
 			String titleWordsLabel = "Amount of words for the title";
-			String randomAmountLabel = "Amount of links in the generated contents";
 			String totalParagraphsLabel = "Paragraphes count";
 			String createContentsTypeLabel = "Select create contents type";
 			String folderIdLabel = "Journal Folder ID of the target folder";
+			String neverExpireLabel = "Never Expired";
+			String neverReviewLabel = "Never Review";
 			
 			List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 			final String groupName = GroupConstants.GUEST;
@@ -120,6 +122,9 @@
 								}
 								%>
 							</aui:select>
+							<aui:input type="toggle-switch" name="neverExpire" label="<%= neverExpireLabel %>" value="true" />
+							<aui:input type="toggle-switch" name="neverReview" label="<%= neverReviewLabel %>" value="true" />
+							
 							
 							<aui:select name="createContentsType" label="<%= createContentsTypeLabel %>" >
 								<aui:option label="Simple Contents Create" value="<%= String.valueOf(LDFPortletKeys.WCM_SIMPLE_CONTENTS_CREATE) %>" />
@@ -132,44 +137,74 @@
 							</span>	
 							<span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.WCM_DUMMY_CONTENTS_CREATE) %>" class="<portlet:namespace />contentsTypeGroup" style="display:none;">
 								
-								<aui:input name="titleWords" label="<%= titleWordsLabel %>" placeholder="10" >
-									<aui:validator name="digits" />
-									<aui:validator name="min">0</aui:validator>
-							        <aui:validator name="required">
-						                function() {
-					                        return (<%= String.valueOf(LDFPortletKeys.WCM_DUMMY_CONTENTS_CREATE) %> == AUI.$('#<portlet:namespace />createContentsType').val());
-						                }
-							        </aui:validator>											
-								</aui:input>												
-								<aui:input name="totalParagraphs" label="<%= totalParagraphsLabel %>" placeholder="10" >
-									<aui:validator name="digits" />
-									<aui:validator name="min">0</aui:validator>
-							        <aui:validator name="required">
-						                function() {
-					                        return (<%= String.valueOf(LDFPortletKeys.WCM_DUMMY_CONTENTS_CREATE) %> == AUI.$('#<portlet:namespace />createContentsType').val());
-						                }
-							        </aui:validator>											
-								</aui:input>												
-								<aui:input name="randomAmount" label="<%= randomAmountLabel %>" placeholder="4" >
-									<aui:validator name="digits" />
-									<aui:validator name="min">0</aui:validator>
-								</aui:input>			
-								<div id="<portlet:namespace />randomLink" style="display:none;">
-									<label class="control-label"><%= linkListsLabel %>
-										<a aria-expanded="false" class="collapse-icon collapsed icon-question-sign" data-toggle="collapse" href="#<portlet:namespace />fakeGenInfo">
-	                  						</a>
-									</label>
-						            <div class="collapsed collapse" id="<portlet:namespace />fakeGenInfo" aria-expanded="false" >
-										<p>In terms of "Image links to insert into the generated contents" text area, you can add urls manually, but you can also generate them automatically. Please go to Configuration page of this portlet and generate image urls<p>
-						            </div>											
-									<aui:input label="" rows="5" name="linkLists" type="textarea" value="<%=linkList %>" placeholder="Input URLs each row">
-								        <aui:validator name="required">
-							                function() {
-						                        return (0 < AUI.$('#<portlet:namespace />randomAmount').val);
-							                }
-								        </aui:validator>				
-									</aui:input>
-								</div>									
+								<%
+								String urlListLabel = "URL list where the crawler fetching images from (multiple URLs can be configured by comma separated, but takes longer to process.)";
+								String linkListLabel = "Corrected image links / custom image links to save";
+								String randomAmountLabel = "Amount of links in the generated contents";
+								%>
+								
+								<div class="row">
+									<aui:fieldset cssClass="col-md-6">
+
+										<aui:input name="titleWords" label="<%= titleWordsLabel %>" placeholder="10" >
+											<aui:validator name="digits" />
+											<aui:validator name="min">0</aui:validator>
+									        <aui:validator name="required">
+								                function() {
+							                        return (<%= String.valueOf(LDFPortletKeys.WCM_DUMMY_CONTENTS_CREATE) %> == AUI.$('#<portlet:namespace />createContentsType').val());
+								                }
+									        </aui:validator>											
+										</aui:input>												
+										<aui:input name="totalParagraphs" label="<%= totalParagraphsLabel %>" placeholder="10" >
+											<aui:validator name="digits" />
+											<aui:validator name="min">0</aui:validator>
+									        <aui:validator name="required">
+								                function() {
+							                        return (<%= String.valueOf(LDFPortletKeys.WCM_DUMMY_CONTENTS_CREATE) %> == AUI.$('#<portlet:namespace />createContentsType').val());
+								                }
+									        </aui:validator>											
+										</aui:input>												
+										<label class="control-label"><%= randomAmountLabel %>
+											<a aria-expanded="false" class="collapse-icon collapsed icon-question-sign" data-toggle="collapse" href="#<portlet:namespace />imageGenInfo"></a>
+										</label>
+							            <div class="collapsed collapse" id="<portlet:namespace />imageGenInfo" aria-expanded="false" >
+											<p>The image links for this functionality are refereed from <code><%=linkListLabel %></code> text area on the right. You can add urls manually and also generate them automatically to click <code>Fetch links</code> button.<p>
+							            </div>			
+
+										<aui:input name="randomAmount" label="" placeholder="0" value="0">
+											<aui:validator name="digits" />
+											<aui:validator name="min">0</aui:validator>
+										</aui:input>			
+
+
+									</aui:fieldset>
+									<aui:fieldset cssClass="col-md-6">
+
+										<div id="<portlet:namespace />randomLink">
+											<label class="control-label">URL&nbsp;List
+												<a aria-expanded="false" class="collapse-icon collapsed icon-question-sign" data-toggle="collapse" href="#<portlet:namespace />urlListInfo"></a>
+											</label>
+								            <div class="collapsed collapse" id="<portlet:namespace />urlListInfo" aria-expanded="false" >
+												<p><%=urlListLabel %></p>
+								            </div>			
+			           	                    <aui:input type="text" name="urlList" value="https://imgur.com/search?q=flower" label="" />
+											<aui:button-row>
+												<aui:button name="fetchLinks" cssClass="btn btn-primary" value="Fetch links" />
+											</aui:button-row>	
+			           	                    
+											<aui:input rows="5" name="linkLists" type="textarea" value="" placeholder="Input URLs each row" label="<%=linkListLabel %>">
+										        <aui:validator name="required">
+									                function() {
+								                        return (0 < AUI.$('#<portlet:namespace />randomAmount').val);
+									                }
+										        </aui:validator>				
+											</aui:input>
+											<span id="<portlet:namespace />linkLoader" class="loading-animation hide"></span>
+										</div>	
+
+									</aui:fieldset>
+								</div>
+
 							</span>		
 								
 							<span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.WCM_STRUCTURE_TEMPLATE_SELECT_CREATE) %>" class="<portlet:namespace />contentsTypeGroup" style="display:none;">
@@ -230,8 +265,6 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 	</aui:fieldset-group>
 </div>
 
-<portlet:resourceURL id="/ldf/image/list" var="linkListURL" />
-
 <aui:script>
 	function <portlet:namespace />execCommand() {
 		<%= progressId %>.startProgress();
@@ -240,10 +273,13 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 </aui:script>
 
 <aui:script use="aui-base,liferay-form">
+$(function() {
 	var randomAmount = A.one('#<portlet:namespace />randomAmount');
+	//Initialize
+	$('#<portlet:namespace />randomLink').hide();
 	
 	$('#<portlet:namespace />randomAmount').on(
-	    'input load',
+	    'input load visibility',
 	    function() {
 			$('#<portlet:namespace />randomLink').toggle((0 < randomAmount.val()));
 	    }
@@ -260,6 +296,7 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 	    	});
 	    }
 	);
+});
 	
 	
 </aui:script>
@@ -307,4 +344,48 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 	    }
 	);	
 	
+</aui:script>
+
+<portlet:resourceURL id="/ldf/image/list" var="linkListURL" />
+
+<aui:script use="aui-base">
+	var linkLoader = A.one('#<portlet:namespace />linkLoader');
+    var fetchLinks = A.one('#<portlet:namespace />fetchLinks');
+    var linkLists = $('#<portlet:namespace />linkLists');
+    var urlList = A.one('#<portlet:namespace />urlList');
+    var randomAmount = $('#<portlet:namespace />randomAmount')
+
+    fetchLinks.on(
+        'click',
+        function(event) {
+            event.preventDefault();
+            Liferay.Util.toggleDisabled('#<portlet:namespace />fetchLinks', true);
+            linkLoader.show();
+            var data = Liferay.Util.ns(
+                '<portlet:namespace />',
+                {
+                    numberOfCrawlers: 15,
+                    maxDepthOfCrawling: 3,
+                    maxPagesToFetch: 100,
+                    randomAmount: randomAmount.val(),
+                    urls: urlList.val()
+                }
+            );
+
+			$.ajax(
+                '<%= linkListURL.toString() %>',
+                {
+                    data: data,
+                    success: function(data) {
+                    	var currentText = linkLists.val();
+                    	linkLists.val(currentText + data.urlstr);
+			            Liferay.Util.toggleDisabled('#<portlet:namespace />fetchLinks', false);
+			            linkLoader.hide();
+                    }
+                }
+            );
+
+        }
+    );
+
 </aui:script>
