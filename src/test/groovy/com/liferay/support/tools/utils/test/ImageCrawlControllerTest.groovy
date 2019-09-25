@@ -9,7 +9,7 @@ class ImageCrawlControllerTest extends Specification {
     def "ImageCrawlController test"() {
         when:
         def icc = new ImageCrawlController();
-        icc.exec(10, 2, 20, targeturl);
+        icc.exec(10, 2, 20, targeturl, 10);
         List<String> results = icc.getURL();
 
         then:
