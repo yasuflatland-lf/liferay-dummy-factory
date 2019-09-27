@@ -1,0 +1,28 @@
+{
+  "verbose": true,
+  "sources": ["src"],
+  "packages": {
+    "is-object": {
+      "copy-plugins": ["exclude-imports"],
+      "plugins": ["replace-browser-modules"],
+      ".babelrc:": {
+        "presets": ["liferay-standard"]
+      },
+      "post-plugins": [
+        "namespace-packages",
+        "inject-imports-dependencies",
+        "inject-peer-dependencies"
+      ]
+    }
+  },
+  "rules": [{
+    "test": "\\.js$",
+    "exclude": "node_modules",
+    "use": [{
+      "loader": "babel-loader",
+      "options": {
+        "presets": ["env"]
+      }
+    }]
+  }]
+}

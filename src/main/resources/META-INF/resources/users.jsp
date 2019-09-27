@@ -105,12 +105,12 @@
 										<span class="panel-title">Main Configration</span>
 										<span class="collapse-icon-closed">
 											<svg aria-hidden="true" class="lexicon-icon lexicon-icon-angle-right">
-												<use href="/images/icons/icons.svg#angle-right"></use>
+												<use xlink:href="<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg#angle-right"></use>
 											</svg>
 										</span>
 										<span class="collapse-icon-open">
 											<svg aria-hidden="true" class="lexicon-icon lexicon-icon-angle-down">
-												<use href="/images/icons/icons.svg#angle-down"></use>
+												<use xlink:href="<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg#angle-down"></use>
 											</svg>
 										</span>
 									</button>
@@ -224,12 +224,12 @@
 										<span class="panel-title">Announcements Deliveries</span>
 										<span class="collapse-icon-closed">
 											<svg aria-hidden="true" class="lexicon-icon lexicon-icon-angle-right">
-												<use href="/images/icons/icons.svg#angle-right"></use>
+												<use xlink:href="<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg#angle-right"></use>
 											</svg>
 										</span>
 										<span class="collapse-icon-open">
 											<svg aria-hidden="true" class="lexicon-icon lexicon-icon-angle-down">
-												<use href="/images/icons/icons.svg#angle-down"></use>
+												<use xlink:href="<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg#angle-down"></use>
 											</svg>
 										</span>
 									</button>
@@ -275,7 +275,8 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
     <option value="<@= roleId @>" data-role-type="<@= type @>" ><@= name @></option>
 </script>
 
-<aui:script use="aui-base">
+<aui:script use="aui-base,liferay-form">
+
 	function <portlet:namespace />updateRoles() {
 		var data = Liferay.Util.ns(
 			'<portlet:namespace />',
@@ -290,24 +291,34 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 			'<%= roleListURL.toString() %>',
 			{
 				data: data,
-				success: function(data) {
+				success: function(dataIn) {
+					var data = dataIn;
 
-					//Load Template
-					var tmpl = _.template($('#<portlet:namespace />roles_options').html());
-					var listAll = "";
-					_.map(data,function(n) {
-						listAll +=
-						tmpl(
-						  {
-							name:(n.name) ? _.escape(n.name) : "",
-							roleId:(n.roleId) ? _.escape(n.roleId) : "",
-							type:(n.type) ? _.escape(n.type) : ""
-						  }
-						);
-					});
-					var pageObj = $('#<portlet:namespace />roles')
-					pageObj.empty();
-					pageObj.append(listAll);
+				    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+				        (function() {
+				            var _ = _lodash;
+				            
+							//Load Template
+							var tmpl = _.template($('#<portlet:namespace />roles_options').html());
+							var listAll = "";
+							_.map(data,function(n) {
+								listAll +=
+								tmpl(
+								  {
+									name:(n.name) ? _.escape(n.name) : "",
+									roleId:(n.roleId) ? _.escape(n.roleId) : "",
+									type:(n.type) ? _.escape(n.type) : ""
+								  }
+								);
+							});
+							var pageObj = $('#<portlet:namespace />roles')
+							pageObj.empty();
+							pageObj.append(listAll);
+				            
+				        })()
+				    }, function(error) {
+				        console.error(error)
+				    });	
 				}
 			}
 		);

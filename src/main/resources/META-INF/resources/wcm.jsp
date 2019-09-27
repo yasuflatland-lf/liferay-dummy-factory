@@ -20,7 +20,6 @@
 
 <div class="container-fluid-1280">
 
-
 	<aui:fieldset-group markupView="lexicon">	
 		<aui:fieldset>
 		
@@ -274,7 +273,7 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 
 <aui:script use="aui-base,liferay-form">
 $(function() {
-	var randomAmount = A.one('#<portlet:namespace />randomAmount');
+	var randomAmount = $('#<portlet:namespace />randomAmount');
 	//Initialize
 	$('#<portlet:namespace />randomLink').hide();
 	
@@ -285,7 +284,7 @@ $(function() {
 	    }
 	);
 	    
-	var createContentsType = A.one('#<portlet:namespace />createContentsType');
+	var createContentsType = $('#<portlet:namespace />createContentsType');
 	
 	$('#<portlet:namespace />createContentsType').on(
 	    'change load',
@@ -297,8 +296,6 @@ $(function() {
 	    }
 	);
 });
-	
-	
 </aui:script>
 
 <script type="text/html" id="<portlet:namespace />journal_folders">
@@ -308,37 +305,49 @@ $(function() {
 <aui:script use="aui-base,liferay-form">
 	
 	// Select Folder
-	var groupIds = A.one('#<portlet:namespace />groupIds');
+	var groupIds = $('#<portlet:namespace />groupIds');
 	
 	$('#<portlet:namespace />groupIds').on(
 	    'change load',
 	    function() {
+	    
 			Liferay.Service(
 			  '/journal.journalfolder/get-folders',
 			  {
-			    groupId: groupIds.val()
+			    groupId: groupIds.val()[0]
 			  },
-			  function(obj) {
-				//Load Template
-				var tmpl = _.template($('#<portlet:namespace />journal_folders').html());
-				var listAll = tmpl({
-					name:"(None)",
-					folderId:0,
-					groupId:<%=themeDisplay.getScopeGroupId() %>
-				});
-				_.map(obj,function(data) {
-					listAll +=
-					tmpl(
-					  {
-						name:data.name,
-						folderId:data.folderId,
-						groupId:data.groupId
-					  }
-					);
-				});
-				var folderListObj = $('#<portlet:namespace />folderId')
-				folderListObj.empty();
-				folderListObj.append(listAll);
+			  function(objIn) {
+			  	var obj = objIn;
+			  	
+			    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+			        //(function() {
+			        	var _ = _lodash;
+			        	
+						//Load Template
+						var tmpl = _.template($('#<portlet:namespace />journal_folders').html());
+						var listAll = tmpl({
+							name:"(None)",
+							folderId:0,
+							groupId:<%=themeDisplay.getScopeGroupId() %>
+						});
+						_.map(obj,function(data) {
+							listAll +=
+							tmpl(
+							  {
+								name:data.name,
+								folderId:data.folderId,
+								groupId:data.groupId
+							  }
+							);
+						});
+						var folderListObj = $('#<portlet:namespace />folderId')
+						folderListObj.empty();
+						folderListObj.append(listAll);
+			            
+			        //})()
+			    }, function(error) {
+			        console.error(error)
+			    });			  
 			  }
 			);
 	    }
@@ -349,10 +358,10 @@ $(function() {
 <portlet:resourceURL id="/ldf/image/list" var="linkListURL" />
 
 <aui:script use="aui-base">
-	var linkLoader = A.one('#<portlet:namespace />linkLoader');
-    var fetchLinks = A.one('#<portlet:namespace />fetchLinks');
+	var linkLoader = $('#<portlet:namespace />linkLoader');
+    var fetchLinks = $('#<portlet:namespace />fetchLinks');
     var linkLists = $('#<portlet:namespace />linkLists');
-    var urlList = A.one('#<portlet:namespace />urlList');
+    var urlList = $('#<portlet:namespace />urlList');
     var randomAmount = $('#<portlet:namespace />randomAmount')
 
     fetchLinks.on(

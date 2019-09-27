@@ -198,7 +198,7 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
     <option value="<@= vocabularyId @>" ><@= vocabularyName @></option>
 </script>
 
-<aui:script use="aui-base">
+<aui:script use="aui-base,liferay-form">
 	
 	// Update category list
 	function <portlet:namespace />categoryListUpdate() {
@@ -212,29 +212,41 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 		    end: -1,
 		    "+obc":"com.liferay.portlet.asset.util.comparator.AssetCategoryCreateDateComparator" 
 		  },
-		  function(data) {
-			//Load Template
-			var tmpl = _.template($('#<portlet:namespace />category_options').html());
-            var listAll = tmpl({
-                categoryId:"<%= String.valueOf(AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) %>",
-                categoryName:"(None)",
-                selected:"true"
-            });
-			
-			_.map(data,function(n) {
-				listAll += 
-				tmpl(
-				  {
-					categoryId:(n.categoryId) ? _.escape(n.categoryId) : "",
-					categoryName:(n.titleCurrentValue) ? _.escape(n.titleCurrentValue) : "",
-					selected:"false"
-				  }
-				);
-			});
-			var catObj = $('#<portlet:namespace />parentCategoryId');
-			catObj.empty();
-			catObj.append(listAll);
-			defer.resolve();				    
+		  function(dataIn) {
+		  	var data = dataIn;
+		  	
+		    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+		        (function() {
+		            var _ = _lodash;
+		            
+					//Load Template
+					var tmpl = _.template($('#<portlet:namespace />category_options').html());
+		            var listAll = tmpl({
+		                categoryId:"<%= String.valueOf(AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) %>",
+		                categoryName:"(None)",
+		                selected:"true"
+		            });
+					
+					_.map(data,function(n) {
+						listAll += 
+						tmpl(
+						  {
+							categoryId:(n.categoryId) ? _.escape(n.categoryId) : "",
+							categoryName:(n.titleCurrentValue) ? _.escape(n.titleCurrentValue) : "",
+							selected:"false"
+						  }
+						);
+					});
+					var catObj = $('#<portlet:namespace />parentCategoryId');
+					catObj.empty();
+					catObj.append(listAll);
+					defer.resolve();				    
+		            
+		        })()
+		    }, function(error) {
+		        console.error(error)
+		    });		        
+		  
 		  }
 		);		
 		return defer.promise();
@@ -274,22 +286,32 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 				  {
 				    groupId: $('#<portlet:namespace />group').val()
 				  },
-				  function(data) {
-				  
-					//Load Template
-					var tmpl = _.template($('#<portlet:namespace />vocabulary_options').html());
-					var listAll = "";
-					_.map(data,function(n) {
-						listAll += 
-						tmpl({
-							vocabularyId:(n.vocabularyId) ? _.escape(n.vocabularyId) : "",
-							vocabularyName:(n.titleCurrentValue) ? _.escape(n.titleCurrentValue) : ""
-						});
-					});
-					var catObj = $('#<portlet:namespace />vocabularyId');
-					catObj.empty();
-					catObj.append(listAll);	
-					defer.resolve();		    
+				  function(dataIn) {
+				    var data = dataIn;
+				    
+				    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+				        (function() {
+				            var _ = _lodash;
+				            
+							//Load Template
+							var tmpl = _.template($('#<portlet:namespace />vocabulary_options').html());
+							var listAll = "";
+							_.map(data,function(n) {
+								listAll += 
+								tmpl({
+									vocabularyId:(n.vocabularyId) ? _.escape(n.vocabularyId) : "",
+									vocabularyName:(n.titleCurrentValue) ? _.escape(n.titleCurrentValue) : ""
+								});
+							});
+							var catObj = $('#<portlet:namespace />vocabularyId');
+							catObj.empty();
+							catObj.append(listAll);	
+							defer.resolve();		    
+				            
+				        })()
+				    }, function(error) {
+				        console.error(error)
+				    });					  
 				  }
 				);	
 			}

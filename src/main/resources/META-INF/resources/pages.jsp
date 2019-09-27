@@ -128,7 +128,8 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
     <option value="<@= parentLayoutId @>"><@= name @></option>
 </script>
 
-<aui:script use="aui-base">
+<aui:script use="aui-base,liferay-form">
+
 	$('#<portlet:namespace />group').on(
 		'change',
 		function(event) {
@@ -144,27 +145,37 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 				'<%= pagesForASiteURL.toString() %>',
 				{
 					data: data,
-					success: function(data) {
+					success: function(dataIn) {
+						var  data = dataIn;
 						
-						//Load Template
-						var tmpl = _.template($('#<portlet:namespace />page_per_site_options').html());
-						var listAll = 
-						tmpl({
-							name:'(None)',
-							parentLayoutId:0
-						});
-						_.map(data,function(n) {
-							listAll += 
-							tmpl(
-							  {
-								name:(n.name) ? _.escape(n.name) : "",
-								parentLayoutId:(n.parentLayoutId) ? _.escape(n.parentLayoutId) : ""
-							  }
-							);
-						});
-						var pageObj = $('#<portlet:namespace />parentLayoutId');
-						pageObj.empty();
-						pageObj.append(listAll);
+					    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+					        (function() {
+					            var _ = _lodash;
+					            
+								//Load Template
+								var tmpl = _.template($('#<portlet:namespace />page_per_site_options').html());
+								var listAll = 
+								tmpl({
+									name:'(None)',
+									parentLayoutId:0
+								});
+								_.map(data,function(n) {
+									listAll += 
+									tmpl(
+									  {
+										name:(n.name) ? _.escape(n.name) : "",
+										parentLayoutId:(n.parentLayoutId) ? _.escape(n.parentLayoutId) : ""
+									  }
+									);
+								});
+								var pageObj = $('#<portlet:namespace />parentLayoutId');
+								pageObj.empty();
+								pageObj.append(listAll);
+					            
+					        })()
+					    }, function(error) {
+					        console.error(error)
+					    });							
 					}
 				}
 			);
