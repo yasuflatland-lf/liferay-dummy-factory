@@ -28,9 +28,8 @@ Dummy Factory generates dummy data for debugging use. Please don't use this for 
 ### For 7.2
 1. Download jar file from [here](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/master/latest) and place it in ${liferay-home}/deploy folder. 
 2. Start Liferay bundle and login as an administrator.
-3. Dummy Factory uses lodash libraly and it's disabled for 7.2 by default. Please navigate `Control Panel → Configuration → System Settings → Third Party` and check Lodash to true.
-4. After the jar is properly installed, navigate to ```Control Panel``` in the left pane and under ```Apps``` folder, Dummy Factory portlet will be found. Please place that on a page.
-5. Now you are ready to create dummy data! Enjoy!
+3. After the jar is properly installed, navigate to ```Control Panel``` in the left pane and under ```Apps``` folder, Dummy Factory portlet will be found. Please place that on a page.
+4. Now you are ready to create dummy data! Enjoy!
 
 ### For 7.1
 1. Download jar file from [here](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.1.x/latest) and place it in ${liferay-home}/deploy folder. 
@@ -49,3 +48,6 @@ Please download file from[here](https://github.com/yasuflatland-lf/liferay-dummy
 
 ## Bug / Enhancement request
 Please create a issue on this repository.
+
+## Known issues
+- Wiki generator gets error and does not work due to denied access to JSON APIs before the initilization. Wiki looks like bing initialized at the first access to the Wiki Admin page in the control panel, right after spining up the Liferay bundle.
