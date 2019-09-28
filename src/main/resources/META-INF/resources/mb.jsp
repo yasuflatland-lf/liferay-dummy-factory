@@ -241,8 +241,7 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
     <option value="<@= categoryId @>" ><@= categoryName @></option>
 </script>
 
-<aui:script use="aui-base">
-	
+<aui:script use="aui-base,liferay-form">	
 	// Update thread list
 	function <portlet:namespace />threadListUpdate() {
 		var data = Liferay.Util.ns(
@@ -257,24 +256,35 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 			'<%= mbListURL.toString() %>',
 			{
 				data: data,
-				success: function(data) {
-
-					//Load Template
-					var tmpl = _.template($('#<portlet:namespace />message_options').html());
-					var listAll = "";
-					_.map(data,function(n) {
-						listAll += 
-						tmpl(
-						  {
-							rootMessageSubject:(n.rootMessageSubject) ? _.escape(n.rootMessageSubject) : "",
-							threadId:(n.threadId) ? _.escape(n.threadId) : "",
-							rootMessageId:(n.rootMessageId) ? _.escape(n.rootMessageId) : ""
-						  }
-						);
-					});
-					var pageObj = $('#<portlet:namespace />threadId');
-					pageObj.empty();
-					pageObj.append(listAll);
+				success: function(dataIn) {
+					var data = dataIn;
+					
+				    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+				        (function() {
+				            var _ = _lodash;
+				            
+							//Load Template
+							var tmpl = _.template($('#<portlet:namespace />message_options').html());
+							var listAll = "";
+							_.map(data,function(n) {
+								listAll += 
+								tmpl(
+								  {
+									rootMessageSubject:(n.rootMessageSubject) ? _.escape(n.rootMessageSubject) : "",
+									threadId:(n.threadId) ? _.escape(n.threadId) : "",
+									rootMessageId:(n.rootMessageId) ? _.escape(n.rootMessageId) : ""
+								  }
+								);
+							});
+							var pageObj = $('#<portlet:namespace />threadId');
+							pageObj.empty();
+							pageObj.append(listAll);
+				            
+				        })()
+				    }, function(error) {
+				        console.error(error)
+				    });	
+				    
 				}
 			}
 		);	
@@ -293,26 +303,36 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 			'<%= mbListURL.toString() %>',
 			{
 				data: data,
-				success: function(data) {
-
-					//Load Template
-					var tmpl = _.template($('#<portlet:namespace />category_options').html());
-					var listAll = tmpl({
-						categoryId:"<%= String.valueOf(MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) %>",
-						categoryName:"Default"
-					});
-					_.map(data,function(n) {
-						listAll += 
-						tmpl(
-						  {
-							categoryId:(n.categoryId) ? _.escape(n.categoryId) : "",
-							categoryName:(n.categoryName) ? _.escape(n.categoryName) : ""
-						  }
-						);
-					});
-					var pageObj = $('#<portlet:namespace />categoryId');
-					pageObj.empty();
-					pageObj.append(listAll);
+				success: function(dataIn) {
+					var data = dataIn;
+					
+				    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+				        (function() {
+				            var _ = _lodash;
+				            
+							//Load Template
+							var tmpl = _.template($('#<portlet:namespace />category_options').html());
+							var listAll = tmpl({
+								categoryId:"<%= String.valueOf(MBCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) %>",
+								categoryName:"Default"
+							});
+							_.map(data,function(n) {
+								listAll += 
+								tmpl(
+								  {
+									categoryId:(n.categoryId) ? _.escape(n.categoryId) : "",
+									categoryName:(n.categoryName) ? _.escape(n.categoryName) : ""
+								  }
+								);
+							});
+							var pageObj = $('#<portlet:namespace />categoryId');
+							pageObj.empty();
+							pageObj.append(listAll);
+				            
+				        })()
+				    }, function(error) {
+				        console.error(error)
+				    });						
 				}
 			}
 		);		

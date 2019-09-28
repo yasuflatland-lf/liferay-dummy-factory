@@ -1,9 +1,11 @@
 package com.liferay.support.tools.portlet;
 
+import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.portlet.actions.DummyFactoryConfiguration;
+import com.liferay.support.tools.utils.LodashResolver;
 
 import java.io.IOException;
 import java.util.Map;
@@ -17,6 +19,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * Dummy Factory Portlet
@@ -56,7 +59,10 @@ public class LiferayDummyFactoryPortlet extends MVCPortlet {
         throws IOException, PortletException {
 
         renderRequest.setAttribute(DummyFactoryConfiguration.class.getName(), _dummyFactoryConfiguration);
-
+        
+        //Loading Lodash
+        LodashResolver.exec(renderRequest, _npmResolver);
+        
         super.doView(renderRequest, renderResponse);
     }
 
@@ -77,5 +83,8 @@ public class LiferayDummyFactoryPortlet extends MVCPortlet {
 		_dummyFactoryConfiguration = ConfigurableUtil.createConfigurable(DummyFactoryConfiguration.class, properties);
     }
 
-    private volatile DummyFactoryConfiguration _dummyFactoryConfiguration;	
+    @Reference
+    private NPMResolver _npmResolver;
+    private volatile DummyFactoryConfiguration _dummyFactoryConfiguration;
+    
 }

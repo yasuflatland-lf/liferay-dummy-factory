@@ -1,7 +1,9 @@
 Bundle-Name: Liferay Dummy Factory Portlet
 Bundle-SymbolicName: liferay.dummy.factory
-Bundle-Version: 7.2.2
+Bundle-Version: 7.2.3
+Web-ContextPath: /liferay-dummy-factory
 -dsannotations-options: inherit
+-sources: true
 
 Import-Package:\
 	!org.apache.commons.fileupload.*,\

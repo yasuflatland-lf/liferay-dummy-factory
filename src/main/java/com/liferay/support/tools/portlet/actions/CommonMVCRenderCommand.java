@@ -1,12 +1,14 @@
 package com.liferay.support.tools.portlet.actions;
 
+import com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
-import com.liferay.portal.kernel.util.*;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.constants.LDFPortletWebKeys;
 import com.liferay.support.tools.utils.CommonUtil;
+import com.liferay.support.tools.utils.LodashResolver;
 import com.liferay.support.tools.utils.WikiCommons;
 
 import javax.portlet.PortletException;
@@ -63,6 +65,9 @@ public class CommonMVCRenderCommand implements MVCRenderCommand {
 			.getOrDefault(mode, LDFPortletKeys.JSP_ORGANIZAION) + ">");
 		}
 
+        //Loading Lodash
+        LodashResolver.exec(renderRequest, _npmResolver);
+		
 		return _commonUtil
 				.getPageFromMode()
 				.getOrDefault(mode, LDFPortletKeys.JSP_ORGANIZAION);
@@ -73,6 +78,9 @@ public class CommonMVCRenderCommand implements MVCRenderCommand {
 	
 	@Reference
 	private WikiCommons _wikiCommons;
+	
+    @Reference
+    private NPMResolver _npmResolver;
 
 	private static Log _log = LogFactoryUtil
 			.getLog(CommonMVCRenderCommand.class);	

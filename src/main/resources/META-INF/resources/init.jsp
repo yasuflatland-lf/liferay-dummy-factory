@@ -50,6 +50,8 @@
 <%@ page import="com.liferay.announcements.kernel.model.*" %>
 <%@ page import="com.liferay.portlet.announcements.model.impl.*" %>
 <%@ page import="com.liferay.support.tools.display.context.*" %>
+<%@ page import="com.liferay.frontend.js.loader.modules.extender.npm.NPMResolver" %>
+<%@ page import="com.liferay.frontend.js.loader.modules.extender.npm.JSPackage" %>
 
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
@@ -98,15 +100,23 @@
     }
 
 	DummyFactoryDisplayContext dummyFactoryDisplayContext = new DummyFactoryDisplayContext(request, liferayPortletRequest, liferayPortletResponse, portletPreferences);
+	
+	String bootstrapRequire =
+			(String)renderRequest.getAttribute("bootstrapRequire");
 %>
-
-
-<aui:script use="aui-base">
-//Convert bracket for Lodash template to avoid overraping jsp tag.
-_.templateSettings = {
-    interpolate: /\<\@\=(.+?)\@\>/gim,
-    evaluate: /\<\@([\s\S]+?)\@\>/gim,
-    escape: /\<\@\-(.+?)\@\>/gim
-};
+<aui:script use="aui-base" sandbox="<%= true %>">
+    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+        (function() {
+			var _ = _lodash;
+			
+			//Convert bracket for Lodash template to avoid overraping jsp tag.
+			_.templateSettings = {
+			    interpolate: /\<\@\=(.+?)\@\>/gim,
+			    evaluate: /\<\@([\s\S]+?)\@\>/gim,
+			    escape: /\<\@\-(.+?)\@\>/gim
+			};
+        })()
+    }, function(error) {
+        console.error(error)
+    });	
 </aui:script>
-

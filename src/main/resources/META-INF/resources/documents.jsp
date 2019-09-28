@@ -192,7 +192,8 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 	}
 </aui:script>
 
-<aui:script use="aui-base">
+<aui:script use="aui-base,liferay-form">
+
 	$('#<portlet:namespace />groupId').on(
 		'change load',
 		function(event) {
@@ -206,28 +207,40 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 			    end: -1,
 			    "+obc":"com.liferay.document.library.kernel.util.comparator.FolderIdComparator"
 			  },
-			  function(data) {
+			  function(dataIn) {
+			    var data = dataIn;
+			    
                 //Load Template
-                var tmpl = _.template($('#<portlet:namespace />journal_folder_options').html());
-                var listAll = tmpl({
-                    folderId:"<%= String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>",
-                    name:"(None)",
-                    selected:"true"
-                });
+			    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+			        (function() {
+			            var _ = _lodash;
+			            
+		                var tmpl = _.template($('#<portlet:namespace />journal_folder_options').html());
+		                var listAll = tmpl({
+		                    folderId:"<%= String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>",
+		                    name:"(None)",
+		                    selected:"true"
+		                });
+		
+		                _.map(data,function(n) {
+		                    listAll +=
+		                    tmpl(
+		                      {
+		                        folderId:(n.folderId) ? _.escape(n.folderId) : "",
+		                        name:(n.name) ? _.escape(n.name) : "",
+		                        selected:"false"
+		                      }
+		                    );
+		                });
+		                var catObj = $('#<portlet:namespace />folderId');
+		                catObj.empty();
+		                catObj.append(listAll);
+			            
+			        })()
+			    }, function(error) {
+			        console.error(error)
+			    });
 
-                _.map(data,function(n) {
-                    listAll +=
-                    tmpl(
-                      {
-                        folderId:(n.folderId) ? _.escape(n.folderId) : "",
-                        name:(n.name) ? _.escape(n.name) : "",
-                        selected:"false"
-                      }
-                    );
-                });
-                var catObj = $('#<portlet:namespace />folderId');
-                catObj.empty();
-                catObj.append(listAll);
 			  }
 			);
 		}

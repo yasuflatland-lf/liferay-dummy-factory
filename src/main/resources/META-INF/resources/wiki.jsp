@@ -172,10 +172,10 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 	}
 </aui:script>
 
-<aui:script use="aui-base, liferay-form">	
-	
+<aui:script use="aui-base,liferay-form">
+$(function() {
     // Manage GroupID list display
-    var createContentsType = A.one('#<portlet:namespace />createContentsType');
+    var createContentsType = $('#<portlet:namespace />createContentsType');
 
 	$('#<portlet:namespace />createContentsType').on(
 	    'change',
@@ -220,8 +220,7 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 	function <portlet:namespace />nodesUpdate() {
 		var defer = $.Deferred();
 			
-		var groupId = A.one('#<portlet:namespace />groupId').val();
-		
+		var groupId = $('#<portlet:namespace />groupId').val();
 		Liferay.Service(
 			'/wiki.wikinode/get-nodes',
 			{
@@ -229,29 +228,40 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 				start: -1,
 				end: -1,
 			},
-			function(data) {
-				//Load Template
-				var tmpl = _.template($('#<portlet:namespace />node_options').html());
-	            var listAll = tmpl({
-	                nodeId:"0",
-	                name:"(None)",
-	                selected:"true"
-	            });
+			function(dataIn) {
+				var data = dataIn;
 				
-				_.map(data,function(n) {
-					listAll += 
-					tmpl(
-					  {
-						nodeId:(n.nodeId) ? _.escape(n.nodeId) : "",
-						name:(n.name) ? _.escape(n.name) : "",
-						selected:"false"
-					  }
-					);
-				});
-				var catObj = $('#<portlet:namespace />nodeId');
-				catObj.empty();
-				catObj.append(listAll);
-				defer.resolve();	
+			    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+			        (function() {
+			            var _ = _lodash;
+			            
+						//Load Template
+						var tmpl = _.template($('#<portlet:namespace />node_options').html());
+			            var listAll = tmpl({
+			                nodeId:"0",
+			                name:"(None)",
+			                selected:"true"
+			            });
+						
+						_.map(data,function(n) {
+							listAll += 
+							tmpl(
+							  {
+								nodeId:(n.nodeId) ? _.escape(n.nodeId) : "",
+								name:(n.name) ? _.escape(n.name) : "",
+								selected:"false"
+							  }
+							);
+						});
+						var catObj = $('#<portlet:namespace />nodeId');
+						catObj.empty();
+						catObj.append(listAll);
+						defer.resolve();	
+			            
+			        })()
+			    }, function(error) {
+			        console.error(error)
+			    });					
 			}
 		);	
 		return defer.promise();
@@ -269,8 +279,8 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 	function <portlet:namespace />pagesUpdate() {
 		var defer = $.Deferred();
 
-		var groupId = A.one('#<portlet:namespace />groupId').val();
-		var nodeId = A.one('#<portlet:namespace />nodeId').val();
+		var groupId = $('#<portlet:namespace />groupId').val();
+		var nodeId = $('#<portlet:namespace />nodeId').val();
 
 		Liferay.Service(
 			'/wiki.wikipage/get-pages',
@@ -283,30 +293,40 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 				end: -1,
 			    "+obc":"com.liferay.wiki.util.comparator.PageTitleComparator" 
 			},
-			function(data) {
-				//Load Template
-				var tmpl = _.template($('#<portlet:namespace />page_options').html());
-	            var listAll = tmpl({
-	                resourcePrimKey:"0",
-	                title:"(None)"
-	            });
+			function(dataIn) {
+				var data = dataIn;
 				
-				_.map(data,function(n) {
-					listAll += 
-					tmpl(
-					  {
-						resourcePrimKey:(n.resourcePrimKey) ? _.escape(n.resourcePrimKey) : "",
-						title:(n.title) ? _.escape(n.title) : ""
-					  }
-					);
-				});
-				var catObj = $('#<portlet:namespace />resourcePrimKey');
-				catObj.empty();
-				catObj.append(listAll);
+			    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+			        (function() {
+			            var _ = _lodash;
+			            
+						//Load Template
+						var tmpl = _.template($('#<portlet:namespace />page_options').html());
+			            var listAll = tmpl({
+			                resourcePrimKey:"0",
+			                title:"(None)"
+			            });
+						
+						_.map(data,function(n) {
+							listAll += 
+							tmpl(
+							  {
+								resourcePrimKey:(n.resourcePrimKey) ? _.escape(n.resourcePrimKey) : "",
+								title:(n.title) ? _.escape(n.title) : ""
+							  }
+							);
+						});
+						var catObj = $('#<portlet:namespace />resourcePrimKey');
+						catObj.empty();
+						catObj.append(listAll);
+			        })()
+			    }, function(error) {
+			        console.error(error)
+			    });					
 				defer.resolve();
 			}
 		);	
 		return defer.promise();
 	}
-	
+});
 </aui:script>
