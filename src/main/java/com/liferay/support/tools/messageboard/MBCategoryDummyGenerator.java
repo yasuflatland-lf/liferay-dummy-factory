@@ -3,6 +3,7 @@ package com.liferay.support.tools.messageboard;
 import com.liferay.message.boards.service.MBCategoryLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.CommonUtil;
@@ -59,13 +60,18 @@ public class MBCategoryDummyGenerator extends DummyGenerator<MBContext> {
 
 				try {
 
+					// Set current site scope ID to the Service Context
+					ServiceContext serviceContext =
+							paramContext.getServiceContext();
+					serviceContext.setScopeGroupId(paramContext.getSiteGroupId());
+
 					// Generate category
 					_MBCategoryLocalService.addCategory(
 							paramContext.getServiceContext().getUserId(), // userId
 							paramContext.getParentCategoryId(), // parentCategoryId
 							actualName.toString(), // name
 							paramContext.getDescription(), // description,
-							paramContext.getServiceContext());
+							serviceContext);
 
 				} catch (Throwable e) {
 					// Finish progress

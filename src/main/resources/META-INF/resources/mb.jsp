@@ -216,10 +216,13 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 	    		$("#<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.MB_THREAD_CREATE) %>").show();
 	    		$("#<portlet:namespace />categoryIdWrap").hide();
 	    		$("#<portlet:namespace />groupIdsWrap").hide();
+
+				//Update thread list
+				<portlet:namespace />threadListUpdate();
 	    	} else if(<%= String.valueOf(LDFPortletKeys.MB_CATEGORY_CREATE) %> == createContentsType.val()) {
-	    		$("#<portlet:namespace />siteGroupIdWrap").hide();
+	    		$("#<portlet:namespace />siteGroupIdWrap").show();
 	    		$("#<portlet:namespace />categoryIdWrap").hide();
-	    		$("#<portlet:namespace />groupIdsWrap").show();
+	    		$("#<portlet:namespace />groupIdsWrap").hide();
 	    	} else {
 	    		$("#<portlet:namespace />siteGroupIdWrap").hide();
 	    		$("#<portlet:namespace />categoryIdWrap").show();
@@ -341,7 +344,6 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 	$('#<portlet:namespace />siteGroupId').on(
 		'change load',
 		function(event) {
-		
 			//Update thread list
 			<portlet:namespace />threadListUpdate();
 		}
