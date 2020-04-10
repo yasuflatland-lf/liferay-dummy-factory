@@ -5,8 +5,8 @@
     "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "liferay-npm-bundler": "^2.13.2",
-    "liferay-npm-scripts": "^9.5.0"
+    "liferay-npm-bundler": "^2.18.4",
+    "liferay-npm-scripts": "^29.0.0"
   },
   "scripts": {
     "build": "liferay-npm-bundler"
