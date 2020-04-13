@@ -65,6 +65,8 @@
 <%@ page import="javax.portlet.PortletPreferences" %>
 <%@ page import="javax.portlet.PortletURL" %>
 <%@ page import="com.liferay.petra.string.StringPool" %>
+<%@ page import="com.liferay.portal.kernel.exception.*" %>
+<%@ page import="com.liferay.asset.kernel.exception.*" %>
 
 <liferay-frontend:defineObjects/>
 <liferay-theme:defineObjects/>

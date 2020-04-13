@@ -11,7 +11,6 @@
 	<aui:fieldset-group markupView="lexicon">	
 		<aui:fieldset>
 		
-			<liferay-ui:success key="success" message="Companies created successfully" />
 			<%@ include file="/command_select.jspf"%>
 		
 			<portlet:actionURL name="<%= LDFPortletKeys.COMPANY %>" var="companyEditURL">
@@ -47,6 +46,12 @@
 			%>
 
 			<aui:form action="<%= companyEditURL %>" method="post" name="fm"  onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
+				<liferay-ui:success key="success" message="Companies created successfully" />
+				<liferay-ui:error exception="<%= Exception.class %>" message="Error occured. Please see console log" />
+				<liferay-ui:error exception="<%= CompanyMxException.class %>" message="please-enter-a-valid-mail-domain" />
+				<liferay-ui:error exception="<%= CompanyVirtualHostException.class %>" message="please-enter-a-valid-virtual-host" />
+				<liferay-ui:error exception="<%= CompanyWebIdException.class %>" message="please-enter-a-valid-web-id" />
+
 				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
 			
 				<aui:input name="numberOfCompanies" label="<%= numberOfCompaniesLabel %>" >

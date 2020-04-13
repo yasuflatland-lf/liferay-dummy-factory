@@ -40,7 +40,8 @@ public abstract class DummyGenerator<T extends ParamContext> {
 
 		TimeKeeper timeKeeper = new TimeKeeper();
 		timeKeeper.start();
-		
+
+		// Execute creation process
 		exec(request, paramContext);
 		
 		timeKeeper.stop();
