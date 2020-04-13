@@ -47,10 +47,18 @@ public class MBMVCActionCommand extends BaseMVCActionCommand {
 
 		} catch (Exception e) {
 			hideDefaultSuccessMessage(request);
-			SessionErrors.add(request,Exception.class);
+			SessionMessages.add(request, e.getClass());
+			SessionErrors.add(request, e.getClass());
+			MutableRenderParameters mutableRenderParameters = response.getRenderParameters();
+			mutableRenderParameters.setValues(LDFPortletKeys.MODE, LDFPortletKeys.MODE_MB);
+			mutableRenderParameters.setValues("mvcRenderCommandName", LDFPortletKeys.COMMON);
 			_log.error(e, e);
+			return;
 		}
 
+		MutableRenderParameters mutableRenderParameters = response.getRenderParameters();
+		mutableRenderParameters.setValues("mvcRenderCommandName", LDFPortletKeys.COMMON);
+		SessionMessages.add(request, "success");
 	}
 
 	@Reference

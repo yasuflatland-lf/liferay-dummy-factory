@@ -61,6 +61,8 @@
 			%>
 
 			<aui:form action="<%= categoryEditURL %>" method="post" name="fm"  onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
+				<liferay-ui:error exception="<%= DuplicateCategoryException.class %>" message="please-enter-a-unique-name" />
+
 				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
 				
 				<aui:select name="createContentsType" label="<%= createContentsTypeLabel %>" >

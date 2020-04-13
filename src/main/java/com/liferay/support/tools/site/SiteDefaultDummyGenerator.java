@@ -103,7 +103,7 @@ public class SiteDefaultDummyGenerator extends DummyGenerator<SiteContext> {
 					continue;
 				}
 				else if(e instanceof GroupKeyException) {
-					_log.error(e.getMessage() + " Site name maybe not acceptable.");
+					_log.error(e.getMessage() + " : Site name maybe not acceptable.");
 					continue;
 				}
 				else {
