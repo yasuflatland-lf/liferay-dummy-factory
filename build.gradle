@@ -91,6 +91,8 @@ dependencies {
 	compile "com.liferay:com.liferay.journal.service"
 	compile "com.liferay:com.liferay.wiki.api"
 	compile "com.liferay:com.liferay.wiki.service"
+	compile "com.liferay:com.liferay.wiki.web"
+
 	compile "com.liferay:com.liferay.petra.string"
 	compile "com.liferay:com.liferay.petra.function"
 

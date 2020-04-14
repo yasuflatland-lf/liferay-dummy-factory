@@ -1,4 +1,14 @@
+<%@ page import="javax.portlet.PortletRequest" %>
 <%@ include file="/init.jsp"%>
+
+<%
+	// Set Guest group ID for scope group ID
+	final long guestGroupId = GroupLocalServiceUtil
+			.getGroup(themeDisplay.getCompanyId(), GroupConstants.GUEST).getGroupId();
+
+	WikiCommons wikiCommons = (WikiCommons)request.getAttribute(LDFPortletWebKeys.WIKI_COMMONS);
+	wikiCommons.initWiki(renderRequest, guestGroupId);
+%>
 
 <clay:navigation-bar
 	inverted="<%= true %>"
@@ -30,9 +40,6 @@
 			String baseSummaryNameLabel = "Enter the base summary for the page";
 			String minorEditLabel = "Create this page as minor edit";			
 
-					// Set Guest group ID for scope group ID
-			final long guestGroupId = GroupLocalServiceUtil
-					.getGroup(themeDisplay.getCompanyId(), GroupConstants.GUEST).getGroupId();
 			List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 			String defaultOption = "(None)";
 			
@@ -99,13 +106,9 @@
 						<aui:option label="<%= defaultOption %>" value="0" />
 					</aui:select>	
 							
-					<%
-					WikiCommons wikiCommons = (WikiCommons)request.getAttribute(LDFPortletWebKeys.WIKI_COMMONS);
-					Map<String, String> formats = wikiCommons.getFormats(locale);
-					%>
-									
 					<aui:select changesContext="<%= true %>" name="format">
 						<%
+						Map<String, String> formats = wikiCommons.getFormats(locale);
 						for(Map.Entry<String, String> format : formats.entrySet()) {
 						%>
 							<aui:option label="<%= format.getValue() %>" value="<%= format.getKey() %>" />

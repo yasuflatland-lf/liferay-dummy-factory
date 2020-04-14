@@ -64,6 +64,7 @@
 <%@ page import="java.text.DecimalFormatSymbols" %>
 <%@ page import="javax.portlet.PortletPreferences" %>
 <%@ page import="javax.portlet.PortletURL" %>
+<%@ page import="javax.portlet.PortletRequest" %>
 <%@ page import="com.liferay.petra.string.StringPool" %>
 <%@ page import="com.liferay.portal.kernel.exception.*" %>
 <%@ page import="com.liferay.asset.kernel.exception.*" %>
