@@ -4,6 +4,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.constants.LDFPortletKeys;
@@ -41,7 +42,13 @@ public class SiteMVCActionCommand extends BaseMVCActionCommand {
 
 		} catch (Exception e) {
 			hideDefaultSuccessMessage(request);
+			SessionMessages.add(request, e.getClass());
+			SessionErrors.add(request, e.getClass());
+			MutableRenderParameters mutableRenderParameters = response.getRenderParameters();
+			mutableRenderParameters.setValues(LDFPortletKeys.MODE, LDFPortletKeys.MODE_SITES);
+			mutableRenderParameters.setValues("mvcRenderCommandName", LDFPortletKeys.COMMON);
 			_log.error(e, e);
+			return;
 		}
 
 		MutableRenderParameters mutableRenderParameters = response.getRenderParameters();
