@@ -1,7 +1,6 @@
 package com.liferay.support.tools.utils;
 
 import com.github.javafaker.Faker;
-import com.github.javafaker.service.LocaleDoesNotExistException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -101,15 +100,7 @@ public class CommonUtil {
 			Faker fakerTmp = new Faker(new Locale(locale));
 			faker = fakerTmp;
 		} catch (Exception e) {
-
-			// If the local is not available for Faker, generate Faker wit
-			// English locale
-
-			if (e instanceof LocaleDoesNotExistException) {
-				_log.error(locale + " doesn't valid for Faker. Use english instead.");
-			} else {
-				e.printStackTrace();
-			}
+			e.printStackTrace();
 		}
 
 		return faker;

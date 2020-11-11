@@ -1,5 +1,10 @@
 package com.liferay.support.tools.portlet.actions;
 
+import com.goikosoft.crawler4j.crawler.CrawlConfig;
+import com.goikosoft.crawler4j.crawler.CrawlController;
+import com.goikosoft.crawler4j.fetcher.PageFetcher;
+import com.goikosoft.crawler4j.robotstxt.RobotstxtConfig;
+import com.goikosoft.crawler4j.robotstxt.RobotstxtServer;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -14,11 +19,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.utils.ImageCrawler;
-import edu.uci.ics.crawler4j.crawler.CrawlConfig;
-import edu.uci.ics.crawler4j.crawler.CrawlController;
-import edu.uci.ics.crawler4j.fetcher.PageFetcher;
-import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
-import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 import io.reactivex.Flowable;
 import io.reactivex.schedulers.Schedulers;
 import java.io.File;
