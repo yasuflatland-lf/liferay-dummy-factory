@@ -50,7 +50,7 @@ dependencies {
 	compile "com.github.mifmif:generex:1.0.2"
 	compile "dk.brics.automaton:automaton:1.11-8"
 	compile "com.github.javafaker:javafaker:1.0.2"
-	compile("com.goikosoft.crawler4j:crawler4j:4.4.4") {
+	compile("com.goikosoft.crawler4j:crawler4j:4.5.10") {
 		exclude module: 'tika-bundle'
 		exclude module: 'tika-core'
 		exclude module: 'tika-parsers'

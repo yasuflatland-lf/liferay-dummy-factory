@@ -12,6 +12,14 @@ Import-Package:\
 	!org.apache.commons.beanutils.*,\
 	!org.apache.commons.codec.*,\
 	!org.checkerframework.*,\
+	!com.linkedin.*,\
+	!de.malkusch.*,\
+    !com.machinepublishers.*,\
+    !javax.annotation.*,\
+    !net.sf.*,\
+    !net.spy.*,\
+    !org.openqa.*,\
+    !org.yaml.*,\
 	*
 
 -includeresource:\
