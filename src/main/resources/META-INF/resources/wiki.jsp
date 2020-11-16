@@ -234,7 +234,7 @@ $(function() {
 			function(dataIn) {
 				var data = dataIn;
 				
-			    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+			    Liferay.Loader.require("<%=lodashResolver %>", function(_lodash) {
 			        (function() {
 			            var _ = _lodash;
 			            
@@ -299,7 +299,7 @@ $(function() {
 			function(dataIn) {
 				var data = dataIn;
 				
-			    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+			    Liferay.Loader.require("<%=lodashResolver %>", function(_lodash) {
 			        (function() {
 			            var _ = _lodash;
 			            

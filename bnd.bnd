@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Dummy Factory Portlet
 Bundle-SymbolicName: liferay.dummy.factory
-Bundle-Version: 7.3.0
+Bundle-Version: 7.3.1
 Web-ContextPath: /liferay-dummy-factory
 -dsannotations-options: inherit
 -sources: true
@@ -12,6 +12,14 @@ Import-Package:\
 	!org.apache.commons.beanutils.*,\
 	!org.apache.commons.codec.*,\
 	!org.checkerframework.*,\
+	!com.linkedin.*,\
+	!de.malkusch.*,\
+    !com.machinepublishers.*,\
+    !javax.annotation.*,\
+    !net.sf.*,\
+    !net.spy.*,\
+    !org.openqa.*,\
+    !org.yaml.*,\
 	*
 
 -includeresource:\

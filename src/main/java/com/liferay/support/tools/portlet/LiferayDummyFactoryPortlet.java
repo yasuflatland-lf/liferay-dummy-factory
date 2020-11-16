@@ -5,6 +5,7 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.portlet.actions.DummyFactoryConfiguration;
+import com.liferay.support.tools.utils.JqueryResolver;
 import com.liferay.support.tools.utils.LodashResolver;
 
 import java.io.IOException;
@@ -62,6 +63,8 @@ public class LiferayDummyFactoryPortlet extends MVCPortlet {
         
         //Loading Lodash
         LodashResolver.exec(renderRequest, _npmResolver);
+        //Loading JQuery
+		JqueryResolver.exec(renderRequest, _npmResolver);
         
         super.doView(renderRequest, renderResponse);
     }

@@ -9,6 +9,6 @@ public class LodashResolver {
 
 	static public void exec(RenderRequest renderRequest, NPMResolver npmResolver) {
 		JSPackage jsPackage = npmResolver.getDependencyJSPackage("lodash");
-		renderRequest.setAttribute("bootstrapRequire", jsPackage.getResolvedId());
+		renderRequest.setAttribute("lodashResolver", jsPackage.getResolvedId());
 	}
 }

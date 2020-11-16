@@ -1,15 +1,15 @@
 package com.liferay.support.tools.utils;
 
+import com.goikosoft.crawler4j.crawler.Page;
+import com.goikosoft.crawler4j.crawler.WebCrawler;
+import com.goikosoft.crawler4j.parser.BinaryParseData;
+import com.goikosoft.crawler4j.url.WebURL;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
-
-import edu.uci.ics.crawler4j.crawler.Page;
-import edu.uci.ics.crawler4j.crawler.WebCrawler;
-import edu.uci.ics.crawler4j.parser.BinaryParseData;
-import edu.uci.ics.crawler4j.url.WebURL;
 
 /**
  * Image Link Crawler

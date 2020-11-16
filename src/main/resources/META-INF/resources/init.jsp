@@ -105,11 +105,13 @@
 
 	DummyFactoryDisplayContext dummyFactoryDisplayContext = new DummyFactoryDisplayContext(request, liferayPortletRequest, liferayPortletResponse, portletPreferences);
 	
-	String bootstrapRequire =
-			(String)renderRequest.getAttribute("bootstrapRequire");
+	String lodashResolver =
+			(String)renderRequest.getAttribute("lodashResolver");
+	String jqueryResolver =
+			(String)renderRequest.getAttribute("jqueryResolver");
 %>
 <aui:script use="aui-base" sandbox="<%= true %>">
-    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+    Liferay.Loader.require("<%=lodashResolver %>", function(_lodash) {
         (function() {
 			var _ = _lodash;
 			

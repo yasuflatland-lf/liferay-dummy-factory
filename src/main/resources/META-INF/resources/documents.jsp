@@ -211,7 +211,7 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 			    var data = dataIn;
 			    
                 //Load Template
-			    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+			    Liferay.Loader.require("<%=lodashResolver %>", function(_lodash) {
 			        (function() {
 			            var _ = _lodash;
 			            
