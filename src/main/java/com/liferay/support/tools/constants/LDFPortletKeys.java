@@ -8,7 +8,7 @@ public class LDFPortletKeys {
     public static final String EOL = System.getProperty("line.separator");
 
 	// Portlet Name
-	public static final String LIFERAY_DUMMY_FACTORY = "portlet_com_liferay_support_tools_portlet_LiferayDummyFactoryPortlet";
+	public static final String LIFERAY_DUMMY_FACTORY = "com_liferay_support_tools_portlet_LiferayDummyFactoryPortlet";
 	
 	public static final String DUMMY_FACTORY_CONFIG = "com.liferay.support.tools.portlet.actions.DummyFactoryConfiguration";
 

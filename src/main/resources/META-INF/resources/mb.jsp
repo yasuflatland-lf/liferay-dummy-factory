@@ -262,7 +262,7 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 				success: function(dataIn) {
 					var data = dataIn;
 					
-				    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+				    Liferay.Loader.require("<%=lodashResolver %>", function(_lodash) {
 				        (function() {
 				            var _ = _lodash;
 				            
@@ -309,7 +309,7 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 				success: function(dataIn) {
 					var data = dataIn;
 					
-				    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+				    Liferay.Loader.require("<%=lodashResolver %>", function(_lodash) {
 				        (function() {
 				            var _ = _lodash;
 				            

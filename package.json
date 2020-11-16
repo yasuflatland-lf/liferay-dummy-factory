@@ -2,6 +2,7 @@
   "name": "liferay-dummy-factory",
   "version": "1.0.0",
   "dependencies": {
+    "jquery": "^3.5.1",
     "lodash": "^4.17.20"
   },
   "devDependencies": {

@@ -109,7 +109,7 @@
 						<aui:validator name="min">1</aui:validator>
 				        <aui:validator name="required">
 			                function() {
-		                        return (<%= String.valueOf(LDFPortletKeys.C_CATEGORY_CREATE) %> == AUI.$('#<portlet:namespace />createContentsType').val());
+		                        return (<%= String.valueOf(LDFPortletKeys.C_CATEGORY_CREATE) %> == $('#<portlet:namespace />createContentsType').val());
 			                }
 				        </aui:validator>											
 
@@ -117,7 +117,7 @@
 					<aui:input name="baseCategoryName" label="<%= baseCategoryNameLabel %>" >
 				        <aui:validator name="required">
 			                function() {
-		                        return (<%= String.valueOf(LDFPortletKeys.C_CATEGORY_CREATE) %> == AUI.$('#<portlet:namespace />createContentsType').val());
+		                        return (<%= String.valueOf(LDFPortletKeys.C_CATEGORY_CREATE) %> == $('#<portlet:namespace />createContentsType').val());
 			                }
 				        </aui:validator>											
 					</aui:input>
@@ -217,7 +217,7 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 		  function(dataIn) {
 		  	var data = dataIn;
 		  	
-		    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+		    Liferay.Loader.require("<%=lodashResolver %>", function(_lodash) {
 		        (function() {
 		            var _ = _lodash;
 		            
@@ -291,7 +291,7 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 				  function(dataIn) {
 				    var data = dataIn;
 				    
-				    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+				    Liferay.Loader.require("<%=lodashResolver %>", function(_lodash) {
 				        (function() {
 				            var _ = _lodash;
 				            

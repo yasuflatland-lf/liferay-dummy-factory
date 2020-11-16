@@ -319,7 +319,7 @@ $(function() {
 			  function(objIn) {
 			  	var obj = objIn;
 			  	
-			    Liferay.Loader.require("<%=bootstrapRequire %>", function(_lodash) {
+			    Liferay.Loader.require("<%=lodashResolver %>", function(_lodash) {
 			        //(function() {
 			        	var _ = _lodash;
 			        	

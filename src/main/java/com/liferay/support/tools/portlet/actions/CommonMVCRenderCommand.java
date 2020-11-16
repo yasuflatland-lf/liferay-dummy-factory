@@ -8,6 +8,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.constants.LDFPortletWebKeys;
 import com.liferay.support.tools.utils.CommonUtil;
+import com.liferay.support.tools.utils.JqueryResolver;
 import com.liferay.support.tools.utils.LodashResolver;
 import com.liferay.support.tools.utils.WikiCommons;
 
@@ -67,7 +68,9 @@ public class CommonMVCRenderCommand implements MVCRenderCommand {
 
         //Loading Lodash
         LodashResolver.exec(renderRequest, _npmResolver);
-		
+		//Loading JQuery
+		JqueryResolver.exec(renderRequest, _npmResolver);
+
 		return _commonUtil
 				.getPageFromMode()
 				.getOrDefault(mode, LDFPortletKeys.JSP_ORGANIZAION);
