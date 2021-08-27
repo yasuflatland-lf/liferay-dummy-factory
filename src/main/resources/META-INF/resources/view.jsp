@@ -17,14 +17,16 @@
                 <portlet:param name="redirect" value="<%=portletURL.toString()%>"/>
             </portlet:actionURL>
 
-            <div class="entry-title form-group">
-                <h1>Create organizations&nbsp;&nbsp;
-                    <a aria-expanded="false" class="collapse-icon collapsed icon-question-sign" data-toggle="collapse"
-                       href="#navPillsCollapse0">
-                    </a>
-                </h1>
+            <div id="<portlet:namespace />Header0" role="tab">
+                <div aria-controls="<portlet:namespace />Collapse0" aria-expanded="false"
+                     class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
+                     href="#<portlet:namespace />Collapse0" role="button">
+                    <h1>Create Organizations <liferay-ui:icon-help message="usage" /></h1>
+                </div>
             </div>
-            <div class="collapsed collapse" id="navPillsCollapse0" aria-expanded="false">
+
+            <div aria-expanded="false" aria-labelledby="<portlet:namespace />Header0"
+                 class="collapse panel-collapse" id="<portlet:namespace />Collapse0" role="tabpanel">
                 <blockquote class="blockquote-info">
                     <small>Example</small>
                     <p>If you enter the values <code>3</code> and "org" the portlet will create three organizations:
@@ -69,15 +71,18 @@
                 <div class="panel panel-secondary">
                     <div class="panel-header panel-heading" id="<portlet:namespace />Header" role="tab">
                         <div class="panel-title">
-                            <div aria-controls="<portlet:namespace />Collapse" aria-expanded="false" class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse" href="#<portlet:namespace />Collapse" role="button">
+                            <div aria-controls="<portlet:namespace />Collapse" aria-expanded="false"
+                                 class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
+                                 href="#<portlet:namespace />Collapse" role="button">
                                 <span class="category-name text-truncate">Click here to show more options</span>
-                                <aui:icon cssClass="collapse-icon-closed" image="angle-right" markupView="lexicon" />
-                                <aui:icon cssClass="collapse-icon-open" image="angle-down" markupView="lexicon" />
+                                <aui:icon cssClass="collapse-icon-closed" image="angle-right" markupView="lexicon"/>
+                                <aui:icon cssClass="collapse-icon-open" image="angle-down" markupView="lexicon"/>
                             </div>
                         </div>
                     </div>
 
-                    <div aria-expanded="<%= true %>" aria-labelledby="<portlet:namespace />Header" class="collapse panel-collapse" id="<portlet:namespace />Collapse" role="tabpanel">
+                    <div aria-expanded="false" aria-labelledby="<portlet:namespace />Header"
+                         class="collapse panel-collapse" id="<portlet:namespace />Collapse" role="tabpanel">
                         <div class="simulation-app-panel-body">
                             <div class="row">
                                 <aui:fieldset cssClass="col-md-6">
@@ -128,7 +133,7 @@
 <aui:script>
     function <portlet:namespace/>execCommand() {
     <%= progressId %>.startProgress();
-    submitForm(document.<portlet:namespace/>fm);
+        submitForm(document.<portlet:namespace/>fm);
     }
 </aui:script>
 
