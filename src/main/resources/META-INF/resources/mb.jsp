@@ -206,7 +206,6 @@
 
 		var ctg = document.getElementsByClassName("<portlet:namespace />contentsTypeGroup");
 		for (var i = 0; i < ctg.length; i++) {
-			console.log(ctg[i]);
 			ctg[i].style.display = (cmp_str === document.getElementById(this).getAttribute("id")) ? "block" : "none";
 		}
 

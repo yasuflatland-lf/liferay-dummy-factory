@@ -171,7 +171,6 @@
 
 <aui:script>
     function <portlet:namespace/>execCommand() {
-        console.log("in");
         <%= progressId %>.startProgress();
         submitForm(document.<portlet:namespace/>fm);
     }
@@ -267,7 +266,6 @@
     document.getElementById('<portlet:namespace/>group')
         .addEventListener("change load", function(event) {
             //Update thread list
-            console.log("in");
             <portlet:namespace/>vocabularyUpdate()
                 .then(function() {
                     <portlet:namespace/>categoryListUpdate();

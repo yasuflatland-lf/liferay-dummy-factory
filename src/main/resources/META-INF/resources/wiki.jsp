@@ -72,7 +72,7 @@
 						<aui:validator name="min">1</aui:validator>
 				        <aui:validator name="required">
 			                function() {
-		                        return (<%= String.valueOf(LDFPortletKeys.W_NODE) %> == AUI.$('#<portlet:namespace />createContentsType').val());
+		                        return (<%= String.valueOf(LDFPortletKeys.W_NODE) %> == document.getElementById('<portlet:namespace />createContentsType').value);
 			                }
 				        </aui:validator>				
 					</aui:input>
@@ -80,7 +80,7 @@
 					<aui:input name="baseNodeName" label="<%= baseNodeNameLabel %>" >
 				        <aui:validator name="required">
 			                function() {
-		                        return (<%= String.valueOf(LDFPortletKeys.W_NODE) %> == AUI.$('#<portlet:namespace />createContentsType').val());
+		                        return (<%= String.valueOf(LDFPortletKeys.W_NODE) %> == document.getElementById('<portlet:namespace />createContentsType').value);
 			                }
 				        </aui:validator>				
 					</aui:input>
@@ -97,7 +97,7 @@
 						<aui:validator name="min">1</aui:validator>					
 				        <aui:validator name="required">
 			                function() {
-		                        return (<%= String.valueOf(LDFPortletKeys.W_PAGE) %> == AUI.$('#<portlet:namespace />createContentsType').val());
+		                        return (<%= String.valueOf(LDFPortletKeys.W_PAGE) %> == document.getElementById('<portlet:namespace />createContentsType').value);
 			                }
 				        </aui:validator>				
 					</aui:select>	
@@ -122,7 +122,7 @@
 						<aui:validator name="min">1</aui:validator>
 				        <aui:validator name="required">
 			                function() {
-		                        return (<%= String.valueOf(LDFPortletKeys.W_PAGE) %> == AUI.$('#<portlet:namespace />createContentsType').val());
+		                        return (<%= String.valueOf(LDFPortletKeys.W_PAGE) %> == document.getElementById('<portlet:namespace />createContentsType').value);
 			                }
 				        </aui:validator>				
 					</aui:input>
@@ -130,7 +130,7 @@
 					<aui:input name="basePageName" label="<%= basePageNameLabel %>" >
 				        <aui:validator name="required">
 			                function() {
-		                        return (<%= String.valueOf(LDFPortletKeys.W_PAGE) %> == AUI.$('#<portlet:namespace />createContentsType').val());
+		                        return (<%= String.valueOf(LDFPortletKeys.W_PAGE) %> == document.getElementById('<portlet:namespace />createContentsType').value);
 			                }
 				        </aui:validator>				
 					</aui:input>		
@@ -176,160 +176,166 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 </aui:script>
 
 <aui:script use="aui-base,liferay-form">
-$(function() {
-    // Manage GroupID list display
-    var createContentsType = $('#<portlet:namespace />createContentsType');
 
-	$('#<portlet:namespace />createContentsType').on(
-	    'change',
-	    function() {
-	    	initialUpdate();
-	    }
-	); 
-	
-	// Initialize
-	initialUpdate();
-	
-	// Initialize when a page rendered.
-	function initialUpdate() {
-    	//--------------------------------
-    	// Contents Creation fields switch
-    	//--------------------------------
-   		var cmp_str = "<portlet:namespace />contentsType" + createContentsType.val();
-    	$('.<portlet:namespace />contentsTypeGroup').each(function(index){
-			$(this).toggle((cmp_str === $(this).attr("id")));
-    	});
-    	
-		//Update thread list
-		<portlet:namespace />nodesUpdate()
-		.then(function() {
-			<portlet:namespace />pagesUpdate();
-		});	    
-	}	
-	
-	// Group ID
-	$('#<portlet:namespace />groupId').on(
-	    'change load',
-	    function() {
+</aui:script>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		// Manage GroupID list display
+		var createContentsType = document.getElementById('<portlet:namespace />createContentsType');
+
+		document.createElement("<portlet:namespace/>createContentsType")
+				.addEventListener("change", function() {
+					initialUpdate();
+				});
+
+		// Initialize
+		initialUpdate();
+
+		// Initialize when a page rendered.
+		function initialUpdate() {
+			//--------------------------------
+			// Contents Creation fields switch
+			//--------------------------------
+			var cmp_str = "<portlet:namespace/>contentsType" + createContentsType.value;
+			var ctg = document.getElementsByClassName("<portlet:namespace />contentsTypeGroup");
+			for (var i = 0; i < ctg.length; i++) {
+				ctg[i].style.display = (cmp_str === document.getElementById(this).getAttribute("id")) ? "block" : "none";
+			}
+
 			//Update thread list
 			<portlet:namespace />nodesUpdate()
-			.then(function() {
-				<portlet:namespace />pagesUpdate();
-			});	    
-	    }
-	)
-		
-	// Nodes update
-	function <portlet:namespace />nodesUpdate() {
-		var defer = $.Deferred();
-			
-		var groupId = $('#<portlet:namespace />groupId').val();
-		Liferay.Service(
-			'/wiki.wikinode/get-nodes',
-			{
-				groupId: groupId,
-				start: -1,
-				end: -1,
-			},
-			function(dataIn) {
-				var data = dataIn;
-				
-			    Liferay.Loader.require("<%=lodashResolver %>", function(_lodash) {
-			        (function() {
-			            var _ = _lodash;
-			            
-						//Load Template
-						var tmpl = _.template($('#<portlet:namespace />node_options').html());
-			            var listAll = tmpl({
-			                nodeId:"0",
-			                name:"(None)",
-			                selected:"true"
-			            });
-						
-						_.map(data,function(n) {
-							listAll += 
-							tmpl(
-							  {
-								nodeId:(n.nodeId) ? _.escape(n.nodeId) : "",
-								name:(n.name) ? _.escape(n.name) : "",
-								selected:"false"
-							  }
-							);
-						});
-						var catObj = $('#<portlet:namespace />nodeId');
-						catObj.empty();
-						catObj.append(listAll);
-						defer.resolve();	
-			            
-			        })()
-			    }, function(error) {
-			        console.error(error)
-			    });					
-			}
-		);	
-		return defer.promise();
-	}	
-	
-	// Node ID
-	$('#<portlet:namespace />nodeId').on(
-	    'change',
-	    function() {
-	    	<portlet:namespace />pagesUpdate();
-	    }
-	)
-		
-	// Pages update
-	function <portlet:namespace />pagesUpdate() {
-		var defer = $.Deferred();
+					.then(function() {
+						<portlet:namespace />pagesUpdate();
+					});
+		}
 
-		var groupId = $('#<portlet:namespace />groupId').val();
-		var nodeId = $('#<portlet:namespace />nodeId').val();
+		// Group ID
+		document.createElement("<portlet:namespace/>groupId")
+				.addEventListener("change load", function() {
+					//Update thread list
+					<portlet:namespace />nodesUpdate()
+							.then(function() {
+								<portlet:namespace />pagesUpdate();
+							});
+				});
 
-		Liferay.Service(
-			'/wiki.wikipage/get-pages',
-			{
-				groupId: groupId,
-				nodeId: nodeId,
-				head : true,
-				status: <%= String.valueOf(WorkflowConstants.STATUS_APPROVED)  %>,
-				start: -1,
-				end: -1,
-			    "+obc":"com.liferay.wiki.util.comparator.PageTitleComparator" 
-			},
-			function(dataIn) {
-				var data = dataIn;
-				
-			    Liferay.Loader.require("<%=lodashResolver %>", function(_lodash) {
-			        (function() {
-			            var _ = _lodash;
-			            
-						//Load Template
-						var tmpl = _.template($('#<portlet:namespace />page_options').html());
-			            var listAll = tmpl({
-			                resourcePrimKey:"0",
-			                title:"(None)"
-			            });
-						
-						_.map(data,function(n) {
-							listAll += 
-							tmpl(
-							  {
-								resourcePrimKey:(n.resourcePrimKey) ? _.escape(n.resourcePrimKey) : "",
-								title:(n.title) ? _.escape(n.title) : ""
-							  }
-							);
+		function Deferred (){
+			let res,rej,p = new Promise((a,b)=>(res = a, rej = b));
+			p.resolve = res;
+			p.reject = rej;
+			return p;
+		}
+
+		// Nodes update
+		function <portlet:namespace />nodesUpdate() {
+			var defer = Deferred();
+
+			var groupId = document.getElementById('<portlet:namespace />groupId').value;
+			Liferay.Service(
+					'/wiki.wikinode/get-nodes',
+					{
+						groupId: groupId,
+						start: -1,
+						end: -1,
+					},
+					function(dataIn) {
+						var data = dataIn;
+
+						Liferay.Loader.require("<%=lodashResolver %>", function(_lodash) {
+							(function() {
+								var _ = _lodash;
+
+								//Load Template
+								var tmpl = _.template(document.getElementById('<portlet:namespace />node_options').innerHTML);
+								var listAll = tmpl({
+									nodeId:"0",
+									name:"(None)",
+									selected:"true"
+								});
+
+								_.map(data,function(n) {
+									listAll +=
+										tmpl(
+											{
+												nodeId:(n.nodeId) ? _.escape(n.nodeId) : "",
+												name:(n.name) ? _.escape(n.name) : "",
+												selected:"false"
+											}
+										);
+								});
+								var catObj = document.getElementById('<portlet:namespace />nodeId');
+								catObj.empty();
+								catObj.append(listAll);
+								defer.resolve();
+
+							})()
+						}, function(error) {
+							console.error(error)
 						});
-						var catObj = $('#<portlet:namespace />resourcePrimKey');
-						catObj.empty();
-						catObj.append(listAll);
-			        })()
-			    }, function(error) {
-			        console.error(error)
-			    });					
-				defer.resolve();
-			}
-		);	
-		return defer.promise();
-	}
-});
-</aui:script>
+					}
+			);
+			return defer.resolve();
+		}
+
+		// Node ID
+		document.createElement("<portlet:namespace/>nodeId")
+				.addEventListener("change", function() {
+					<portlet:namespace />pagesUpdate();
+				});
+
+		// Pages update
+		function <portlet:namespace />pagesUpdate() {
+			var defer = Deferred();
+
+			var groupId = document.getElementById('<portlet:namespace />groupId').value;
+			var nodeId = document.getElementById('<portlet:namespace />nodeId').value;
+
+			Liferay.Service(
+				'/wiki.wikipage/get-pages',
+				{
+					groupId: groupId,
+					nodeId: nodeId,
+					head : true,
+					status: <%= String.valueOf(WorkflowConstants.STATUS_APPROVED)  %>,
+					start: -1,
+					end: -1,
+					"+obc":"com.liferay.wiki.util.comparator.PageTitleComparator"
+				},
+				function(dataIn) {
+					var data = dataIn;
+
+					Liferay.Loader.require("<%=lodashResolver %>", function(_lodash) {
+						(function() {
+							var _ = _lodash;
+
+							//Load Template
+							var tmpl = _.template(document.getElementById('<portlet:namespace />page_options').innerHTML);
+							var listAll = tmpl({
+								resourcePrimKey:"0",
+								title:"(None)"
+							});
+
+							_.map(data,function(n) {
+								listAll +=
+									tmpl(
+										{
+											resourcePrimKey:(n.resourcePrimKey) ? _.escape(n.resourcePrimKey) : "",
+											title:(n.title) ? _.escape(n.title) : ""
+										}
+									);
+							});
+							var catObj = document.getElementById('<portlet:namespace />resourcePrimKey');
+							catObj.empty();
+							catObj.append(listAll);
+						})()
+					}, function(error) {
+						console.error(error)
+					});
+					defer.resolve();
+				}
+			);
+			return defer.resolve();
+		}
+	});
+</script>
