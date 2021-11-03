@@ -80,7 +80,8 @@ public class CompanyDefaultDummyGenerator extends DummyGenerator<CompanyContext>
             paramContext.isActive());
 
         _portalInstancesLocalService.initializePortalInstance(
-            paramContext.getServletContext(), company.getWebId());
+            company.getCompanyId(), company.getWebId(),
+            paramContext.getServletContext());
 
       } catch (Exception e) {
         //Finish progress
