@@ -85,7 +85,6 @@ dependencies {
 	compile "com.liferay:com.liferay.blogs.api"
 
 	compile "com.liferay:com.liferay.portal.settings.api"
-	compile "com.liferay:com.liferay.portal.settings.lang"
 
 	compile "com.liferay:com.liferay.journal.api"
 	compile "com.liferay:com.liferay.journal.service"

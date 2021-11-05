@@ -53,7 +53,7 @@ public class JournalUtils {
 				locales,
 				LocaleUtil.getDefault());
 
-		return _journalConverter.getContent(ddmStructure, fields);
+		return _journalConverter.getContent(ddmStructure, fields, groupId);
 	}
 	
 	/**
@@ -79,7 +79,7 @@ public class JournalUtils {
 				locales,
 				LocaleUtil.getDefault());
 
-		return _journalConverter.getContent(ddmStructure, fields);
+		return _journalConverter.getContent(ddmStructure, fields, groupId);
 	}
 
 	@Reference

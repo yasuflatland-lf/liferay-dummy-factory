@@ -16,25 +16,28 @@
 			<portlet:actionURL name="<%= LDFPortletKeys.COMPANY %>" var="companyEditURL">
 				<portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_COMPANY %>" />
 				<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
-			</portlet:actionURL>		
-            <div class="entry-title form-group">
-                <h1>Create Companies&nbsp;&nbsp;
-                    <a aria-expanded="false" class="collapse-icon collapsed icon-question-sign" data-toggle="collapse" href="#navPillsCollapse0">
-                    </a>
-                </h1>
-            </div>
-        
-            <div class="collapsed collapse" id="navPillsCollapse0" aria-expanded="false" >
-                <blockquote class="blockquote-info">
-                    <small>Example</small>
-                    <p>if you enter the values <code>3</code> and <code>company</code> the portlet will create three companies: <code>company1</code>, <code>company2</code>, and <code>company3</code>.<p>
-                </blockquote>
-            
-                <p>You must be signed in as an administrator in order to create companies</p>
-                <p>The counter always starts at <code>1</code></p>
+			</portlet:actionURL>
+
+			<div id="<portlet:namespace />Header0" role="tab">
+				<div aria-controls="<portlet:namespace />Collapse0" aria-expanded="false"
+					 class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
+					 href="#<portlet:namespace />Collapse0" role="button">
+					<h1>Create Companies <liferay-ui:icon-help message="usage" /></h1>
+				</div>
+			</div>
+
+			<div aria-expanded="false" aria-labelledby="<portlet:namespace />Header0"
+				 class="collapse panel-collapse" id="<portlet:namespace />Collapse0" role="tabpanel">
+				<blockquote class="blockquote-info">
+					<small>Example</small>
+					<p>if you enter the values <code>3</code> and <code>company</code> the portlet will create three companies: <code>company1</code>, <code>company2</code>, and <code>company3</code>.<p>
+				</blockquote>
+
+				<p>You must be signed in as an administrator in order to create companies</p>
+				<p>The counter always starts at <code>1</code></p>
 				<p>If no site is selected, the default site will be <code>liferay.com</code></p>
 				<p><code>Dummy Contents Create</code> mode will use the dummy data generation. For the configuration of the dummy image resources, Navigate to "Organization" panel, and elipse button is displayed on the top right.</p>
-            </div>
+			</div>
 
 			<%
 			String numberOfCompaniesLabel= "Enter the number of companies you would like to create";
