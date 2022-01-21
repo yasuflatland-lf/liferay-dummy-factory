@@ -2,12 +2,12 @@
   "name": "liferay-dummy-factory",
   "version": "1.0.0",
   "dependencies": {
-    "jquery": "^3.5.1",
-    "lodash": "^4.17.20"
+    "jquery": "^3.6.0",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@liferay/npm-scripts": "^34.0.1",
-    "liferay-npm-bundler": "^2.20.0"
+    "@liferay/npm-scripts": "^47.0.0",
+    "liferay-npm-bundler": "^2.28.2"
   },
   "scripts": {
     "build": "liferay-npm-bundler"
