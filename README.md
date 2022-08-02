@@ -19,19 +19,21 @@ Dummy Factory generates dummy data for debugging use. Please don't use this for 
 * Company
 
 ## Required environment
-* Java 1.8 or above
+* Java 11 or above
+* Liferay 7.4 GA1 (Master / Develop branch)
 * Liferay 7.3 GA1 (Master / Develop branch)
 * Liferay 7.2 (Please see 7.2.x branch)
 * Liferay 7.1 (Please see 7.1.x branch)
 * Liferay 7.0 (Please see 7.0.x branch)
 
 ## Usage
-| Version        | Link           | 
-| ------------- |:------------- | 
-| 7.3      | [https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/master/latest](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/master/latest) | 
-| 7.2      | [https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.2.x/latest](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.2.x/latest) | 
-| 7.1      | [https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.1.x/latest](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.1.x/latest) | 
-| 7.0      | [https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.0.x/latest](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.0.x/latest) | 
+| Version | Link                                                                                                                                                       | 
+|---------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------| 
+| 7.4     | [https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/master/latest](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/master/latest) |
+| 7.3     | [https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.3.x/latest](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.3.x/latest)   | 
+| 7.2     | [https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.2.x/latest](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.2.x/latest)   | 
+| 7.1     | [https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.1.x/latest](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.1.x/latest)   | 
+| 7.0     | [https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.0.x/latest](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.0.x/latest)   | 
 
 1. Download jar file according to the version above and place it int `${liferay-home}/deploy ` 
 1. Start Liferay bundle and login as an administrator.
