@@ -6,8 +6,9 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@liferay/npm-scripts": "^45.0.0",
-    "liferay-npm-bundler": "^2.24.3"
+    "@liferay/npm-scripts": "^47.6.1",
+    "liferay-npm-bundler": "^2.28.3",
+    "liferay-npm-build-support": "^2.28.3"
   },
   "scripts": {
     "build": "liferay-npm-bundler"

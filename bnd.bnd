@@ -1,9 +1,12 @@
 Bundle-Name: Liferay Dummy Factory Portlet
 Bundle-SymbolicName: liferay.dummy.factory
-Bundle-Version: 7.4.0
+Bundle-Version: 7.4.1
 Web-ContextPath: /liferay-dummy-factory
 -dsannotations-options: inherit
 -sources: true
+
+-consumer-policy: ${replacestring;${range;[==,==]};.*,(.*)];$1}
+-provider-policy: ${replacestring;${range;[==,==]};.*,(.*)];$1}
 
 Import-Package:\
 	!org.apache.commons.fileupload.*,\
@@ -11,6 +14,8 @@ Import-Package:\
 	!com.sun.*,\
 	!org.apache.commons.beanutils.*,\
 	!org.apache.commons.codec.*,\
+    !org.apache.tika.*,\
+    !org.apache.tools.*,\
 	!org.checkerframework.*,\
 	!com.linkedin.*,\
 	!de.malkusch.*,\
