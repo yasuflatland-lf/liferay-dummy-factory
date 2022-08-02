@@ -3,302 +3,304 @@ package com.liferay.support.tools.user;
 
 import com.liferay.announcements.kernel.model.AnnouncementsDelivery;
 import com.liferay.announcements.kernel.model.AnnouncementsEntryConstants;
+import com.liferay.announcements.kernel.service.AnnouncementsDeliveryLocalServiceUtil;
+import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portlet.announcements.model.impl.AnnouncementsDeliveryImpl;
 import com.liferay.support.tools.common.ParamContext;
 import com.liferay.support.tools.utils.CommonUtil;
 
+import javax.portlet.ActionRequest;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.portlet.ActionRequest;
-
 public class UserContext extends ParamContext {
 
-	public UserContext(ActionRequest actionRequest)
-		throws PortalException {
-
-		// Fetch data
-		numberOfusers = ParamUtil.getLong(actionRequest, "numberOfusers", 0);
-		baseScreenName =
-			ParamUtil.getString(actionRequest, "baseScreenName", "");
-		baseDomain =
-			ParamUtil.getString(actionRequest, "baseDomain", "liferay.com");
-		male = ParamUtil.getBoolean(actionRequest, "male", true);
-		fakerEnable = ParamUtil.getBoolean(actionRequest, "fakerEnable", false);
-		password = ParamUtil.getString(actionRequest, "password", "test");
-		locale = ParamUtil.getString(actionRequest, "locale", "en");
-		autoUserPreLogin =
-			ParamUtil.getBoolean(actionRequest, "autoUserPreLogin", false);
+    public UserContext(ActionRequest actionRequest)
+        throws PortalException {
+
+        // Fetch data
+        numberOfusers = ParamUtil.getLong(actionRequest, "numberOfusers", 0);
+        baseScreenName =
+            ParamUtil.getString(actionRequest, "baseScreenName", "");
+        baseDomain =
+            ParamUtil.getString(actionRequest, "baseDomain", "liferay.com");
+        male = ParamUtil.getBoolean(actionRequest, "male", true);
+        fakerEnable = ParamUtil.getBoolean(actionRequest, "fakerEnable", false);
+        password = ParamUtil.getString(actionRequest, "password", "test");
+        locale = ParamUtil.getString(actionRequest, "locale", "en");
+        autoUserPreLogin =
+            ParamUtil.getBoolean(actionRequest, "autoUserPreLogin", false);
 
-		// Organization
-		String[] organizations =
-			ParamUtil.getStringValues(actionRequest, "organizations", null);
-		organizationIds = CommonUtil.convertStringToLongArray(organizations);
+        // Organization
+        String[] organizations =
+            ParamUtil.getStringValues(actionRequest, "organizations", null);
+        organizationIds = CommonUtil.convertStringToLongArray(organizations);
 
-		// Sites
-		String[] groups =
-			ParamUtil.getStringValues(actionRequest, "groups", null);
-		groupIds = CommonUtil.convertStringToLongArray(groups);
+        // Sites
+        String[] groups =
+            ParamUtil.getStringValues(actionRequest, "groups", null);
+        groupIds = CommonUtil.convertStringToLongArray(groups);
 
-		// Roles
-		String[] roles =
-			ParamUtil.getStringValues(actionRequest, "roles", null);
-		roleIds = CommonUtil.convertStringToLongArray(roles);
+        // Roles
+        String[] roles =
+            ParamUtil.getStringValues(actionRequest, "roles", null);
+        roleIds = CommonUtil.convertStringToLongArray(roles);
 
-		// User Group
-		String[] userGroups =
-			ParamUtil.getStringValues(actionRequest, "userGroups", null);
-		userGroupIds = CommonUtil.convertStringToLongArray(userGroups);
+        // User Group
+        String[] userGroups =
+            ParamUtil.getStringValues(actionRequest, "userGroups", null);
+        userGroupIds = CommonUtil.convertStringToLongArray(userGroups);
 
-		// Announcements Deliveries
-		announcementsDeliveries = getAnnouncementsDeliveries(actionRequest);
+        // Announcements Deliveries
+        announcementsDeliveries = getAnnouncementsDeliveries(actionRequest);
 
-		// Site Templates for My Profile and My Dashboard
-		publicLayoutSetPrototypeId =
-			ParamUtil.getLong(actionRequest, "publicLayoutSetPrototypeId");
+        // Site Templates for My Profile and My Dashboard
+        publicLayoutSetPrototypeId =
+            ParamUtil.getLong(actionRequest, "publicLayoutSetPrototypeId");
 
-		setPublicLayoutSetPrototypeLinkEnabled(
-			(0 == publicLayoutSetPrototypeId) ? false : true);
+        setPublicLayoutSetPrototypeLinkEnabled(
+            (0 == publicLayoutSetPrototypeId) ? false : true);
 
-		privateLayoutSetPrototypeId =
-			ParamUtil.getLong(actionRequest, "privateLayoutSetPrototypeId");
+        privateLayoutSetPrototypeId =
+            ParamUtil.getLong(actionRequest, "privateLayoutSetPrototypeId");
 
-		setPrivateLayoutSetPrototypeLinkEnabled(
-			(0 == privateLayoutSetPrototypeId) ? false : true);
+        setPrivateLayoutSetPrototypeLinkEnabled(
+            (0 == privateLayoutSetPrototypeId) ? false : true);
 
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			Group.class.getName(), actionRequest);
-		setServiceContext(serviceContext);
-	}
+        ServiceContext serviceContext = ServiceContextFactory.getInstance(
+            Group.class.getName(), actionRequest);
+        setServiceContext(serviceContext);
+    }
 
-	/**
-	 * Get Announcements Deliveries
-	 * 
-	 * @param actionRequest
-	 * @return List of AnnouncementsDelivery
-	 */
-	protected List<AnnouncementsDelivery> getAnnouncementsDeliveries(
-		ActionRequest actionRequest) {
+    /**
+     * Get Announcements Deliveries
+     *
+     * @param actionRequest
+     * @return List of AnnouncementsDelivery
+     */
+    protected List<AnnouncementsDelivery> getAnnouncementsDeliveries(
+        ActionRequest actionRequest) {
 
-		List<AnnouncementsDelivery> announcementsDeliveries = new ArrayList<>();
+        List<AnnouncementsDelivery> announcementsDeliveries = new ArrayList<>();
 
-		for (String type : AnnouncementsEntryConstants.TYPES) {
-			boolean email = ParamUtil.getBoolean(
-				actionRequest, "announcementsType" + type + "Email");
-			boolean sms = ParamUtil.getBoolean(
-				actionRequest, "announcementsType" + type + "Sms");
+        for (String type : AnnouncementsEntryConstants.TYPES) {
 
-			AnnouncementsDelivery announcementsDelivery =
-				new AnnouncementsDeliveryImpl();
+            boolean email = ParamUtil.getBoolean(
+                actionRequest, "announcementsType" + type + "Email");
+            boolean sms = ParamUtil.getBoolean(
+                actionRequest, "announcementsType" + type + "Sms");
 
-			announcementsDelivery.setType(type);
-			announcementsDelivery.setEmail(email);
-			announcementsDelivery.setSms(sms);
+            long deliveryId = CounterLocalServiceUtil.increment();
+            AnnouncementsDelivery announcementsDelivery =
+                AnnouncementsDeliveryLocalServiceUtil.createAnnouncementsDelivery(deliveryId);
 
-			announcementsDeliveries.add(announcementsDelivery);
-		}
+            announcementsDelivery.setType(type);
+            announcementsDelivery.setEmail(email);
+            announcementsDelivery.setSms(sms);
 
-		return announcementsDeliveries;
-	}
+            announcementsDeliveries.add(announcementsDelivery);
+        }
 
-	public long getNumberOfusers() {
+        return announcementsDeliveries;
+    }
 
-		return numberOfusers;
-	}
+    public long getNumberOfusers() {
 
-	public void setNumberOfusers(long numberOfusers) {
+        return numberOfusers;
+    }
 
-		this.numberOfusers = numberOfusers;
-	}
+    public void setNumberOfusers(long numberOfusers) {
 
-	public String getBaseScreenName() {
+        this.numberOfusers = numberOfusers;
+    }
 
-		return baseScreenName;
-	}
+    public String getBaseScreenName() {
 
-	public void setBaseScreenName(String baseScreenName) {
+        return baseScreenName;
+    }
 
-		this.baseScreenName = baseScreenName;
-	}
+    public void setBaseScreenName(String baseScreenName) {
 
-	public String getBaseDomain() {
+        this.baseScreenName = baseScreenName;
+    }
 
-		return baseDomain;
-	}
+    public String getBaseDomain() {
 
-	public void setBaseDomain(String baseDomain) {
+        return baseDomain;
+    }
 
-		this.baseDomain = baseDomain;
-	}
+    public void setBaseDomain(String baseDomain) {
 
-	public long[] getOrganizationIds() {
+        this.baseDomain = baseDomain;
+    }
 
-		return organizationIds;
-	}
+    public long[] getOrganizationIds() {
 
-	public void setOrganizationIds(long[] organizationIds) {
+        return organizationIds;
+    }
 
-		this.organizationIds = organizationIds;
-	}
+    public void setOrganizationIds(long[] organizationIds) {
 
-	public long[] getGroupIds() {
+        this.organizationIds = organizationIds;
+    }
 
-		return groupIds;
-	}
+    public long[] getGroupIds() {
 
-	public void setGroupIds(long[] groupIds) {
+        return groupIds;
+    }
 
-		this.groupIds = groupIds;
-	}
+    public void setGroupIds(long[] groupIds) {
 
-	public long[] getRoleIds() {
+        this.groupIds = groupIds;
+    }
 
-		return roleIds;
-	}
+    public long[] getRoleIds() {
 
-	public void setRoleIds(long[] roleIds) {
+        return roleIds;
+    }
 
-		this.roleIds = roleIds;
-	}
+    public void setRoleIds(long[] roleIds) {
 
-	public long[] getUserGroupIds() {
+        this.roleIds = roleIds;
+    }
 
-		return userGroupIds;
-	}
+    public long[] getUserGroupIds() {
 
-	public void setUserGroupIds(long[] userGroupIds) {
+        return userGroupIds;
+    }
 
-		this.userGroupIds = userGroupIds;
-	}
+    public void setUserGroupIds(long[] userGroupIds) {
 
-	public boolean isMale() {
+        this.userGroupIds = userGroupIds;
+    }
 
-		return male;
-	}
+    public boolean isMale() {
 
-	public void setMale(boolean male) {
+        return male;
+    }
 
-		this.male = male;
-	}
+    public void setMale(boolean male) {
 
-	public boolean isFakerEnable() {
+        this.male = male;
+    }
 
-		return fakerEnable;
-	}
+    public boolean isFakerEnable() {
 
-	public void setFakerEnable(boolean fakerEnable) {
+        return fakerEnable;
+    }
 
-		this.fakerEnable = fakerEnable;
-	}
+    public void setFakerEnable(boolean fakerEnable) {
 
-	public String getPassword() {
+        this.fakerEnable = fakerEnable;
+    }
 
-		return password;
-	}
+    public String getPassword() {
 
-	public void setPassword(String password) {
+        return password;
+    }
 
-		this.password = password;
-	}
+    public void setPassword(String password) {
 
-	public String getLocale() {
+        this.password = password;
+    }
 
-		return locale;
-	}
+    public String getLocale() {
 
-	public void setLocale(String locale) {
+        return locale;
+    }
 
-		this.locale = locale;
-	}
+    public void setLocale(String locale) {
 
-	public boolean isAutoUserPreLogin() {
+        this.locale = locale;
+    }
 
-		return autoUserPreLogin;
-	}
+    public boolean isAutoUserPreLogin() {
 
-	public void setAutoUserPreLogin(boolean autoUserPreLogin) {
+        return autoUserPreLogin;
+    }
 
-		this.autoUserPreLogin = autoUserPreLogin;
-	}
+    public void setAutoUserPreLogin(boolean autoUserPreLogin) {
 
-	public List<AnnouncementsDelivery> getAnnouncementsDeliveries() {
+        this.autoUserPreLogin = autoUserPreLogin;
+    }
 
-		return announcementsDeliveries;
-	}
+    public List<AnnouncementsDelivery> getAnnouncementsDeliveries() {
 
-	public void setAnnouncementsDeliveries(
-		List<AnnouncementsDelivery> announcementsDeliveries) {
+        return announcementsDeliveries;
+    }
 
-		this.announcementsDeliveries = announcementsDeliveries;
-	}
+    public void setAnnouncementsDeliveries(
+        List<AnnouncementsDelivery> announcementsDeliveries) {
 
-	public long getPublicLayoutSetPrototypeId() {
+        this.announcementsDeliveries = announcementsDeliveries;
+    }
 
-		return publicLayoutSetPrototypeId;
-	}
+    public long getPublicLayoutSetPrototypeId() {
 
-	public void setPublicLayoutSetPrototypeId(long publicLayoutSetPrototypeId) {
+        return publicLayoutSetPrototypeId;
+    }
 
-		this.publicLayoutSetPrototypeId = publicLayoutSetPrototypeId;
-	}
+    public void setPublicLayoutSetPrototypeId(long publicLayoutSetPrototypeId) {
 
-	public long getPrivateLayoutSetPrototypeId() {
+        this.publicLayoutSetPrototypeId = publicLayoutSetPrototypeId;
+    }
 
-		return privateLayoutSetPrototypeId;
-	}
+    public long getPrivateLayoutSetPrototypeId() {
 
-	public void setPrivateLayoutSetPrototypeId(
-		long privateLayoutSetPrototypeId) {
+        return privateLayoutSetPrototypeId;
+    }
 
-		this.privateLayoutSetPrototypeId = privateLayoutSetPrototypeId;
-	}
+    public void setPrivateLayoutSetPrototypeId(
+        long privateLayoutSetPrototypeId) {
 
-	public boolean isPublicLayoutSetPrototypeLinkEnabled() {
+        this.privateLayoutSetPrototypeId = privateLayoutSetPrototypeId;
+    }
 
-		return publicLayoutSetPrototypeLinkEnabled;
-	}
+    public boolean isPublicLayoutSetPrototypeLinkEnabled() {
 
-	public void setPublicLayoutSetPrototypeLinkEnabled(
-		boolean publicLayoutSetPrototypeLinkEnabled) {
+        return publicLayoutSetPrototypeLinkEnabled;
+    }
 
-		this.publicLayoutSetPrototypeLinkEnabled =
-			publicLayoutSetPrototypeLinkEnabled;
-	}
+    public void setPublicLayoutSetPrototypeLinkEnabled(
+        boolean publicLayoutSetPrototypeLinkEnabled) {
 
-	public boolean isPrivateLayoutSetPrototypeLinkEnabled() {
+        this.publicLayoutSetPrototypeLinkEnabled =
+            publicLayoutSetPrototypeLinkEnabled;
+    }
 
-		return privateLayoutSetPrototypeLinkEnabled;
-	}
+    public boolean isPrivateLayoutSetPrototypeLinkEnabled() {
 
-	public void setPrivateLayoutSetPrototypeLinkEnabled(
-		boolean privateLayoutSetPrototypeLinkEnabled) {
+        return privateLayoutSetPrototypeLinkEnabled;
+    }
 
-		this.privateLayoutSetPrototypeLinkEnabled =
-			privateLayoutSetPrototypeLinkEnabled;
-	}
+    public void setPrivateLayoutSetPrototypeLinkEnabled(
+        boolean privateLayoutSetPrototypeLinkEnabled) {
 
-	private long numberOfusers = 0;
-	private String baseScreenName = "";
-	private String baseDomain = "";
-	private long[] organizationIds = null;
-	private long[] groupIds = null;
-	private long[] roleIds = null;
-	private long[] userGroupIds = null;
-	private boolean male;
-	private boolean fakerEnable;
-	private String password;
-	private String locale;
-	private boolean autoUserPreLogin;
-	private List<AnnouncementsDelivery> announcementsDeliveries =
-		new ArrayList<>();
-	private long publicLayoutSetPrototypeId;
-	private long privateLayoutSetPrototypeId;
-	private boolean publicLayoutSetPrototypeLinkEnabled;
-	private boolean privateLayoutSetPrototypeLinkEnabled;
+        this.privateLayoutSetPrototypeLinkEnabled =
+            privateLayoutSetPrototypeLinkEnabled;
+    }
+
+    private long numberOfusers = 0;
+    private String baseScreenName = "";
+    private String baseDomain = "";
+    private long[] organizationIds = null;
+    private long[] groupIds = null;
+    private long[] roleIds = null;
+    private long[] userGroupIds = null;
+    private boolean male;
+    private boolean fakerEnable;
+    private String password;
+    private String locale;
+    private boolean autoUserPreLogin;
+    private List<AnnouncementsDelivery> announcementsDeliveries =
+        new ArrayList<>();
+    private long publicLayoutSetPrototypeId;
+    private long privateLayoutSetPrototypeId;
+    private boolean publicLayoutSetPrototypeLinkEnabled;
+    private boolean privateLayoutSetPrototypeLinkEnabled;
 
 }

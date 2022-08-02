@@ -1,4 +1,10 @@
-<%--
+<%@ page import="com.liferay.announcements.kernel.model.AnnouncementsDelivery" %>
+<%@ page import="com.liferay.announcements.kernel.model.AnnouncementsEntryConstants" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="com.liferay.announcements.kernel.service.AnnouncementsDeliveryLocalServiceUtil" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
+<%@ page import="com.liferay.counter.kernel.service.CounterLocalServiceUtil" %>
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -18,7 +24,9 @@
 List<AnnouncementsDelivery> deliveries = new ArrayList<AnnouncementsDelivery>(AnnouncementsEntryConstants.TYPES.length);
 
 for (String type : AnnouncementsEntryConstants.TYPES) {
-	AnnouncementsDelivery delivery = new AnnouncementsDeliveryImpl();
+	long deliveryId = CounterLocalServiceUtil.increment();
+	AnnouncementsDelivery delivery =
+			AnnouncementsDeliveryLocalServiceUtil.createAnnouncementsDelivery(deliveryId);
 
 	delivery.setType(type);
 	delivery.setWebsite(true);

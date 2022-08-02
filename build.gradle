@@ -4,144 +4,101 @@ apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'jacoco'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 //Need for Windows
 def defaultEncoding = 'UTF-8'
 
 repositories {
-	mavenCentral()
-	jcenter()
-	maven {
-		url "http://repository.jboss.org/nexus/content/groups/public-jboss" // JBoss
-		url "http://repository.apache.org/content/groups/public"            // Apache
-		url "http://repository.springsource.com/maven/bundles/release"      // SpringSource
-		url "http://repository.codehaus.org"                                // Codehaus
-		url "http://download.java.net/maven/2"                              // Java.NET
-		url "http://download.java.net/maven/glassfish"                     	// Glassfish
-		url "http://m2repo.spockframework.org/snapshots"                    // Spock Snapshot
-		url "http://repository.sonatype.org/content/groups/public"
-		url "https://mvnrepository.com/artifact/com.sun/tools"
-		url 'https://jitpack.io'
-	}
+    mavenCentral()
+    jcenter()
+    maven {
+        url "http://repository.jboss.org/nexus/content/groups/public-jboss"
+    }
+    maven { url "http://repository.apache.org/content/groups/public" }
+    maven { url "http://repository.springsource.com/maven/bundles/release" }
+    maven { url "http://repository.codehaus.org" }
+    maven { url "http://download.java.net/maven/2" }
+    maven { url "http://download.java.net/maven/glassfish" }
+    maven { url "http://m2repo.spockframework.org/snapshots" }
+    maven { url "http://repository.sonatype.org/content/groups/public" }
+    maven { url "https://mvnrepository.com/artifact/com.sun/tools" }
+    maven { url 'https://jitpack.io' }
 }
 
 buildscript {
-	repositories {
-		mavenCentral()
-	}
+    repositories {
+        mavenCentral()
+    }
 
-	dependencies {
-		classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:latest.release'
-	}
+    dependencies {
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:latest.release'
+    }
 }
 
 apply plugin: 'com.github.kt3k.coveralls'
 
 dependencies {
-	compile 'biz.aQute.bnd:biz.aQute.bndlib:3.5.0'
-	compile 'com.google.errorprone:error_prone_annotations:2.3.1'
-	compile 'commons-digester:commons-digester:2.1'
-	compile "com.google.guava:guava:27.1-jre"
-	compile "commons-io:commons-io:2.5"
-	compile "commons-validator:commons-validator:1.6"
-	compile "org.apache.commons:commons-lang3:3.9"
-	compile "com.github.mifmif:generex:1.0.2"
-	compile "dk.brics.automaton:automaton:1.11-8"
-	compile "com.github.javafaker:javafaker:1.0.2"
-	compile("com.goikosoft.crawler4j:crawler4j:4.5.10") {
-		exclude module: 'tika-bundle'
-		exclude module: 'tika-core'
-		exclude module: 'tika-parsers'
-	}
+    compile 'com.google.errorprone:error_prone_annotations:2.3.1'
+    compile 'commons-digester:commons-digester:2.1'
+    compile "com.google.guava:guava:27.1-jre"
+    compile "commons-io:commons-io:2.5"
+    compile "commons-validator:commons-validator:1.6"
+    compile "org.apache.commons:commons-lang3:3.9"
+    compile "com.github.mifmif:generex:1.0.2"
+    compile "dk.brics.automaton:automaton:1.11-8"
+    compile "com.github.javafaker:javafaker:1.0.2"
+    compile("com.goikosoft.crawler4j:crawler4j:4.5.10") {
+        exclude module: 'tika-bundle'
+        exclude module: 'tika-core'
+        exclude module: 'tika-parsers'
+    }
 
-	compile group: 'com.sleepycat', name: 'je', version: '18.3.12'
-	compile "io.reactivex.rxjava2:rxjava:2.2.+"
-	compile group: 'org.apache.httpcomponents', name: 'httpcore-osgi', version: '4.4.+'
-	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.+'
-	compile group: 'org.reactivestreams', name: 'reactive-streams', version: '1.0.+'
-	compile group: "commons-fileupload", name: "commons-fileupload", version: "1.3.3"
-	compile group: "org.apache.felix", name: "org.apache.felix.gogo.runtime", version: "1.1.+"
+    compile group: 'com.sleepycat', name: 'je', version: '18.3.12'
+    compile "io.reactivex.rxjava2:rxjava:2.2.+"
+    compile group: 'org.apache.httpcomponents', name: 'httpcore-osgi', version: '4.4.+'
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.+'
+    compile group: 'org.reactivestreams', name: 'reactive-streams', version: '1.0.+'
+    compile group: "commons-fileupload", name: "commons-fileupload", version: "1.3.3"
+    compile group: "org.apache.felix", name: "org.apache.felix.gogo.runtime", version: "1.1.+"
 
-	compile "com.liferay:com.liferay.application.list.api"
-	compile "com.liferay:com.liferay.frontend.taglib"
-	compile "com.liferay:com.liferay.frontend.taglib.clay"
-	compile "com.liferay:com.liferay.frontend.taglib.util"
-	compile "com.liferay:com.liferay.item.selector.api"
-	compile "com.liferay:com.liferay.item.selector.criteria.api"
-	compile "com.liferay:com.liferay.item.selector.taglib"
-	compile "com.liferay:com.liferay.trash.taglib"
-	compile "com.liferay:com.liferay.portal.spring.extender:2.1.+"
-	compile "com.liferay:com.liferay.portal.instances.api"
-	
-	compile "com.liferay:com.liferay.frontend.js.loader.modules.extender.api"
+    compileOnly group: "com.liferay.portal", name: "release.dxp.api"
 
-	compile "com.liferay.portal:com.liferay.portal.kernel"
-	compile "com.liferay.portal:com.liferay.portal.impl"
-	compile "com.liferay.portal:com.liferay.util.taglib"
-	compile "com.liferay:com.liferay.message.boards.api"
-	compile "com.liferay:com.liferay.message.boards.service"
-	compile "com.liferay:com.liferay.blogs.api"
+    testCompile 'org.codehaus.groovy:groovy-all:2.5.+'
+    testCompile group: 'cglib', name: 'cglib-nodep', version: 'latest.integration'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.apache.tika', name: 'tika-core', version: '1.22'
+    testCompile group: 'org.apache.tika', name: 'tika-parsers', version: '1.22'
 
-	compile "com.liferay:com.liferay.portal.settings.api"
-
-	compile "com.liferay:com.liferay.journal.api"
-	compile "com.liferay:com.liferay.journal.service"
-	compile "com.liferay:com.liferay.wiki.api"
-	compile "com.liferay:com.liferay.wiki.service"
-	compile "com.liferay:com.liferay.wiki.web"
-
-	compile "com.liferay:com.liferay.petra.string"
-	compile "com.liferay:com.liferay.petra.function"
-
-	compile "com.liferay:com.liferay.dynamic.data.lists.service"
-	compile "com.liferay:com.liferay.dynamic.data.lists.api"
-	compile "com.liferay:com.liferay.dynamic.data.mapping.api"
-	compile "com.liferay:com.liferay.dynamic.data.mapping.service"
-	compile "com.liferay:com.liferay.dynamic.data.mapping.taglib"
-	compile "com.liferay:com.liferay.dynamic.data.mapping.io:4.0.+"
-	compile "com.liferay:com.liferay.dynamic.data.mapping.validator"
-	compile "com.liferay:com.liferay.portal.configuration.metatype:2.0.+"
-	compile "com.liferay:com.liferay.portal.background.task.api"
-	compile "com.liferay:com.liferay.document.library.api"
-
-	compile group: "javax.portlet", name: "portlet-api", version: "3.0.0"
-	compile group: "javax.servlet", name: "javax.servlet-api", version: "3.0.1"
-	compile group: "jstl", name: "jstl", version: "1.2"
-	compile group: "org.osgi", name: "org.osgi.service.component.annotations", version: "1.3.0"
-	compile group: "org.osgi", name: "osgi.core", version: "6.0.0"
-
-	testCompile 'org.codehaus.groovy:groovy-all:2.5.+'
-	testCompile group: 'cglib', name: 'cglib-nodep', version:'latest.integration'
-	testCompile group: 'junit', name: 'junit', version:'4.12'
-	testCompile group: 'org.apache.tika', name: 'tika-core', version: '1.22'
-	testCompile group: 'org.apache.tika', name: 'tika-parsers', version: '1.22'
-
-	testCompile group: 'org.hamcrest', name: 'hamcrest-core', version:'latest.integration'
-	testCompile group: 'org.objenesis', name: 'objenesis', version:'latest.integration'
-	testCompile group: 'org.mockito', name: 'mockito-core', version: '2.23.0'
-	testCompile group: 'org.powermock', name: 'powermock-core', version: '1.7.4'
-	testCompile group: 'org.powermock', name: 'powermock-classloading-xstream', version:'1.7.4'
-	testCompile group: 'org.powermock', name: 'powermock-module-junit4', version:'1.7.4'
-	testCompile group: 'org.powermock', name: 'powermock-module-junit4-common', version:'1.7.4'
-	testCompile group: 'org.powermock', name: 'powermock-module-junit4-rule', version:'1.7.4'
-	testCompile group: 'org.powermock', name: 'powermock-api-mockito', version: '1.7.4'
-	testCompile group: 'org.powermock', name: 'powermock-api-mockito-common', version: '1.7.4'
-	testCompile('org.spockframework:spock-core:1.2-groovy-2.5') {
-		exclude module: 'groovy-all'
-	}
+    testCompile group: 'org.hamcrest', name: 'hamcrest-core', version: 'latest.integration'
+    testCompile group: 'org.objenesis', name: 'objenesis', version: 'latest.integration'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.23.0'
+    testCompile group: 'org.powermock', name: 'powermock-core', version: '1.7.4'
+    testCompile group: 'org.powermock', name: 'powermock-classloading-xstream', version: '1.7.4'
+    testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '1.7.4'
+    testCompile group: 'org.powermock', name: 'powermock-module-junit4-common', version: '1.7.4'
+    testCompile group: 'org.powermock', name: 'powermock-module-junit4-rule', version: '1.7.4'
+    testCompile group: 'org.powermock', name: 'powermock-api-mockito', version: '1.7.4'
+    testCompile group: 'org.powermock', name: 'powermock-api-mockito-common', version: '1.7.4'
+    testCompile('org.spockframework:spock-core:1.2-groovy-2.5') {
+        exclude module: 'groovy-all'
+    }
 }
 
 test {
-	testLogging.showStandardStreams = true
+    testLogging.showStandardStreams = true
 }
 
 jacocoTestReport {
-	reports {
-		xml.enabled true
-		html.enabled = true
-	}
+    reports {
+        xml.enabled true
+        html.enabled = true
+    }
+}
+
+task prepareKotlinBuildScriptModel {
+
 }
 
 check.dependsOn jacocoTestReport
