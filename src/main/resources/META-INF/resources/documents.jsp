@@ -1,12 +1,11 @@
 <%@ include file="/init.jsp" %>
 
 <clay:navigation-bar
-        inverted="<%= true %>"
+        inverted="<%= false %>"
         navigationItems='<%= dummyFactoryDisplayContext.getNavigationBarItems("Documents") %>'
 />
 
-<div class="container-fluid-1280">
-
+<div class="container-fluid container-fluid-max-xl container-view">
 
     <aui:fieldset-group markupView="lexicon">
         <aui:fieldset>
