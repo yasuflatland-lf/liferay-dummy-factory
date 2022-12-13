@@ -10,14 +10,14 @@
 
 	<aui:fieldset-group markupView="lexicon">
 		<aui:fieldset>
-		
+
 			<liferay-ui:success key="success" message="Documents created successfully" />
 			<%@ include file="/command_select.jspf"%>
-		
+
 			<portlet:actionURL name="<%= LDFPortletKeys.DOCUMENTS %>" var="documentEditURL">
 				<portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_DOCUMENTS %>" />
 				<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
-			</portlet:actionURL>		
+			</portlet:actionURL>
             <div class="entry-title form-group">
                 <h1>Create Documents&nbsp;&nbsp;
                     <a aria-expanded="false" class="collapse-icon collapsed icon-question-sign" data-toggle="collapse" href="#navPillsCollapse0">
@@ -43,19 +43,31 @@
 			String numberOfDocumentsLabel= "Enter the number of documents you would like to create";
 			String baseDocumentTitleLabel= "Enter the base document title (i.e. doc, newDoc, testDoc)";
 			String baseDocumentDescriptionLabel = "Enter the base document description";
+			String baseDocumentFieldsLabel = "Enter the Document Metadata fields if a Document Type other than Basic Web Content is selected in a semicolon(;) separated list. If desired, each field can have specific values to be picked at random by separate the options via a \"|\" separated sublist";
 			String defaultOption = "(None)";
 			String groupIdLabel = "Select a site to assign the documents to";
+			String documentTypeLabel = "Select a document type (please verify if it accessible to selected site)";
 			String dlFolderIdLabel = "Select a folder where the document is created";
 			String uploadFieldText = "Upload files here to be used for generating dummy documents. Multiple files uploaded will be randomly used with the original extention ";
 			List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 			final String groupName = GroupConstants.GUEST;
 			final long companyId = PortalUtil.getDefaultCompanyId();
 			final long guestGroupId = GroupLocalServiceUtil.getGroup(companyId, groupName).getGroupId();
+
+			List<DLFileEntryType> dlFileEntryTypes = DLFileEntryTypeLocalServiceUtil.getDLFileEntryTypes(-1, -1);
+			DLFileEntryType defaultDLFileEntryType = null;
+			long defaultFileTypeId = 0;
+			for (DLFileEntryType type : dlFileEntryTypes) {
+				if ("BASIC-DOCUMENT".equals(type.getFileEntryTypeKey())) {
+					defaultDLFileEntryType = type;
+					defaultFileTypeId = type.getDataDefinitionId();
+				}
+			}
 			%>
 
 			<aui:form action="<%= documentEditURL %>" method="post" name="fm"  onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
 				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
-			
+
 				<aui:input name="numberOfDocuments" label="<%= numberOfDocumentsLabel %>" >
 					<aui:validator name="digits" />
 					<aui:validator name="min">1</aui:validator>
@@ -71,6 +83,18 @@
 						if (group.isSite() && !group.getDescriptiveName().equals("Control Panel")) {
 					%>
 							<aui:option label="<%= group.getDescriptiveName() %>" value="<%= group.getGroupId() %>"/>
+					<%
+						}
+					}
+					%>
+				</aui:select>
+				<aui:select name="fileEntryTypeId" label="<%= documentTypeLabel %>"  >
+					<aui:option label="<%= defaultDLFileEntryType.getName("en_US") %>" value="<%= defaultFileTypeId %>" selected="<%= true %>" />
+					<%
+					for (DLFileEntryType type : dlFileEntryTypes) {
+						if (defaultDLFileEntryType != type) {
+					%>
+						<aui:option label="<%= type.getName("en_US") %>" value="<%= type.getFileEntryTypeId() %>"/>
 					<%
 						}
 					}
@@ -158,6 +182,7 @@
 							</aui:row>
 
 							<aui:input name="baseDocumentDescription" label="<%= baseDocumentDescriptionLabel %>" cssClass="lfr-textarea-container" type="textarea" wrap="soft" />
+							<aui:input name="baseDocumentFields" label="<%= baseDocumentFieldsLabel %>" cssClass="lfr-textarea-container" type="textarea" wrap="soft" />
  						</aui:fieldset>
 					</div>
 				</div>
@@ -170,7 +195,7 @@
 // Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
 String progressSessionKey = ProgressTracker.PERCENT + progressId;
 request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
-%>			
+%>
 			<liferay-ui:upload-progress
 				id="<%= progressId %>"
 				message="creating..."
@@ -209,19 +234,19 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 			  },
 			  function(dataIn) {
 			    var data = dataIn;
-			    
+
                 //Load Template
 			    Liferay.Loader.require("<%=lodashResolver %>", function(_lodash) {
 			        (function() {
 			            var _ = _lodash;
-			            
+
 		                var tmpl = _.template($('#<portlet:namespace />journal_folder_options').html());
 		                var listAll = tmpl({
 		                    folderId:"<%= String.valueOf(DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) %>",
 		                    name:"(None)",
 		                    selected:"true"
 		                });
-		
+
 		                _.map(data,function(n) {
 		                    listAll +=
 		                    tmpl(
@@ -235,7 +260,7 @@ request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
 		                var catObj = $('#<portlet:namespace />folderId');
 		                catObj.empty();
 		                catObj.append(listAll);
-			            
+
 			        })()
 			    }, function(error) {
 			        console.error(error)

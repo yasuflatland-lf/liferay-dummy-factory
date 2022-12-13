@@ -23,6 +23,7 @@
 <%@ page import="com.liferay.portal.kernel.language.LanguageUtil" %>
 <%@ page import="com.liferay.portal.kernel.workflow.*" %>
 <%@ page import="com.liferay.document.library.kernel.model.*" %>
+<%@ page import="com.liferay.document.library.kernel.service.*" %>
 <%@ page import="com.liferay.document.library.configuration.*" %>
 
 <%@ page import="com.liferay.taglib.search.ResultRow" %>
