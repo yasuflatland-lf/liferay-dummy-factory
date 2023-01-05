@@ -1,5 +1,6 @@
 package com.liferay.support.tools.document.library;
 
+import com.google.common.collect.Lists;
 import com.liferay.document.library.kernel.exception.DuplicateFileEntryException;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryType;
@@ -11,6 +12,9 @@ import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
 import com.liferay.document.library.kernel.service.DLFolderLocalService;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
 import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
+import com.liferay.dynamic.data.mapping.model.DDMFormField;
+import com.liferay.dynamic.data.mapping.model.DDMFormFieldOptions;
+import com.liferay.dynamic.data.mapping.model.LocalizedValue;
 import com.liferay.dynamic.data.mapping.model.Value;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
@@ -38,10 +42,12 @@ import com.liferay.support.tools.utils.ProgressManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.portlet.ActionRequest;
@@ -191,13 +197,34 @@ public class DLDefaultDummyGenerator extends DummyGenerator<DLContext> {
 
 			if (!baseDocumentFieldOptions.isEmpty()) {
 				int index = 0;
+				int size = baseDocumentFieldOptions.size();
 
 				for (DDMFormFieldValue ddmFormFieldValue : ddmFormValues.getDDMFormFieldValues()) {
 					Map<Locale, String> values = ddmFormFieldValue.getValue().getValues();
-					for (Locale key : values.keySet()) {
-						List<String> options = baseDocumentFieldOptions.get(index);
-						int len = options.size();
-						values.replace(key, options.get(RandomUtil.nextInt(len)));
+					if (index < size) {
+						for (Locale key : values.keySet()) {
+							List<String> options = baseDocumentFieldOptions.get(index);
+							String value = options.get(RandomUtil.nextInt(options.size())).trim();
+							DDMFormField ddmFormField = ddmFormFieldValue.getDDMFormField();
+							if ("select".equals(ddmFormField.getType())) {
+								DDMFormFieldOptions fieldOptions = ddmFormField.getDDMFormFieldOptions();
+								Map<String, LocalizedValue> fieldOptionsMap = fieldOptions.getOptions();
+								if (fieldOptionsMap.size() > 0) {
+									List<String> entries = fieldOptionsMap.values().stream().map(localizedValue -> localizedValue.getString(fieldOptions.getDefaultLocale())).collect(Collectors.toList());
+									if ("?".equals(value)) {
+										value = entries.get(RandomUtil.nextInt(entries.size()));
+									} else {
+										if (!entries.contains(value)) {
+											_log.error("** Unable to use the value: " + value);
+											_log.error("** Valid values: " + Arrays.toString(entries.toArray()));
+										}
+									}
+								}
+							}
+							values.replace(key, value);
+						}
+					} else {
+						break;
 					}
 					index++;
 				}

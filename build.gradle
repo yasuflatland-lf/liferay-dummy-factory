@@ -1,11 +1,19 @@
-apply plugin: 'java'
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+
+	dependencies {
+		classpath group: "org.kt3k.gradle.plugin", name: "coveralls-gradle-plugin", version: "latest.release"
+	}
+}
+
+apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'eclipse'
 apply plugin: 'groovy'
 apply plugin: 'idea'
-apply plugin: 'eclipse'
 apply plugin: 'jacoco'
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+apply plugin: 'java'
 
 //Need for Windows
 def defaultEncoding = 'UTF-8'
@@ -15,29 +23,17 @@ repositories {
 	jcenter()
 	maven {
 		url "http://repository.jboss.org/nexus/content/groups/public-jboss" // JBoss
-		url "http://repository.apache.org/content/groups/public"            // Apache
-		url "http://repository.springsource.com/maven/bundles/release"      // SpringSource
-		url "http://repository.codehaus.org"                                // Codehaus
-		url "http://download.java.net/maven/2"                              // Java.NET
-		url "http://download.java.net/maven/glassfish"                     	// Glassfish
-		url "http://m2repo.spockframework.org/snapshots"                    // Spock Snapshot
+		url "http://repository.apache.org/content/groups/public" // Apache
+		url "http://repository.springsource.com/maven/bundles/release" // SpringSource
+		url "http://repository.codehaus.org" // Codehaus
+		url "http://download.java.net/maven/2" // Java.NET
+		url "http://download.java.net/maven/glassfish" 	// Glassfish
+		url "http://m2repo.spockframework.org/snapshots" // Spock Snapshot
 		url "http://repository.sonatype.org/content/groups/public"
 		url "https://mvnrepository.com/artifact/com.sun/tools"
 		url 'https://jitpack.io'
 	}
 }
-
-buildscript {
-	repositories {
-		mavenCentral()
-	}
-
-	dependencies {
-		classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:latest.release'
-	}
-}
-
-apply plugin: 'com.github.kt3k.coveralls'
 
 dependencies {
 	compile 'biz.aQute.bnd:biz.aQute.bndlib:3.5.0'
@@ -74,7 +70,7 @@ dependencies {
 	compile "com.liferay:com.liferay.trash.taglib"
 	compile "com.liferay:com.liferay.portal.spring.extender:2.1.+"
 	compile "com.liferay:com.liferay.portal.instances.api"
-	
+
 	compile "com.liferay:com.liferay.frontend.js.loader.modules.extender.api"
 
 	compile "com.liferay.portal:com.liferay.portal.kernel"
@@ -146,3 +142,14 @@ jacocoTestReport {
 }
 
 check.dependsOn jacocoTestReport
+
+task deployToDocker(type:Exec) {
+	//	workingDir "${buildDir}/libs"
+	//	workingDir "${buildDir}/libs"
+	//	commandLine "docker","cp","${jar.archiveFileName}","dxp-1:/opt/liferay/deploy/"
+	println "${jar.archiveName}"
+	commandLine 'sh', '-c', "/usr/bin/docker cp ${buildDir}/libs/${jar.archiveName} dxp-1:/opt/liferay/deploy/"
+	//	commandLine "/usr/bin/docker cp ${buildDir}/libs/${jar.archiveName} dxp-1:/opt/liferay/deploy/"
+}
+
+deploy.finalizedBy deployToDocker
