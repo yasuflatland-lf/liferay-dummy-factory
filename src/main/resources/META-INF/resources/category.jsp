@@ -7,91 +7,91 @@
 
 <div class="container-fluid container-fluid-max-xl container-view">
 
+    <div class="sheet">
+        <div class="panel-group panel-group-flush">
+            <aui:fieldset>
 
-    <aui:fieldset-group markupView="lexicon">
-        <aui:fieldset>
+                <liferay-ui:success key="success" message="Category / Vocabraly created successfully"/>
+                <%@ include file="/command_select.jspf" %>
 
-            <liferay-ui:success key="success" message="Category / Vocabraly created successfully"/>
-            <%@ include file="/command_select.jspf" %>
+                <portlet:actionURL name="<%= LDFPortletKeys.CATEGORY %>" var="categoryEditURL">
+                    <portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_CATEGORY %>"/>
+                    <portlet:param name="redirect" value="<%=portletURL.toString()%>"/>
+                </portlet:actionURL>
 
-            <portlet:actionURL name="<%= LDFPortletKeys.CATEGORY %>" var="categoryEditURL">
-                <portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_CATEGORY %>"/>
-                <portlet:param name="redirect" value="<%=portletURL.toString()%>"/>
-            </portlet:actionURL>
-
-            <div id="<portlet:namespace />Header0" role="tab">
-                <div aria-controls="<portlet:namespace />Collapse0" aria-expanded="false"
-                     class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
-                     href="#<portlet:namespace />Collapse0" role="button">
-                    <h1>Create Category / Vocabulary <liferay-ui:icon-help message="usage" /></h1>
+                <div id="<portlet:namespace />Header0" role="tab">
+                    <div aria-controls="<portlet:namespace />Collapse0" aria-expanded="false"
+                         class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
+                         href="#<portlet:namespace />Collapse0" role="button">
+                        <h1>Create Category / Vocabulary <liferay-ui:icon-help message="usage" /></h1>
+                    </div>
                 </div>
-            </div>
 
-            <div aria-expanded="false" aria-labelledby="<portlet:namespace />Header0"
-                 class="collapse panel-collapse" id="<portlet:namespace />Collapse0" role="tabpanel">
-                <blockquote class="blockquote-info">
-                    <small>Example</small>
-                    <p>if you enter the values <code>3</code> in the "category / vocabulary", the portlet will create
-                        three categories: <code>category1</code>, <code>category2</code>, and <code>category3</code>.
-                    <p>
-                </blockquote>
+                <div aria-expanded="false" aria-labelledby="<portlet:namespace />Header0"
+                     class="collapse panel-collapse" id="<portlet:namespace />Collapse0" role="tabpanel">
+                    <blockquote class="blockquote-info">
+                        <small>Example</small>
+                        <p>if you enter the values <code>3</code> in the "category / vocabulary", the portlet will create
+                            three categories: <code>category1</code>, <code>category2</code>, and <code>category3</code>.
+                        <p>
+                    </blockquote>
 
-                <ul>
-                    <li>You must be signed in as an administrator in order to create categories / vocabularies</li>
-                    <li>The counter always starts at <code>1</code></li>
-                    <li>If no site is selected, the default site will be <code>liferay.com</code></li>
-                </ul>
-            </div>
+                    <ul>
+                        <li>You must be signed in as an administrator in order to create categories / vocabularies</li>
+                        <li>The counter always starts at <code>1</code></li>
+                        <li>If no site is selected, the default site will be <code>liferay.com</code></li>
+                    </ul>
+                </div>
 
-            <%
-                String numberOfCategoriesLabel = "Enter the number of categories / vocabralies you would like to create";
-                String baseCategoryNameLabel = "Enter the base Category / Vocabulary name";
-                List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-                final String groupName = GroupConstants.GUEST;
-                final long companyId = PortalUtil.getDefaultCompanyId();
-                final long guestGroupId = GroupLocalServiceUtil.getGroup(companyId, groupName).getGroupId();
+                <%
+                    String numberOfCategoriesLabel = "Enter the number of categories / vocabralies you would like to create";
+                    String baseCategoryNameLabel = "Enter the base Category / Vocabulary name";
+                    List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+                    final String groupName = GroupConstants.GUEST;
+                    final long companyId = PortalUtil.getDefaultCompanyId();
+                    final long guestGroupId = GroupLocalServiceUtil.getGroup(companyId, groupName).getGroupId();
 
-                String defaultOption = "(None)";
+                    String defaultOption = "(None)";
 
-                String groupLabel = "Select a site to assign the pages to";
-                String createContentsTypeLabel = "Select create type";
-                String parentCategoryIdLabel = "Enter the parent category ID";
-                String vocabularyIdLabel = "Vocabulary ID";
-            %>
+                    String groupLabel = "Select a site to assign the pages to";
+                    String createContentsTypeLabel = "Select create type";
+                    String parentCategoryIdLabel = "Enter the parent category ID";
+                    String vocabularyIdLabel = "Vocabulary ID";
+                %>
 
-            <aui:form action="<%= categoryEditURL %>" method="post" name="fm"
-                      onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
-                <liferay-ui:error exception="<%= DuplicateCategoryException.class %>"
-                                  message="please-enter-a-unique-name"/>
+                <aui:form action="<%= categoryEditURL %>" method="post" name="fm"
+                          onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
+                    <liferay-ui:error exception="<%= DuplicateCategoryException.class %>"
+                                      message="please-enter-a-unique-name"/>
 
-                <aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
+                    <aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
 
-                <aui:select name="createContentsType" label="<%= createContentsTypeLabel %>">
-                    <aui:option label="Category" value="<%= String.valueOf(LDFPortletKeys.C_CATEGORY_CREATE) %>"/>
-                    <aui:option label="Vocabulary" value="<%= String.valueOf(LDFPortletKeys.C_VOCABULARY_CREATE) %>"/>
-                </aui:select>
+                    <aui:select name="createContentsType" label="<%= createContentsTypeLabel %>">
+                        <aui:option label="Category" value="<%= String.valueOf(LDFPortletKeys.C_CATEGORY_CREATE) %>"/>
+                        <aui:option label="Vocabulary" value="<%= String.valueOf(LDFPortletKeys.C_VOCABULARY_CREATE) %>"/>
+                    </aui:select>
 
-                <aui:select name="group" label="<%= groupLabel %>">
-                    <aui:option label="<%= defaultOption %>" value="<%= guestGroupId %>"/>
-                    <%
-                        for (Group group : groups) {
-                            if (group.isSite()) {
-                    %>
-                    <aui:option label="<%= group.getDescriptiveName() %>" value="<%= group.getGroupId() %>"/>
-                    <%
+                    <aui:select name="group" label="<%= groupLabel %>">
+                        <aui:option label="<%= defaultOption %>" value="<%= guestGroupId %>"/>
+                        <%
+                            for (Group group : groups) {
+                                if (group.isSite()) {
+                        %>
+                        <aui:option label="<%= group.getDescriptiveName() %>" value="<%= group.getGroupId() %>"/>
+                        <%
+                                }
                             }
-                        }
-                    %>
-                </aui:select>
+                        %>
+                    </aui:select>
 
-                <span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.C_CATEGORY_CREATE) %>"
-                      class="<portlet:namespace />contentsTypeGroup">
+                    <span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.C_CATEGORY_CREATE) %>"
+                          class="<portlet:namespace />contentsTypeGroup">
 					<%
                         List<AssetVocabulary> assetVocabularies = AssetVocabularyServiceUtil.getGroupVocabularies(
                                 guestGroupId, true);
 
                     %>
-					
+
 					<aui:select name="vocabularyId" label="<%= vocabularyIdLabel %>">
                         <%
                             for (AssetVocabulary assetVocabulary : assetVocabularies) {
@@ -107,7 +107,7 @@
                         <aui:option value="<%= String.valueOf(AssetCategoryConstants.DEFAULT_PARENT_CATEGORY_ID) %>"
                                     selected="true">(None)</aui:option>
                     </aui:select>
-					
+
 					<aui:input name="numberOfCategories" label="<%= numberOfCategoriesLabel %>">
                         <aui:validator name="digits"/>
                         <aui:validator name="min">1</aui:validator>
@@ -127,12 +127,12 @@
                     </aui:input>
 				</span>
 
-                <%
-                    String numberOfVocabularyLabel = "Number of vocabulary";
-                    String baseVocabularyNameLabel = "Base Vocabulary Name";
-                %>
-                <span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.C_VOCABULARY_CREATE) %>"
-                      class="<portlet:namespace />contentsTypeGroup" style="display:none;">
+                    <%
+                        String numberOfVocabularyLabel = "Number of vocabulary";
+                        String baseVocabularyNameLabel = "Base Vocabulary Name";
+                    %>
+                    <span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.C_VOCABULARY_CREATE) %>"
+                          class="<portlet:namespace />contentsTypeGroup" style="display:none;">
 					<aui:input name="numberOfVocabulary" label="<%= numberOfVocabularyLabel %>">
                         <aui:validator name="digits"/>
                         <aui:validator name="min">1</aui:validator>
@@ -151,22 +151,24 @@
                     </aui:input>
 				</span>
 
-                <aui:button-row>
-                    <aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary" id="processStart"/>
-                </aui:button-row>
-            </aui:form>
-            <%
-                // Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
-                String progressSessionKey = ProgressTracker.PERCENT + progressId;
-                request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
-            %>
-            <liferay-ui:upload-progress
-                id="<%= progressId %>"
-                message="creating..."
-                height="20"
-            />
-        </aui:fieldset>
-    </aui:fieldset-group>
+                    <aui:button-row>
+                        <aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary" id="processStart"/>
+                    </aui:button-row>
+                </aui:form>
+                <%
+                    // Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
+                    String progressSessionKey = ProgressTracker.PERCENT + progressId;
+                    request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
+                %>
+                <liferay-ui:upload-progress
+                        id="<%= progressId %>"
+                        message="creating..."
+                        height="20"
+                />
+            </aui:fieldset>
+        </div>
+    </div>
+
 </div>
 
 <aui:script>

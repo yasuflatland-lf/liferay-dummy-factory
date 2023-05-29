@@ -18,156 +18,156 @@
 />
 
 <div class="container-fluid container-fluid-max-xl container-view">
+    <div class="sheet">
+        <div class="panel-group panel-group-flush">
+            <aui:fieldset>
 
-    <aui:fieldset-group markupView="lexicon">
-        <aui:fieldset>
+                <liferay-ui:success key="success" message="Web contents created successfully"/>
+                <liferay-ui:error exception="<%= Exception.class %>" message="Error occured. Please see console log"/>
+                <%@ include file="/command_select.jspf" %>
 
-            <liferay-ui:success key="success" message="Web contents created successfully"/>
-            <liferay-ui:error exception="<%= Exception.class %>" message="Error occured. Please see console log"/>
-            <%@ include file="/command_select.jspf" %>
+                <portlet:actionURL name="<%= LDFPortletKeys.WCM %>" var="journalEditURL">
+                    <portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_WCM %>"/>
+                    <portlet:param name="redirect" value="<%=portletURL.toString()%>"/>
+                </portlet:actionURL>
 
-            <portlet:actionURL name="<%= LDFPortletKeys.WCM %>" var="journalEditURL">
-                <portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_WCM %>"/>
-                <portlet:param name="redirect" value="<%=portletURL.toString()%>"/>
-            </portlet:actionURL>
-
-            <div id="<portlet:namespace />Header0" role="tab">
-                <div aria-controls="<portlet:namespace />Collapse0" aria-expanded="false"
-                     class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
-                     href="#<portlet:namespace />Collapse0" role="button">
-                    <h1>Create Web Contents <liferay-ui:icon-help message="usage"/></h1>
-                </div>
-            </div>
-
-            <div aria-expanded="false" aria-labelledby="<portlet:namespace />Header0"
-                 class="collapse panel-collapse" id="<portlet:namespace />Collapse0" role="tabpanel">
-                <blockquote class="blockquote-info">
-                    <small>Example</small>
-                    <p>if you enter the values <code>3</code> and <code>webContent</code> the portlet will create three
-                        web content articles: <code>webContent1</code>, <code>webContent2</code>, and
-                        <code>webContent3</code>.
-                    <p>
-                </blockquote>
-
-                <p>You must be signed in as an administrator in order to create web content articles</p>
-                <p>The counter always starts at <code>1</code></p>
-                <p>If no site is selected, the default site will be <code>liferay.com</code></p>
-                <p>If no site is selected, the default site will be <code>liferay.com</code></p>
-            </div>
-
-            <%
-                String numberOfArticlesLabel = "Enter the number of web content articles you would like to create";
-                String baseTitleLabel = "Enter the base title";
-                String baseArticleLabel = "Enter the contents";
-                String defaultOption = "(None)";
-                String groupIdLabel = "Select a site to assign the web content articles to";
-                String localesLabel = "Select languages";
-                String titleWordsLabel = "Amount of words for the title";
-                String totalParagraphsLabel = "Paragraphes count";
-                String createContentsTypeLabel = "Select create contents type";
-                String folderIdLabel = "Journal Folder ID of the target folder";
-                String neverExpireLabel = "Never Expired";
-                String neverReviewLabel = "Never Review";
-
-                List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-                final String groupName = GroupConstants.GUEST;
-                final long companyId = PortalUtil.getDefaultCompanyId();
-                final long guestGroupId = GroupLocalServiceUtil.getGroup(companyId, groupName).getGroupId();
-            %>
-
-            <aui:form action="<%= journalEditURL %>" method="post" name="fm"
-                      onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
-                <aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
-
-                <aui:input name="numberOfArticles" label="<%= numberOfArticlesLabel %>">
-                    <aui:validator name="digits"/>
-                    <aui:validator name="min">1</aui:validator>
-                    <aui:validator name="required"/>
-                </aui:input>
-                <aui:input name="baseTitle" label="<%= baseTitleLabel %>" cssClass="lfr-textarea-container">
-                    <aui:validator name="required"/>
-                </aui:input>
-                <aui:select name="groupIds" label="<%= groupIdLabel %>" multiple="<%= true %>">
-                    <aui:option label="<%= defaultOption %>" value="<%= guestGroupId %>" selected="<%= true %>"/>
-                    <%
-                        for (Group group : groups) {
-                            if (group.isSite() && !group.getDescriptiveName().equals("Control Panel")) {
-                    %>
-                    <aui:option label="<%= group.getDescriptiveName() %>" value="<%= group.getGroupId() %>"/>
-                    <%
-                            }
-                        }
-                    %>
-                </aui:select>
-
-                <aui:select name="folderId" label="<%= folderIdLabel %>">
-                    <aui:option label="<%= defaultOption %>" data-group-id="<%= guestGroupId %>"
-                                value="<%= JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID %>" selected="<%= true %>"/>
-                </aui:select>
-
-                <div class="panel panel-secondary">
-                    <div class="panel-header panel-heading" id="<portlet:namespace />Header" role="tab">
-                        <div class="panel-title">
-                            <div aria-controls="<portlet:namespace />Collapse" aria-expanded="false"
-                                 class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
-                                 href="#<portlet:namespace />Collapse" role="button">
-                                <span class="category-name text-truncate">Click here to show more options</span>
-                                <aui:icon cssClass="collapse-icon-closed" image="angle-right" markupView="lexicon"/>
-                                <aui:icon cssClass="collapse-icon-open" image="angle-down" markupView="lexicon"/>
-                            </div>
-                        </div>
+                <div id="<portlet:namespace />Header0" role="tab">
+                    <div aria-controls="<portlet:namespace />Collapse0" aria-expanded="false"
+                         class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
+                         href="#<portlet:namespace />Collapse0" role="button">
+                        <h1>Create Web Contents <liferay-ui:icon-help message="usage"/></h1>
                     </div>
                 </div>
 
-                <div aria-expanded="false" aria-labelledby="<portlet:namespace/>Header"
-                     class="collapse panel-collapse" id="<portlet:namespace/>Collapse" role="tabpanel">
-                    <div class="row">
-                        <aui:fieldset cssClass="col-md-12">
+                <div aria-expanded="false" aria-labelledby="<portlet:namespace />Header0"
+                     class="collapse panel-collapse" id="<portlet:namespace />Collapse0" role="tabpanel">
+                    <blockquote class="blockquote-info">
+                        <small>Example</small>
+                        <p>if you enter the values <code>3</code> and <code>webContent</code> the portlet will create three
+                            web content articles: <code>webContent1</code>, <code>webContent2</code>, and
+                            <code>webContent3</code>.
+                        <p>
+                    </blockquote>
 
-                            <%
-                                Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
+                    <p>You must be signed in as an administrator in order to create web content articles</p>
+                    <p>The counter always starts at <code>1</code></p>
+                    <p>If no site is selected, the default site will be <code>liferay.com</code></p>
+                    <p>If no site is selected, the default site will be <code>liferay.com</code></p>
+                </div>
 
-                            %>
-                            <aui:select name="locales" label="<%= localesLabel %>" multiple="<%= true %>">
+                <%
+                    String numberOfArticlesLabel = "Enter the number of web content articles you would like to create";
+                    String baseTitleLabel = "Enter the base title";
+                    String baseArticleLabel = "Enter the contents";
+                    String defaultOption = "(None)";
+                    String groupIdLabel = "Select a site to assign the web content articles to";
+                    String localesLabel = "Select languages";
+                    String titleWordsLabel = "Amount of words for the title";
+                    String totalParagraphsLabel = "Paragraphes count";
+                    String createContentsTypeLabel = "Select create contents type";
+                    String folderIdLabel = "Journal Folder ID of the target folder";
+                    String neverExpireLabel = "Never Expired";
+                    String neverReviewLabel = "Never Review";
+
+                    List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+                    final String groupName = GroupConstants.GUEST;
+                    final long companyId = PortalUtil.getDefaultCompanyId();
+                    final long guestGroupId = GroupLocalServiceUtil.getGroup(companyId, groupName).getGroupId();
+                %>
+
+                <aui:form action="<%= journalEditURL %>" method="post" name="fm"
+                          onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
+                    <aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
+
+                    <aui:input name="numberOfArticles" label="<%= numberOfArticlesLabel %>">
+                        <aui:validator name="digits"/>
+                        <aui:validator name="min">1</aui:validator>
+                        <aui:validator name="required"/>
+                    </aui:input>
+                    <aui:input name="baseTitle" label="<%= baseTitleLabel %>" cssClass="lfr-textarea-container">
+                        <aui:validator name="required"/>
+                    </aui:input>
+                    <aui:select name="groupIds" label="<%= groupIdLabel %>" multiple="<%= true %>">
+                        <aui:option label="<%= defaultOption %>" value="<%= guestGroupId %>" selected="<%= true %>"/>
+                        <%
+                            for (Group group : groups) {
+                                if (group.isSite() && !group.getDescriptiveName().equals("Control Panel")) {
+                        %>
+                        <aui:option label="<%= group.getDescriptiveName() %>" value="<%= group.getGroupId() %>"/>
+                        <%
+                                }
+                            }
+                        %>
+                    </aui:select>
+
+                    <aui:select name="folderId" label="<%= folderIdLabel %>">
+                        <aui:option label="<%= defaultOption %>" data-group-id="<%= guestGroupId %>"
+                                    value="<%= JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID %>" selected="<%= true %>"/>
+                    </aui:select>
+
+                    <div class="panel panel-secondary">
+                        <div class="panel-header panel-heading" id="<portlet:namespace />Header" role="tab">
+                            <div class="panel-title">
+                                <div aria-controls="<portlet:namespace />Collapse" aria-expanded="false"
+                                     class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
+                                     href="#<portlet:namespace />Collapse" role="button">
+                                    <span class="category-name text-truncate">Click here to show more options</span>
+                                    <aui:icon cssClass="collapse-icon-closed" image="angle-right" markupView="lexicon"/>
+                                    <aui:icon cssClass="collapse-icon-open" image="angle-down" markupView="lexicon"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div aria-expanded="false" aria-labelledby="<portlet:namespace/>Header"
+                         class="collapse panel-collapse" id="<portlet:namespace/>Collapse" role="tabpanel">
+                        <div class="row">
+                            <aui:fieldset cssClass="col-md-12">
+
                                 <%
-                                    for (Locale availableLocale : locales) {
+                                    Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
+
                                 %>
-                                <aui:option label="<%= availableLocale.getDisplayName(locale) %>"
-                                            value="<%= LocaleUtil.toLanguageId(availableLocale) %>"
-                                            selected="<%= availableLocale.toString().equals(LocaleUtil.getDefault().toString()) %>"/>
-                                <%
-                                    }
-                                %>
-                            </aui:select>
-                            <aui:input type="toggle-switch" name="neverExpire" label="<%= neverExpireLabel %>"
-                                       value="true"/>
-                            <aui:input type="toggle-switch" name="neverReview" label="<%= neverReviewLabel %>"
-                                       value="true"/>
+                                <aui:select name="locales" label="<%= localesLabel %>" multiple="<%= true %>">
+                                    <%
+                                        for (Locale availableLocale : locales) {
+                                    %>
+                                    <aui:option label="<%= availableLocale.getDisplayName(locale) %>"
+                                                value="<%= LocaleUtil.toLanguageId(availableLocale) %>"
+                                                selected="<%= availableLocale.toString().equals(LocaleUtil.getDefault().toString()) %>"/>
+                                    <%
+                                        }
+                                    %>
+                                </aui:select>
+                                <aui:input type="toggle-switch" name="neverExpire" label="<%= neverExpireLabel %>"
+                                           value="true"/>
+                                <aui:input type="toggle-switch" name="neverReview" label="<%= neverReviewLabel %>"
+                                           value="true"/>
 
 
-                            <aui:select name="createContentsType" label="<%= createContentsTypeLabel %>">
-                                <aui:option label="Simple Contents Create"
-                                            value="<%= String.valueOf(LDFPortletKeys.WCM_SIMPLE_CONTENTS_CREATE) %>"/>
-                                <aui:option label="Dummy Contents Create"
-                                            value="<%= String.valueOf(LDFPortletKeys.WCM_DUMMY_CONTENTS_CREATE) %>"/>
-                                <aui:option label="Structure Template Select Contents Create"
-                                            value="<%= String.valueOf(LDFPortletKeys.WCM_STRUCTURE_TEMPLATE_SELECT_CREATE) %>"/>
-                            </aui:select>
+                                <aui:select name="createContentsType" label="<%= createContentsTypeLabel %>">
+                                    <aui:option label="Simple Contents Create"
+                                                value="<%= String.valueOf(LDFPortletKeys.WCM_SIMPLE_CONTENTS_CREATE) %>"/>
+                                    <aui:option label="Dummy Contents Create"
+                                                value="<%= String.valueOf(LDFPortletKeys.WCM_DUMMY_CONTENTS_CREATE) %>"/>
+                                    <aui:option label="Structure Template Select Contents Create"
+                                                value="<%= String.valueOf(LDFPortletKeys.WCM_STRUCTURE_TEMPLATE_SELECT_CREATE) %>"/>
+                                </aui:select>
 
-                            <span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.WCM_SIMPLE_CONTENTS_CREATE) %>"
-                                  class="<portlet:namespace />contentsTypeGroup">
+                                <span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.WCM_SIMPLE_CONTENTS_CREATE) %>"
+                                      class="<portlet:namespace />contentsTypeGroup">
 								<aui:input name="baseArticle" label="<%= baseArticleLabel %>"
                                            cssClass="lfr-textarea-container" type="textarea" wrap="soft"/>
 							</span>
-                            <span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.WCM_DUMMY_CONTENTS_CREATE) %>"
-                                  class="<portlet:namespace />contentsTypeGroup" style="display:none;">
-								
+                                <span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.WCM_DUMMY_CONTENTS_CREATE) %>"
+                                      class="<portlet:namespace />contentsTypeGroup" style="display:none;">
+
 								<%
                                     String urlListLabel = "URL list where the crawler fetching images from (multiple URLs can be configured by comma separated, but takes longer to process.)";
                                     String linkListLabel = "Corrected image links / custom image links to save";
                                     String randomAmountLabel = "Amount of links in the generated contents";
                                 %>
-								
+
 								<div class="row">
 									<aui:fieldset cssClass="col-md-6">
 
@@ -217,14 +217,14 @@
 								            <div class="collapsed collapse" id="<portlet:namespace />urlListInfo"
                                                  aria-expanded="false">
 												<p><%=urlListLabel %></p>
-								            </div>			
+								            </div>
 			           	                    <aui:input type="text" name="urlList"
                                                        value="https://imgur.com/search?q=flower" label=""/>
 											<aui:button-row>
                                                 <aui:button name="fetchLinks" cssClass="btn btn-primary"
                                                             value="Fetch links"/>
                                             </aui:button-row>
-			           	                    
+
 											<aui:input rows="5" name="linkLists" type="textarea" value=""
                                                        placeholder="Input URLs each row" label="<%=linkListLabel %>">
                                                 <aui:validator name="required">
@@ -242,8 +242,8 @@
 
 							</span>
 
-                            <span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.WCM_STRUCTURE_TEMPLATE_SELECT_CREATE) %>"
-                                  class="<portlet:namespace />contentsTypeGroup" style="display:none;">
+                                <span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.WCM_STRUCTURE_TEMPLATE_SELECT_CREATE) %>"
+                                      class="<portlet:namespace />contentsTypeGroup" style="display:none;">
 								<%
                                     String ddmStructureLabel = "Journal Structures";
                                     String ddmTemplateLabel = "Journal Templates";
@@ -272,33 +272,35 @@
                                     %>
                                 </aui:select>
 							</span>
-                        </aui:fieldset>
+                            </aui:fieldset>
+                        </div>
+
+                        <div class="row">
+                            <aui:fieldset cssClass="col-md-12">
+                            </aui:fieldset>
+                        </div>
+
                     </div>
+                    <aui:button-row>
+                        <aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary" id="processStart"/>
+                    </aui:button-row>
+                </aui:form>
 
-                    <div class="row">
-                        <aui:fieldset cssClass="col-md-12">
-                        </aui:fieldset>
-                    </div>
+                <%
+                    // Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
+                    String progressSessionKey = ProgressTracker.PERCENT + progressId;
+                    request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
+                %>
+                <liferay-ui:upload-progress
+                        id="<%= progressId %>"
+                        message="creating..."
+                        height="20"
+                />
 
-                </div>
-                <aui:button-row>
-                    <aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary" id="processStart"/>
-                </aui:button-row>
-            </aui:form>
+            </aui:fieldset>
+        </div>
+    </div>
 
-            <%
-                // Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
-                String progressSessionKey = ProgressTracker.PERCENT + progressId;
-                request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
-            %>
-            <liferay-ui:upload-progress
-                    id="<%= progressId %>"
-                    message="creating..."
-                    height="20"
-            />
-
-        </aui:fieldset>
-    </aui:fieldset-group>
 </div>
 
 <aui:script>

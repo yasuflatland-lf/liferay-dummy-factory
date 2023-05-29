@@ -7,130 +7,130 @@
 
 <div class="container-fluid container-fluid-max-xl container-view">
 
+	<div class="sheet">
+		<div class="panel-group panel-group-flush">
+			<aui:fieldset>
 
-	<aui:fieldset-group markupView="lexicon">	
-		<aui:fieldset>
-		
-			<liferay-ui:success key="success" message="Web contents created successfully" />
-			<%@ include file="/command_select.jspf"%>
-		
-			<portlet:actionURL name="<%= LDFPortletKeys.MB %>" var="journalEditURL">
-				<portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_MB %>" />
-				<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
-			</portlet:actionURL>
+				<liferay-ui:success key="success" message="Web contents created successfully" />
+				<%@ include file="/command_select.jspf"%>
 
-			<div id="<portlet:namespace />Header0" role="tab">
-				<div aria-controls="<portlet:namespace />Collapse0" aria-expanded="false"
-					 class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
-					 href="#<portlet:namespace />Collapse0" role="button">
-					<h1>Create Message Board <liferay-ui:icon-help message="usage" /></h1>
+				<portlet:actionURL name="<%= LDFPortletKeys.MB %>" var="journalEditURL">
+					<portlet:param name="<%= LDFPortletKeys.MODE %>" value="<%=LDFPortletKeys.MODE_MB %>" />
+					<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
+				</portlet:actionURL>
+
+				<div id="<portlet:namespace />Header0" role="tab">
+					<div aria-controls="<portlet:namespace />Collapse0" aria-expanded="false"
+						 class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
+						 href="#<portlet:namespace />Collapse0" role="button">
+						<h1>Create Message Board <liferay-ui:icon-help message="usage" /></h1>
+					</div>
 				</div>
-			</div>
 
-			<div aria-expanded="false" aria-labelledby="<portlet:namespace />Header0"
-				 class="collapse panel-collapse" id="<portlet:namespace />Collapse0" role="tabpanel">
-				<blockquote class="blockquote-info">
-					<small>Example</small>
-					<p>if you enter the values <code>3</code> and <code>thread</code> the portlet will create three threads: <code>thread1</code>, <code>thread2</code>, and <code>thread3</code>.<p>
-				</blockquote>
+				<div aria-expanded="false" aria-labelledby="<portlet:namespace />Header0"
+					 class="collapse panel-collapse" id="<portlet:namespace />Collapse0" role="tabpanel">
+					<blockquote class="blockquote-info">
+						<small>Example</small>
+						<p>if you enter the values <code>3</code> and <code>thread</code> the portlet will create three threads: <code>thread1</code>, <code>thread2</code>, and <code>thread3</code>.<p>
+					</blockquote>
 
-				<p>You must be signed in as an administrator in order to create message board threads / categories</p>
-				<p>The counter always starts at <code>1</code></p>
-				<p>If no site is selected, the default site will be <code>liferay.com</code></p>
-			</div>
+					<p>You must be signed in as an administrator in order to create message board threads / categories</p>
+					<p>The counter always starts at <code>1</code></p>
+					<p>If no site is selected, the default site will be <code>liferay.com</code></p>
+				</div>
 
-			<%
-			String numberOfMBLabel= "Enter the number of threads / categories you would like to create";
-			String defaultOption = "(None)";
-			String groupIdLabel = "Select a site to assign the threads / categories to";
-			String createContentsTypeLabel = "Select create type";
-			String subjectLabel = "Subject";
-			String bodyLabel = "Body";
-			String anonymousLabel = "Anonymous";
-			String allowPingbacksLabel = "Allow ping back";
-			String priorityLabel = "Priority";
-			String categoryNameLabel = "Category Name";
-			String descriptionLabel = "Description";
-			String threadListLabel = "Thread list";
-			String categoryIdLabel = "Categories";
-			String formatLabel = "format";
-			
-			List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
-			final String groupName = GroupConstants.GUEST;
-			final long companyId = PortalUtil.getDefaultCompanyId();
-			final long guestGroupId = GroupLocalServiceUtil.getGroup(companyId, groupName).getGroupId();			
-			%>
+				<%
+					String numberOfMBLabel= "Enter the number of threads / categories you would like to create";
+					String defaultOption = "(None)";
+					String groupIdLabel = "Select a site to assign the threads / categories to";
+					String createContentsTypeLabel = "Select create type";
+					String subjectLabel = "Subject";
+					String bodyLabel = "Body";
+					String anonymousLabel = "Anonymous";
+					String allowPingbacksLabel = "Allow ping back";
+					String priorityLabel = "Priority";
+					String categoryNameLabel = "Category Name";
+					String descriptionLabel = "Description";
+					String threadListLabel = "Thread list";
+					String categoryIdLabel = "Categories";
+					String formatLabel = "format";
 
-			<aui:form action="<%= journalEditURL %>" method="post" name="fm"
-					  onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
-				<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
-			
-				<aui:input name="numberOfMB" label="<%= numberOfMBLabel %>" >
-					<aui:validator name="digits" />
-					<aui:validator name="min">1</aui:validator>
-					<aui:validator name="required" />				
-				</aui:input>
-					
-				<aui:select name="createContentsType" label="<%= createContentsTypeLabel %>" >
-					<aui:option label="Threads" value="<%= String.valueOf(LDFPortletKeys.MB_THREAD_CREATE) %>" />
-					<aui:option label="Categories" value="<%= String.valueOf(LDFPortletKeys.MB_CATEGORY_CREATE) %>" />
-					<aui:option label="Reply" value="<%= String.valueOf(LDFPortletKeys.MB_REPLY_CREATE) %>" />
-				</aui:select>
-					
-				<span id="<portlet:namespace />groupIdsWrap">
+					List<Group> groups = GroupLocalServiceUtil.getGroups(QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+					final String groupName = GroupConstants.GUEST;
+					final long companyId = PortalUtil.getDefaultCompanyId();
+					final long guestGroupId = GroupLocalServiceUtil.getGroup(companyId, groupName).getGroupId();
+				%>
+
+				<aui:form action="<%= journalEditURL %>" method="post" name="fm"
+						  onSubmit='<%= "event.preventDefault(); " + renderResponse.getNamespace() + "execCommand();" %>'>
+					<aui:input name="<%= LDFPortletKeys.COMMON_PROGRESS_ID %>" value="<%= progressId %>" type="hidden"/>
+
+					<aui:input name="numberOfMB" label="<%= numberOfMBLabel %>" >
+						<aui:validator name="digits" />
+						<aui:validator name="min">1</aui:validator>
+						<aui:validator name="required" />
+					</aui:input>
+
+					<aui:select name="createContentsType" label="<%= createContentsTypeLabel %>" >
+						<aui:option label="Threads" value="<%= String.valueOf(LDFPortletKeys.MB_THREAD_CREATE) %>" />
+						<aui:option label="Categories" value="<%= String.valueOf(LDFPortletKeys.MB_CATEGORY_CREATE) %>" />
+						<aui:option label="Reply" value="<%= String.valueOf(LDFPortletKeys.MB_REPLY_CREATE) %>" />
+					</aui:select>
+
+					<span id="<portlet:namespace />groupIdsWrap">
 					<aui:select name="groupIds" label="<%= groupIdLabel %>" multiple="<%= true %>" >
 						<aui:option label="<%= defaultOption %>" value="<%= guestGroupId %>" selected="<%= true %>" />
 						<%
-						for (Group group : groups) {
-							if (group.isSite() && !group.getDescriptiveName().equals("Control Panel")) {
+							for (Group group : groups) {
+								if (group.isSite() && !group.getDescriptiveName().equals("Control Panel")) {
 						%>
-								<aui:option label="<%= group.getDescriptiveName() %>" value="<%= group.getGroupId() %>"/>
+						<aui:option label="<%= group.getDescriptiveName() %>" value="<%= group.getGroupId() %>"/>
 						<%
+								}
 							}
-						}
 						%>
-					</aui:select>	
+					</aui:select>
 				</span>
-				<span id="<portlet:namespace />siteGroupIdWrap" style="display:none;">
+					<span id="<portlet:namespace />siteGroupIdWrap" style="display:none;">
 					<aui:select name="siteGroupId" label="<%= groupIdLabel %>" >
 						<aui:option label="<%= defaultOption %>" value="<%= guestGroupId %>" selected="<%= true %>" />
 						<%
-						for (Group group : groups) {
-							if (group.isSite() && !group.getDescriptiveName().equals("Control Panel")) {
+							for (Group group : groups) {
+								if (group.isSite() && !group.getDescriptiveName().equals("Control Panel")) {
 						%>
-								<aui:option label="<%= group.getDescriptiveName() %>" value="<%= group.getGroupId() %>"/>
+						<aui:option label="<%= group.getDescriptiveName() %>" value="<%= group.getGroupId() %>"/>
 						<%
+								}
 							}
-						}
 						%>
-					</aui:select>						
-				</span>								
+					</aui:select>
+				</span>
 
-				<span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.MB_REPLY_CREATE) %>" class="<portlet:namespace />contentsTypeGroup" style="display:none;">
+					<span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.MB_REPLY_CREATE) %>" class="<portlet:namespace />contentsTypeGroup" style="display:none;">
 					<aui:select name="threadId" label="<%=threadListLabel %>" >
 					</aui:select>
 				</span>
-													
-				<span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.MB_THREAD_CREATE) %>" class="<portlet:namespace />contentsTypeGroup">
+
+					<span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.MB_THREAD_CREATE) %>" class="<portlet:namespace />contentsTypeGroup">
 					<div class="row">
 						<aui:fieldset cssClass="col-md-6">
 							<span id="<portlet:namespace />categoryIdWrap" class="<portlet:namespace />contentsTypeGroup">
 								<aui:select name="categoryId" label="<%= categoryIdLabel %>" >
-								</aui:select>								
+								</aui:select>
 							</span>
 							<aui:input name="subject" label="<%= subjectLabel %>" cssClass="lfr-textarea-container" >
-						        <aui:validator name="required">
-					                function() {
-				                        return (<%= String.valueOf(LDFPortletKeys.MB_THREAD_CREATE) %> == document.getElementById('<portlet:namespace />createContentsType').value);
-					                }
-						        </aui:validator>											
+								<aui:validator name="required">
+									function() {
+									return (<%= String.valueOf(LDFPortletKeys.MB_THREAD_CREATE) %> == document.getElementById('<portlet:namespace />createContentsType').value);
+									}
+								</aui:validator>
 							</aui:input>
 							<aui:input name="body" label="<%= bodyLabel %>" rows="5" type="textarea" cssClass="lfr-textarea-container" >
-						        <aui:validator name="required">
-					                function() {
-				                        return (<%= String.valueOf(LDFPortletKeys.MB_THREAD_CREATE) %> == document.getElementById('<portlet:namespace />createContentsType').value);
-					                }
-						        </aui:validator>											
+								<aui:validator name="required">
+									function() {
+									return (<%= String.valueOf(LDFPortletKeys.MB_THREAD_CREATE) %> == document.getElementById('<portlet:namespace />createContentsType').value);
+									}
+								</aui:validator>
 							</aui:input>
 						</aui:fieldset>
 						<aui:fieldset cssClass="col-md-6">
@@ -142,48 +142,50 @@
 								<aui:option label="bbcode" value="<%= String.valueOf(LDFPortletKeys.MB_FORMAT_BBCODE) %>" />
 								<aui:option label="HTML" value="<%= String.valueOf(LDFPortletKeys.MB_FORMAT_BBCODE) %>" />
 							</aui:select>
-							
+
 							<aui:input name="anonymous" type="toggle-switch" label="<%= anonymousLabel %>" value="<%= false %>"/>
 							<aui:input name="allowPingbacks" type="toggle-switch" label="<%= allowPingbacksLabel %>" value="<%= false %>"/>
 						</aui:fieldset>
 					</div>
 				</span>
-				
-				<span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.MB_CATEGORY_CREATE) %>" class="<portlet:namespace />contentsTypeGroup" style="display:none;">
+
+					<span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.MB_CATEGORY_CREATE) %>" class="<portlet:namespace />contentsTypeGroup" style="display:none;">
 					<aui:input name="categoryName" label="<%= categoryNameLabel %>" cssClass="lfr-textarea-container" >
-				        <aui:validator name="required">
-			                function() {
-		                        return (<%= String.valueOf(LDFPortletKeys.MB_CATEGORY_CREATE) %> == document.getElementById('<portlet:namespace />createContentsType').value);
-			                }
-				        </aui:validator>											
+						<aui:validator name="required">
+							function() {
+							return (<%= String.valueOf(LDFPortletKeys.MB_CATEGORY_CREATE) %> == document.getElementById('<portlet:namespace />createContentsType').value);
+							}
+						</aui:validator>
 					</aui:input>
 					<aui:input name="description" label="<%= descriptionLabel %>" rows="3" type="textarea" cssClass="lfr-textarea-container" >
-				        <aui:validator name="required">
-			                function() {
-		                        return (<%= String.valueOf(LDFPortletKeys.MB_CATEGORY_CREATE) %> == document.getElementById('<portlet:namespace />createContentsType').value);
-			                }
-				        </aui:validator>											
+						<aui:validator name="required">
+							function() {
+							return (<%= String.valueOf(LDFPortletKeys.MB_CATEGORY_CREATE) %> == document.getElementById('<portlet:namespace />createContentsType').value);
+							}
+						</aui:validator>
 					</aui:input>
-				</span>					
-			
-				<aui:button-row>
-					<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary" id="processStart"/>
-				</aui:button-row>	
-			</aui:form>	
-			
-			<%
-			// Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
-			String progressSessionKey = ProgressTracker.PERCENT + progressId;
-			request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
-			%>
-			<liferay-ui:upload-progress
-				id="<%= progressId %>"
-				message="creating..."
-				height="20"
-			/>
-						
-		</aui:fieldset>
-	</aui:fieldset-group>
+				</span>
+
+					<aui:button-row>
+						<aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary" id="processStart"/>
+					</aui:button-row>
+				</aui:form>
+
+				<%
+					// Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
+					String progressSessionKey = ProgressTracker.PERCENT + progressId;
+					request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
+				%>
+				<liferay-ui:upload-progress
+						id="<%= progressId %>"
+						message="creating..."
+						height="20"
+				/>
+
+			</aui:fieldset>
+		</div>
+	</div>
+
 </div>
 
 <portlet:resourceURL id="/ldf/image/list" var="linkListURL" />
