@@ -6,6 +6,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.util.PortalInstances;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.ProgressManager;
 import javax.portlet.ActionRequest;
@@ -59,7 +60,7 @@ public class CompanyDefaultDummyGenerator extends DummyGenerator<CompanyContext>
       StringBundler mx = new StringBundler(2);
       mx.append(paramContext.getMx());
 
-      //Add number more then one company
+      //Add number more than one company
       if (1 < paramContext.getNumberOfCompanies()) {
         webId.append(i);
         virtualHostname.append(i);
@@ -72,16 +73,14 @@ public class CompanyDefaultDummyGenerator extends DummyGenerator<CompanyContext>
         }
 
         Company company = _companyLocalService.addCompany(
-            webId.toString(),
+            Long.valueOf(webId.toString()),
             virtualHostname.toString(),
             mx.toString(),
-            paramContext.isSystem(),
+            String.valueOf(paramContext.isSystem()),
             paramContext.getMaxUsers(),
             paramContext.isActive());
 
-        _portalInstancesLocalService.initializePortalInstance(
-            company.getCompanyId(), company.getWebId(),
-            paramContext.getServletContext());
+        PortalInstances.initCompany(company);
 
       } catch (Exception e) {
         //Finish progress

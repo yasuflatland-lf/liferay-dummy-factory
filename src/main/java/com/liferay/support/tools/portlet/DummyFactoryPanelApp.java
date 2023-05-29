@@ -21,17 +21,20 @@ import org.osgi.service.component.annotations.Reference;
 	service = PanelApp.class
 )
 public class DummyFactoryPanelApp extends BasePanelApp {
+
+	@Override
+	public Portlet getPortlet() {
+		return _portlet;
+	}
+
 	@Override
 	public String getPortletId() {
 		return LDFPortletKeys.LIFERAY_DUMMY_FACTORY;
 	}
 
-	@Override
 	@Reference(
 		target = "(javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY + ")",
 		unbind = "-"
 	)
-	public void setPortlet(Portlet portlet) {
-		super.setPortlet(portlet);
-	}
+	private Portlet _portlet;
 }
