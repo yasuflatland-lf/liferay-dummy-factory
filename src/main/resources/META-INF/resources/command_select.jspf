@@ -1,6 +1,6 @@
 
 	<portlet:renderURL var="commandURL">
-		<portlet:param name="mvcRenderCommandName" value="<%=LDFPortletKeys.COMMON %>" />
+		<portlet:param name="mvcRenderCommandName" value="/ldf/common" />
 		<portlet:param name="redirect" value="<%=portletURL.toString()%>" />
 	</portlet:renderURL>
 
@@ -19,7 +19,9 @@
 	        <aui:option label="Message Board" value="<%= LDFPortletKeys.MODE_MB %>" selected="<%= mode.equals(LDFPortletKeys.MODE_MB) %>" />
 	        <aui:option label="Category / Vocabulary" value="<%= LDFPortletKeys.MODE_CATEGORY %>" selected="<%= mode.equals(LDFPortletKeys.MODE_CATEGORY) %>" />
 	        <aui:option label="Blogs" value="<%= LDFPortletKeys.MODE_BLOGS %>" selected="<%= mode.equals(LDFPortletKeys.MODE_BLOGS) %>" />
-	        <aui:option label="Wiki" value="<%= LDFPortletKeys.MODE_WIKI %>" selected="<%= mode.equals(LDFPortletKeys.MODE_WIKI) %>" />
+	        <!--
+	        	<aui:option label="Wiki" value="<%= LDFPortletKeys.MODE_WIKI %>" selected="<%= mode.equals(LDFPortletKeys.MODE_WIKI) %>" />
+			-->
 	        <aui:option label="Company" value="<%= LDFPortletKeys.MODE_COMPANY %>" selected="<%= mode.equals(LDFPortletKeys.MODE_COMPANY) %>" />
 	    </aui:select>
     </aui:form>

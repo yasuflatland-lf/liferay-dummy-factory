@@ -12,6 +12,16 @@
 <%@ taglib uri="http://liferay.com/tld/util" prefix="liferay-util" %>
 <%@ taglib uri="http://liferay.com/tld/clay" prefix="clay" %>
 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
+
+<%@ taglib uri="http://liferay.com/tld/asset" prefix="liferay-asset" %><%@
+	taglib uri="http://liferay.com/tld/ddm" prefix="liferay-ddm" %><%@
+	taglib uri="http://liferay.com/tld/frontend" prefix="liferay-frontend" %><%@
+	taglib uri="http://liferay.com/tld/react" prefix="react" %><%@
+	taglib uri="http://liferay.com/tld/site-navigation" prefix="liferay-site-navigation" %>
+
 <%@ page import="com.liferay.portal.kernel.util.*" %>
 <%@ page import="com.liferay.portal.kernel.model.*" %>
 <%@ page import="com.liferay.portal.kernel.portlet.*" %>
@@ -78,10 +88,10 @@
 	String redirect = ParamUtil.getString(request, "redirect");
 	//Mode
 	String mode = ParamUtil.getString(request, LDFPortletKeys.MODE, LDFPortletKeys.MODE_ORGANIZAION);
-	
+
 	// Generate Progress ID
 	String progressId = PortalUtil.generateRandomKey(request, "progressId");
-	
+
 	DummyFactoryConfiguration dummyFactoryConfiguration =
 	        (DummyFactoryConfiguration)
 	            renderRequest.getAttribute(DummyFactoryConfiguration.class.getName());
@@ -96,15 +106,15 @@
             HtmlUtil.escape(
                 portletPreferences.getValue(
                     "linkList", dummyFactoryConfiguration.linkList()));
-        
+
         urlList =
                 HtmlUtil.escape(
                     portletPreferences.getValue(
-                        "urlList", dummyFactoryConfiguration.urlList()));        
+                        "urlList", dummyFactoryConfiguration.urlList()));
     }
 
 	DummyFactoryDisplayContext dummyFactoryDisplayContext = new DummyFactoryDisplayContext(request, liferayPortletRequest, liferayPortletResponse, portletPreferences);
-	
+
 	String lodashResolver =
 			(String)renderRequest.getAttribute("lodashResolver");
 	String jqueryResolver =
@@ -114,7 +124,7 @@
     Liferay.Loader.require("<%=lodashResolver %>", function(_lodash) {
         (function() {
 			var _ = _lodash;
-			
+
 			//Convert bracket for Lodash template to avoid overraping jsp tag.
 			_.templateSettings = {
 			    interpolate: /\<\@\=(.+?)\@\>/gim,
@@ -124,5 +134,5 @@
         })()
     }, function(error) {
         console.error(error)
-    });	
+    });
 </aui:script>

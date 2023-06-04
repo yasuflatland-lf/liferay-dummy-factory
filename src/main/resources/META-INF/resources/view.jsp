@@ -14,7 +14,7 @@
                 <liferay-ui:success key="success" message="Organizations created successfully"/>
                 <%@ include file="/command_select.jspf" %>
 
-                <portlet:actionURL name="<%= LDFPortletKeys.ORGANIZAION %>" var="organizationEditURL">
+                <portlet:actionURL name="<%= LDFPortletKeys.ORGANIZATION %>" var="organizationEditURL">
                     <portlet:param name="redirect" value="<%=portletURL.toString()%>"/>
                 </portlet:actionURL>
 
