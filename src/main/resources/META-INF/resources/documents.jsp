@@ -161,7 +161,7 @@
                                                     deleteFile: '<%=delteFileEntryURL%>&ticketKey=<%= ticket.getKey() %><liferay-ui:input-permissions-params
                                                         modelName="<%= DLFileEntryConstants.getClassName() %>"/>',
                                                     fileDescription: '<%= StringUtil.merge(dlConfiguration.fileExtensions()) %>',
-                                                    maxFileSize: '<%= dlConfiguration.fileMaxSize() %> B',
+                                                    maxFileSize: '<%= UploadServletRequestConfigurationProviderUtil.getMaxSize() %> B',
                                                     metadataContainer: '#<portlet:namespace/>commonFileMetadataContainer',
                                                     metadataExplanationContainer: '#<portlet:namespace/>metadataExplanationContainer',
                                                     namespace: '<portlet:namespace/>',

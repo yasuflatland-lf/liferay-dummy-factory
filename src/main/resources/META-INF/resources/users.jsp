@@ -102,190 +102,138 @@
 
                     %>
 
-                    <div class="panel panel-secondary">
-                        <div class="panel-header panel-heading" id="<portlet:namespace />Header" role="tab">
-                            <div class="panel-title">
-                                <div aria-controls="<portlet:namespace />Collapse" aria-expanded="false"
-                                     class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
-                                     href="#<portlet:namespace />Collapse" role="button">
-                                    <span class="category-name text-truncate">Click here to show more options</span>
-                                    <aui:icon cssClass="collapse-icon-closed" image="angle-right" markupView="lexicon"/>
-                                    <aui:icon cssClass="collapse-icon-open" image="angle-down" markupView="lexicon"/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <liferay-frontend:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="CLICK HERE TO SHOW MORE OPTIONS">
 
-                    <div aria-expanded="false" aria-labelledby="<portlet:namespace/>Header"
-                         class="collapse panel-collapse" id="<portlet:namespace/>Collapse" role="tabpanel">
-                        <div class="row">
+                        <div class="form-group row">
                             <div class="col-md-12">
 
-                                <div aria-orientation="vertical" class="panel-group" id="accordion05" role="tablist">
-                                    <div class="panel panel-secondary">
-                                        <div class="panel-header panel-heading" id="<portlet:namespace />Header1" role="tab">
-                                            <div class="panel-title">
-                                                <div aria-controls="<portlet:namespace />Collapse1" aria-expanded="false"
-                                                     class="collapse-icon collapse-icon-middle panel-toggler"
-                                                     data-toggle="liferay-collapse"
-                                                     href="#<portlet:namespace />Collapse1" role="button">
-                                                    <span class="category-name text-truncate">Main Configurations</span>
-                                                    <aui:icon cssClass="collapse-icon-closed" image="angle-right"
-                                                              markupView="lexicon"/>
-                                                    <aui:icon cssClass="collapse-icon-open" image="angle-down"
-                                                              markupView="lexicon"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <liferay-frontend:fieldset cssClass="mb-0" collapsed="<%= true %>" collapsible="<%= true %>" label="Main Configurations">
+                                    <div class="col-md-6">
 
-                                    <div aria-expanded="false" aria-labelledby="<portlet:namespace/>Header1"
-                                         class="collapse panel-collapse" id="<portlet:namespace/>Collapse1" role="tabpanel">
-                                        <aui:fieldset cssClass="col-md-6">
+                                        <aui:input type="toggle-switch" name="autoUserPreLogin"
+                                                   label="<%= autoUserPreLoginLabel %>" value="false"/>
 
-                                            <aui:input type="toggle-switch" name="autoUserPreLogin"
-                                                       label="<%= autoUserPreLoginLabel %>" value="false"/>
-
-                                            <aui:select name="organizations" label="<%= organizationLabel %>"
-                                                        multiple="<%= true %>">
-                                                <%
-                                                    for (Organization organization : organizations) {
-                                                %>
-                                                <aui:option label="<%= organization.getName() %>"
-                                                            value="<%= organization.getOrganizationId() %>"/>
-                                                <%
-                                                    }
-                                                %>
-                                            </aui:select>
-                                            <aui:select name="groups" label="<%= groupLabel %>"
-                                                        multiple="<%= true %>">
-                                                <%
-                                                    for (Group group : groups) {
-                                                        if (group.isSite() && !group.getDescriptiveName().equals("Control Panel")) {
-                                                %>
-                                                <aui:option label="<%= group.getDescriptiveName() %>"
-                                                            value="<%= group.getGroupId() %>"/>
-                                                <%
-                                                        }
-                                                    }
-                                                %>
-                                            </aui:select>
-                                            <aui:select name="roles" label="<%= roleLabel %>"
-                                                        helpMessage="<%= roleHelpMessage %>"
-                                                        multiple="<%= true %>">
-                                                <%
-                                                    for (Role role : roles) {
-                                                %>
-                                                <aui:option label="<%= role.getDescriptiveName() %>"
-                                                            value="<%= role.getPrimaryKey() %>"/>
-                                                <%
-                                                    }
-                                                %>
-                                            </aui:select>
-                                            <aui:select name="userGroups" label="<%= userGroupsLabel %>"
-                                                        multiple="<%= true %>">
-                                                <%
-                                                    for (UserGroup userGroup : userGroups) {
-                                                %>
-                                                <aui:option label="<%= userGroup.getName() %>"
-                                                            value="<%= userGroup.getUserGroupId() %>"/>
-                                                <%
-                                                    }
-                                                %>
-                                            </aui:select>
-                                        </aui:fieldset>
-                                        <aui:fieldset cssClass="col-md-6">
-                                            <aui:input name="password" label="<%= passwordLabel %>"
-                                                       value="test"/>
-                                            <aui:input name="male" type="toggle-switch" label="<%= maleLabel %>"
-                                                       value="<%= true %>"/>
-                                            <aui:input name="fakerEnable" type="toggle-switch"
-                                                       label="<%= fakerEnableLabel %>" value="<%= false %>"/>
+                                        <aui:select name="organizations" label="<%= organizationLabel %>"
+                                                    multiple="<%= true %>">
                                             <%
-                                                Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
-                                                //TODO : Locale need to be filtered for only available
-                                                //List<Locale> locales = UserDataService.getFakerAvailableLocales(orgLocales);
-
+                                                for (Organization organization : organizations) {
                                             %>
-                                            <aui:select name="locale" label="<%= localesLabel %>"
-                                                        multiple="<%= false %>">
-                                                <%
-                                                    for (Locale availableLocale : locales) {
-                                                %>
-                                                <aui:option
-                                                        label="<%= availableLocale.getDisplayName(locale) %>"
-                                                        value="<%= availableLocale.getLanguage() %>"
-                                                        selected="<%= availableLocale.toString().equals(LocaleUtil.getDefault().toString()) %>"/>
-                                                <%
-                                                    }
-                                                %>
-                                            </aui:select>
-
+                                            <aui:option label="<%= organization.getName() %>"
+                                                        value="<%= organization.getOrganizationId() %>"/>
                                             <%
-                                                String publicLayoutSetPrototypeIdLabel = "My Profile Site Template";
-                                                String privateLayoutSetPrototypeIdLabel = "My Dashboard Site Template";
-
-                                                List<LayoutSetPrototype> layoutSetPrototypes = LayoutSetPrototypeLocalServiceUtil.search(
-                                                        themeDisplay.getCompanyId(), true,
-                                                        QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+                                                }
                                             %>
-                                            <aui:select name="publicLayoutSetPrototypeId"
-                                                        label="<%= publicLayoutSetPrototypeIdLabel %>">
-                                                <aui:option label="<%= defaultOption %>" value="<%= 0 %>"/>
-                                                <%
-                                                    for (LayoutSetPrototype layoutSetPrototype : layoutSetPrototypes) {
-                                                %>
-                                                <aui:option label="<%= layoutSetPrototype.getName(locale) %>"
-                                                            value="<%= layoutSetPrototype.getLayoutSetPrototypeId() %>"/>
-                                                <%
+                                        </aui:select>
+                                        <aui:select name="groups" label="<%= groupLabel %>"
+                                                    multiple="<%= true %>">
+                                            <%
+                                                for (Group group : groups) {
+                                                    if (group.isSite() && !group.getDescriptiveName().equals("Control Panel")) {
+                                            %>
+                                            <aui:option label="<%= group.getDescriptiveName() %>"
+                                                        value="<%= group.getGroupId() %>"/>
+                                            <%
                                                     }
-                                                %>
-                                            </aui:select>
-
-                                            <aui:select name="privateLayoutSetPrototypeId"
-                                                        label="<%= privateLayoutSetPrototypeIdLabel %>">
-                                                <aui:option label="<%= defaultOption %>" value="<%= 0 %>"/>
-                                                <%
-                                                    for (LayoutSetPrototype layoutSetPrototype : layoutSetPrototypes) {
-                                                %>
-                                                <aui:option label="<%= layoutSetPrototype.getName(locale) %>"
-                                                            value="<%= layoutSetPrototype.getLayoutSetPrototypeId() %>"/>
-                                                <%
-                                                    }
-                                                %>
-                                            </aui:select>
-
-                                        </aui:fieldset>
+                                                }
+                                            %>
+                                        </aui:select>
+                                        <aui:select name="roles" label="<%= roleLabel %>"
+                                                    helpMessage="<%= roleHelpMessage %>"
+                                                    multiple="<%= true %>">
+                                            <%
+                                                for (Role role : roles) {
+                                            %>
+                                            <aui:option label="<%= role.getDescriptiveName() %>"
+                                                        value="<%= role.getPrimaryKey() %>"/>
+                                            <%
+                                                }
+                                            %>
+                                        </aui:select>
+                                        <aui:select name="userGroups" label="<%= userGroupsLabel %>"
+                                                    multiple="<%= true %>">
+                                            <%
+                                                for (UserGroup userGroup : userGroups) {
+                                            %>
+                                            <aui:option label="<%= userGroup.getName() %>"
+                                                        value="<%= userGroup.getUserGroupId() %>"/>
+                                            <%
+                                                }
+                                            %>
+                                        </aui:select>
                                     </div>
+                                    <div class="col-md-6">
+                                        <aui:input name="password" label="<%= passwordLabel %>"
+                                                   value="test"/>
+                                        <aui:input name="male" type="toggle-switch" label="<%= maleLabel %>"
+                                                   value="<%= true %>"/>
+                                        <aui:input name="fakerEnable" type="toggle-switch"
+                                                   label="<%= fakerEnableLabel %>" value="<%= false %>"/>
+                                        <%
+                                            Set<Locale> locales = LanguageUtil.getAvailableLocales(themeDisplay.getSiteGroupId());
+                                            //TODO : Locale need to be filtered for only available
+                                            //List<Locale> locales = UserDataService.getFakerAvailableLocales(orgLocales);
 
-                                </div>
-                            </div>
-                        </div>
-                        <div class="panel panel-secondary">
-                            <div class="panel-header panel-heading" id="<portlet:namespace />Header2" role="tab">
-                                <div class="panel-title">
-                                    <div aria-controls="<portlet:namespace />Collapse2" aria-expanded="false"
-                                         class="collapse-icon collapse-icon-middle panel-toggler"
-                                         data-toggle="liferay-collapse"
-                                         href="#<portlet:namespace />Collapse2" role="button">
-                                        <span class="category-name text-truncate">Announcements Deliveries</span>
-                                        <aui:icon cssClass="collapse-icon-closed" image="angle-right"
-                                                  markupView="lexicon"/>
-                                        <aui:icon cssClass="collapse-icon-open" image="angle-down"
-                                                  markupView="lexicon"/>
+                                        %>
+                                        <aui:select name="locale" label="<%= localesLabel %>"
+                                                    multiple="<%= false %>">
+                                            <%
+                                                for (Locale availableLocale : locales) {
+                                            %>
+                                            <aui:option
+                                                    label="<%= availableLocale.getDisplayName(locale) %>"
+                                                    value="<%= availableLocale.getLanguage() %>"
+                                                    selected="<%= availableLocale.toString().equals(LocaleUtil.getDefault().toString()) %>"/>
+                                            <%
+                                                }
+                                            %>
+                                        </aui:select>
+
+                                        <%
+                                            String publicLayoutSetPrototypeIdLabel = "My Profile Site Template";
+                                            String privateLayoutSetPrototypeIdLabel = "My Dashboard Site Template";
+
+                                            List<LayoutSetPrototype> layoutSetPrototypes = LayoutSetPrototypeLocalServiceUtil.search(
+                                                    themeDisplay.getCompanyId(), true,
+                                                    QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
+                                        %>
+                                        <aui:select name="publicLayoutSetPrototypeId"
+                                                    label="<%= publicLayoutSetPrototypeIdLabel %>">
+                                            <aui:option label="<%= defaultOption %>" value="<%= 0 %>"/>
+                                            <%
+                                                for (LayoutSetPrototype layoutSetPrototype : layoutSetPrototypes) {
+                                            %>
+                                            <aui:option label="<%= layoutSetPrototype.getName(locale) %>"
+                                                        value="<%= layoutSetPrototype.getLayoutSetPrototypeId() %>"/>
+                                            <%
+                                                }
+                                            %>
+                                        </aui:select>
+
+                                        <aui:select name="privateLayoutSetPrototypeId"
+                                                    label="<%= privateLayoutSetPrototypeIdLabel %>">
+                                            <aui:option label="<%= defaultOption %>" value="<%= 0 %>"/>
+                                            <%
+                                                for (LayoutSetPrototype layoutSetPrototype : layoutSetPrototypes) {
+                                            %>
+                                            <aui:option label="<%= layoutSetPrototype.getName(locale) %>"
+                                                        value="<%= layoutSetPrototype.getLayoutSetPrototypeId() %>"/>
+                                            <%
+                                                }
+                                            %>
+                                        </aui:select>
+
                                     </div>
-                                </div>
+                                </liferay-frontend:fieldset>
+
                             </div>
                         </div>
 
-                        <div aria-expanded="false" aria-labelledby="<portlet:namespace/>Header2"
-                             class="collapse panel-collapse" id="<portlet:namespace/>Collapse2" role="tabpanel">
+                        <liferay-frontend:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="Announcements Deliveries">
                             <div class="panel-body">
-                                <br/>
                                 <%@ include file="/user/announcements.jsp" %>
                             </div>
-                        </div>
-                    </div>
+                        </liferay-frontend:fieldset>
+                    </liferay-frontend:fieldset>
                     <aui:button-row>
                         <aui:button type="submit" value="Run" cssClass="btn-lg btn-block btn-primary" id="processStart"/>
                     </aui:button-row>

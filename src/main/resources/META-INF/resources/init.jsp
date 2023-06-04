@@ -34,6 +34,7 @@
 <%@ page import="com.liferay.portal.kernel.workflow.*" %>
 <%@ page import="com.liferay.document.library.kernel.model.*" %>
 <%@ page import="com.liferay.document.library.configuration.*" %>
+<%@ page import="com.liferay.portal.kernel.upload.configuration.UploadServletRequestConfigurationProviderUtil" %>
 
 <%@ page import="com.liferay.taglib.search.ResultRow" %>
 <%@ page import="com.liferay.taglib.search.SearchEntry" %>
@@ -51,6 +52,7 @@
 <%@ page import="com.liferay.dynamic.data.mapping.model.*" %>
 <%@ page import="com.liferay.journal.model.*" %>
 <%@ page import="com.liferay.journal.service.*" %>
+<%@ page import="com.liferay.journal.constants.*" %>
 <%@ page import="com.liferay.dynamic.data.mapping.service.*" %>
 <%@ page import="com.liferay.message.boards.model.*" %>
 <%@ page import="com.liferay.message.boards.constants.*" %>
