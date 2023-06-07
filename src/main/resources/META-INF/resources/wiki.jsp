@@ -170,18 +170,14 @@
     <option value="<@= resourcePrimKey @>" ><@= title @></option>
 </script>
 
-<aui:script>
+
+<aui:script use="aui-base,liferay-form">
+
 	function <portlet:namespace />execCommand() {
 		<%= progressId %>.startProgress();
 		submitForm(document.<portlet:namespace />fm);
 	}
-</aui:script>
 
-<aui:script use="aui-base,liferay-form">
-
-</aui:script>
-
-<script>
 	document.addEventListener('DOMContentLoaded', function () {
 		// Manage GroupID list display
 		var createContentsType = document.getElementById('<portlet:namespace />createContentsType');
@@ -340,4 +336,4 @@
 			return defer.resolve();
 		}
 	});
-</script>
+</aui:script>

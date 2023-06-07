@@ -83,7 +83,7 @@ public class CommonMVCRenderCommand implements MVCRenderCommand {
 //	@Reference(bind = "-")
 //	private WikiCommons _wikiCommons;
 //
-    @Reference
+	@Reference(bind = "-")
     private NPMResolver _npmResolver;
 
 	private static Log _log = LogFactoryUtil

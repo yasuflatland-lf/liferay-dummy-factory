@@ -10,6 +10,8 @@ import com.liferay.portal.util.PortalInstances;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.ProgressManager;
 import javax.portlet.ActionRequest;
+
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -50,21 +52,22 @@ public class CompanyDefaultDummyGenerator extends DummyGenerator<CompanyContext>
 
       //Create company web id
       StringBundler webId = new StringBundler(2);
-      webId.append(paramContext.getWebId());
 
       //Create company Virtual Host Name
       StringBundler virtualHostname = new StringBundler(2);
-      virtualHostname.append(paramContext.getVirtualHostname());
 
       //Create company Mail Domain
       StringBundler mx = new StringBundler(2);
-      mx.append(paramContext.getMx());
 
       //Add number more than one company
       if (1 < paramContext.getNumberOfCompanies()) {
-        webId.append(i);
-        virtualHostname.append(i);
-        mx.append(i);
+        webId.append(String.valueOf(i)).append(paramContext.getWebId());
+        virtualHostname.append(String.valueOf(i)).append(paramContext.getVirtualHostname());
+        mx.append(String.valueOf(i)).append(paramContext.getMx());
+      } else {
+        webId.append(paramContext.getWebId());
+        virtualHostname.append(paramContext.getVirtualHostname());
+        mx.append(paramContext.getMx());
       }
 
       try {
@@ -73,19 +76,15 @@ public class CompanyDefaultDummyGenerator extends DummyGenerator<CompanyContext>
         }
 
         Company company = _companyLocalService.addCompany(
-            Long.valueOf(webId.toString()),
+            null,
+            webId.toString(),
             virtualHostname.toString(),
             mx.toString(),
-            String.valueOf(paramContext.isSystem()),
             paramContext.getMaxUsers(),
             paramContext.isActive());
 
-        PortalInstances.initCompany(company);
-
-      } catch (Exception e) {
-        //Finish progress
-        progressManager.finish();
-        throw e;
+      } catch (Throwable e) {
+        _log.error(e,e);
       }
     }
 

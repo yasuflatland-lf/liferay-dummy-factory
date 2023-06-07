@@ -22,23 +22,24 @@
                     <div aria-controls="<portlet:namespace />Collapse0" aria-expanded="false"
                          class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
                          href="#<portlet:namespace />Collapse0" role="button">
-                        <h1>Create Organizations <liferay-ui:icon-help message="usage" /></h1>
+                        <h1>Create Organizations <small><liferay-ui:icon-help message="usage"/></small></h1>
                     </div>
                 </div>
 
                 <div aria-expanded="false" aria-labelledby="<portlet:namespace />Header0"
                      class="collapse panel-collapse" id="<portlet:namespace />Collapse0" role="tabpanel">
-                    <blockquote class="blockquote-info">
-                        <small>Example</small>
+                    <div class="alert alert-info">
+                        <h4>Example</h4>
                         <p>If you enter the values <code>3</code> and "org" the portlet will create three organizations:
                             <code>org1</code>, <code>org2</code>, and <code>org3</code>.
                         <p>
-                    </blockquote>
-                    <ul>
-                        <li>You must be signed in as an administrator in order to create organizations</li>
-                        <li>The counter always starts at <code>1</code></li>
-                        <li>The organization type is <code>Organization</code></li>
-                    </ul>
+                        <hr class="separator" />
+                        <ul>
+                            <li>You must be signed in as an administrator in order to create organizations</li>
+                            <li>The counter always starts at <code>1</code></li>
+                            <li>The organization type is <code>Organization</code></li>
+                        </ul>
+                    </div>
                 </div>
 
                 <%

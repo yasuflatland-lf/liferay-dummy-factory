@@ -35,24 +35,25 @@
                     <div aria-controls="<portlet:namespace />Collapse0" aria-expanded="false"
                          class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
                          href="#<portlet:namespace />Collapse0" role="button">
-                        <h1>Create Web Contents <liferay-ui:icon-help message="usage"/></h1>
+                        <h1>Create Web Contents <small><liferay-ui:icon-help message="usage"/></small></h1>
                     </div>
                 </div>
 
                 <div aria-expanded="false" aria-labelledby="<portlet:namespace />Header0"
                      class="collapse panel-collapse" id="<portlet:namespace />Collapse0" role="tabpanel">
-                    <blockquote class="blockquote-info">
-                        <small>Example</small>
+                    <div class="alert alert-info">
+                        <h4>Example</h4>
                         <p>if you enter the values <code>3</code> and <code>webContent</code> the portlet will create three
                             web content articles: <code>webContent1</code>, <code>webContent2</code>, and
                             <code>webContent3</code>.
                         <p>
-                    </blockquote>
+                        <hr class="separator" />
 
-                    <p>You must be signed in as an administrator in order to create web content articles</p>
-                    <p>The counter always starts at <code>1</code></p>
-                    <p>If no site is selected, the default site will be <code>liferay.com</code></p>
-                    <p>If no site is selected, the default site will be <code>liferay.com</code></p>
+                        <p>You must be signed in as an administrator in order to create web content articles</p>
+                        <p>The counter always starts at <code>1</code></p>
+                        <p>If no site is selected, the default site will be <code>liferay.com</code></p>
+                        <p>If no site is selected, the default site will be <code>liferay.com</code></p>
+                    </div>
                 </div>
 
                 <%

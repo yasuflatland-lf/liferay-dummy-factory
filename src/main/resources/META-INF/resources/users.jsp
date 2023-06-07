@@ -25,39 +25,39 @@
                     <div aria-controls="<portlet:namespace />Collapse0" aria-expanded="false"
                          class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
                          href="#<portlet:namespace />Collapse0" role="button">
-                        <h1>Create Users <liferay-ui:icon-help message="usage"/></h1>
+                        <h1>Create Users <small><liferay-ui:icon-help message="usage"/></small></h1>
                     </div>
                 </div>
 
                 <div aria-expanded="false" aria-labelledby="<portlet:namespace />Header0"
                      class="collapse panel-collapse" id="<portlet:namespace />Collapse0" role="tabpanel">
-                    <blockquote class="blockquote-info">
-                        <small>Example</small>
+                    <div class="alert alert-info">
+                        <h4>Example</h4>
                         <p>if you enter the values <code>3</code> and <code>user</code> the portlet will create three users:
                             <code>user1</code>, <code>user2</code>, and <code>user3</code>.
                         <p>
-                    </blockquote>
+                        <hr class="separator" />
+                        <ul>
+                            <li>You must be signed in as an administrator in order to create users</li>
+                            <li>The counter always starts at <code>1</code></li>
+                            <li>Email addresses will be the base screenName + "@liferay.com"</li>
+                            <li>Passwords are set to <code>test</code></li>
+                            <li>Users' first names will be the base screenName you input</li>
+                            <li>Users' last names will be the counter</li>
+                        </ul>
 
-                    <ul>
-                        <li>You must be signed in as an administrator in order to create users</li>
-                        <li>The counter always starts at <code>1</code></li>
-                        <li>Email addresses will be the base screenName + "@liferay.com"</li>
-                        <li>Passwords are set to <code>test</code></li>
-                        <li>Users' first names will be the base screenName you input</li>
-                        <li>Users' last names will be the counter</li>
-                    </ul>
-
-                    <h3>Creating Large Batches of Users</h3>
-                    <ul>
-                        <li>If the number of users is large (over <code>100</code>), go to <i>Control Panel -> Server
-                            Administration -> Log Levels -> Add Category</i>, and add <code>com.liferay.support.tools</code>
-                            and set to <code>INFO</code> to track progress (batches of 10%)
-                        </li>
-                        <li>It may take some time (even for the logs to show) to create a large number of users, and the
-                            page will hang until the process is complete; you can query the database if you are uncertain of
-                            the progress
-                        </li>
-                    </ul>
+                        <h5>Creating Large Batches of Users</h5>
+                        <ul>
+                            <li>If the number of users is large (over <code>100</code>), go to <i>Control Panel -> Server
+                                Administration -> Log Levels -> Add Category</i>, and add <code>com.liferay.support.tools</code>
+                                and set to <code>INFO</code> to track progress (batches of 10%)
+                            </li>
+                            <li>It may take some time (even for the logs to show) to create a large number of users, and the
+                                page will hang until the process is complete; you can query the database if you are uncertain of
+                                the progress
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
                 <%

@@ -23,28 +23,28 @@
 					<div aria-controls="<portlet:namespace />Collapse0" aria-expanded="false"
 						 class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
 						 href="#<portlet:namespace />Collapse0" role="button">
-						<h1>Create Companies <liferay-ui:icon-help message="usage" /></h1>
+						<h1>Create Companies <small><liferay-ui:icon-help message="usage"/></small></h1>
 					</div>
 				</div>
 
 				<div aria-expanded="false" aria-labelledby="<portlet:namespace />Header0"
 					 class="collapse panel-collapse" id="<portlet:namespace />Collapse0" role="tabpanel">
-					<blockquote class="blockquote-info">
-						<small>Example</small>
+					<div class="alert alert-info">
+						<h4>Example</h4>
 						<p>if you enter the values <code>3</code> and <code>company</code> the portlet will create three companies: <code>company1</code>, <code>company2</code>, and <code>company3</code>.<p>
-					</blockquote>
-
-					<p>You must be signed in as an administrator in order to create companies</p>
-					<p>The counter always starts at <code>1</code></p>
-					<p>If no site is selected, the default site will be <code>liferay.com</code></p>
-					<p><code>Dummy Contents Create</code> mode will use the dummy data generation. For the configuration of the dummy image resources, Navigate to "Organization" panel, and elipse button is displayed on the top right.</p>
+						<hr class="separator" />
+						<p>You must be signed in as an administrator in order to create companies</p>
+						<p>The counter always starts at <code>1</code></p>
+						<p>If no site is selected, the default site will be <code>liferay.com</code></p>
+						<p><code>Dummy Contents Create</code> mode will use the dummy data generation. For the configuration of the dummy image resources, Navigate to "Organization" panel, and elipse button is displayed on the top right.</p>
+					</div>
 				</div>
 
 				<%
 					String numberOfCompaniesLabel= "Enter the number of companies you would like to create";
 					String webIdLabel= "Enter the Web ID";
 					String virtualHostnameLabel = "Enter the Virtual Host Name";
-					String mxLabel = "Enter the Mail Domain";
+					String mxLabel = "Enter the Mail Domain.";
 					String maxUsersLabel = "Max user numbers";
 					String activeLabel = "Activate the company";
 				%>
@@ -70,8 +70,16 @@
 					<aui:input name="virtualHostname" label="<%= virtualHostnameLabel %>" cssClass="lfr-textarea-container" >
 						<aui:validator name="required" />
 					</aui:input>
-					<aui:input name="mx" label="<%= mxLabel %>" cssClass="lfr-textarea-container" >
+					<aui:input name="mx" label="<%= mxLabel %>" cssClass="lfr-textarea-container" placeholder="example.com" >
 						<aui:validator name="required" />
+						<aui:validator name="custom">
+						function() {
+							var mx = document.getElementById('<portlet:namespace />mx').value;
+							console.log(mx);
+							console.log((/^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/.test(mx)));
+							return (/^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/.test(mx))
+						}
+						</aui:validator>
 					</aui:input>
 
 					<aui:input name="maxUsers" label="<%= maxUsersLabel %>" >

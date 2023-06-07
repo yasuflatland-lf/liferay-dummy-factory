@@ -22,24 +22,25 @@
                     <div aria-controls="<portlet:namespace />Collapse0" aria-expanded="false"
                          class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
                          href="#<portlet:namespace />Collapse0" role="button">
-                        <h1>Create Sites <liferay-ui:icon-help message="usage"/></h1>
+                        <h1>Create Sites <small><liferay-ui:icon-help message="usage"/></small></h1>
                     </div>
                 </div>
 
                 <div aria-expanded="false" aria-labelledby="<portlet:namespace />Header0"
                      class="collapse panel-collapse" id="<portlet:namespace />Collapse0" role="tabpanel">
-                    <blockquote class="blockquote-info">
-                        <small>Example</small>
+                    <div class="alert alert-info">
+                        <h4>Example</h4>
                         <p>if you enter the values <code>3</code> and "site" the portlet will create three blank sites:
                             <code>site1</code>, <code>site2</code>, and <code>site3</code>.
                         <p>
-                    </blockquote>
+                        <hr class="separator" />
 
-                    <ul>
-                        <li>You must be signed in as an administrator in order to create sites</li>
-                        <li>The counter always starts at <code>1</code></li>
-                        <li>The site type is <code>Blank Site</code></li>
-                    </ul>
+                        <ul>
+                            <li>You must be signed in as an administrator in order to create sites</li>
+                            <li>The counter always starts at <code>1</code></li>
+                            <li>The site type is <code>Blank Site</code></li>
+                        </ul>
+                    </div>
 
                     <h3>Creating Large Batches of Sites</h3>
                     <ul>

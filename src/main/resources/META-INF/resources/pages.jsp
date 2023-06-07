@@ -22,24 +22,24 @@
                     <div aria-controls="<portlet:namespace />Collapse0" aria-expanded="false"
                          class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
                          href="#<portlet:namespace />Collapse0" role="button">
-                        <h1>Create Pages <liferay-ui:icon-help message="usage"/></h1>
+                        <h1>Create Pages <small><liferay-ui:icon-help message="usage"/></small></h1>
                     </div>
                 </div>
 
                 <div aria-expanded="false" aria-labelledby="<portlet:namespace />Header0"
                      class="collapse panel-collapse" id="<portlet:namespace />Collapse0" role="tabpanel">
-                    <blockquote class="blockquote-info">
-                        <small>Example</small>
+                    <div class="alert alert-info">
+                        <h4>Example</h4>
                         <p>if you enter the values <code>3</code> and "page" the portlet will create three pages: <code>page1</code>,
                             <code>page2</code>, and <code>page3</code>.
                         <p>
-                    </blockquote>
-
-                    <ul>
-                        <li>You must be signed in as an administrator in order to create pages</li>
-                        <li>The counter always starts at <code>1</code></li>
-                        <li>If no site is selected, the default site will be <code>liferay.com</code></li>
-                    </ul>
+                        <hr class="separator" />
+                        <ul>
+                            <li>You must be signed in as an administrator in order to create pages</li>
+                            <li>The counter always starts at <code>1</code></li>
+                            <li>If no site is selected, the default site will be <code>liferay.com</code></li>
+                        </ul>
+                    </div>
                 </div>
 
                 <%
