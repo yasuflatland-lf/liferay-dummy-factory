@@ -5,15 +5,15 @@ import com.liferay.portal.instances.service.PortalInstancesLocalService;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.util.PortalInstances;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.ProgressManager;
-import javax.portlet.ActionRequest;
-
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+
+import javax.portlet.ActionRequest;
 
 /**
  * Company Generator
@@ -94,5 +94,4 @@ public class CompanyDefaultDummyGenerator extends DummyGenerator<CompanyContext>
     System.out.println("Finished creating " + paramContext.getNumberOfCompanies() + " companies");
 
   }
-
 }

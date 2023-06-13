@@ -27,8 +27,12 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.utils.CommonUtil;
 
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.RenderParameters;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.servlet.http.HttpServletResponse;
