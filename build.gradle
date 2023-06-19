@@ -68,6 +68,7 @@ dependencies {
     compileOnly 'com.liferay.portal:com.liferay.portal.impl'
     compileOnly 'com.liferay:com.liferay.dynamic.data.mapping.api'
     compileOnly 'com.liferay:com.liferay.journal.api'
+    compileOnly 'com.liferay:com.liferay.message.boards.api'
 
     testCompile 'org.codehaus.groovy:groovy-all:2.5.+'
     testCompile group: 'cglib', name: 'cglib-nodep', version: 'latest.integration'

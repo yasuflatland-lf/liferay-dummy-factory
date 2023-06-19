@@ -23,20 +23,22 @@
 					<div aria-controls="<portlet:namespace />Collapse0" aria-expanded="false"
 						 class="collapse-icon collapse-icon-middle panel-toggler" data-toggle="liferay-collapse"
 						 href="#<portlet:namespace />Collapse0" role="button">
-						<h1>Create Message Board <liferay-ui:icon-help message="usage" /></h1>
+						<h1>Create Message Board <small><liferay-ui:icon-help message="usage"/></small></h1>
 					</div>
 				</div>
 
 				<div aria-expanded="false" aria-labelledby="<portlet:namespace />Header0"
 					 class="collapse panel-collapse" id="<portlet:namespace />Collapse0" role="tabpanel">
-					<blockquote class="blockquote-info">
-						<small>Example</small>
+					<div class="alert alert-info">
+						<h4>Example</h4>
 						<p>if you enter the values <code>3</code> and <code>thread</code> the portlet will create three threads: <code>thread1</code>, <code>thread2</code>, and <code>thread3</code>.<p>
-					</blockquote>
-
-					<p>You must be signed in as an administrator in order to create message board threads / categories</p>
-					<p>The counter always starts at <code>1</code></p>
-					<p>If no site is selected, the default site will be <code>liferay.com</code></p>
+						<hr class="separator" />
+						<ul>
+							<li>You must be signed in as an administrator in order to create message board threads / categories</li>
+							<li>The counter always starts at <code>1</code></li>
+							<li>If no site is selected, the default site will be <code>liferay.com</code></li>
+						</ul>
+					</div>
 				</div>
 
 				<%
@@ -121,14 +123,14 @@
 							<aui:input name="subject" label="<%= subjectLabel %>" cssClass="lfr-textarea-container" >
 								<aui:validator name="required">
 									function() {
-									return (<%= String.valueOf(LDFPortletKeys.MB_THREAD_CREATE) %> == document.getElementById('<portlet:namespace />createContentsType').value);
+										return <%= String.valueOf(LDFPortletKeys.MB_THREAD_CREATE) %> == document.getElementById('<portlet:namespace />createContentsType').value
 									}
 								</aui:validator>
 							</aui:input>
 							<aui:input name="body" label="<%= bodyLabel %>" rows="5" type="textarea" cssClass="lfr-textarea-container" >
 								<aui:validator name="required">
 									function() {
-									return (<%= String.valueOf(LDFPortletKeys.MB_THREAD_CREATE) %> == document.getElementById('<portlet:namespace />createContentsType').value);
+										return <%= String.valueOf(LDFPortletKeys.MB_THREAD_CREATE) %> == document.getElementById('<portlet:namespace />createContentsType').value
 									}
 								</aui:validator>
 							</aui:input>
@@ -148,7 +150,6 @@
 						</aui:fieldset>
 					</div>
 				</span>
-
 					<span id="<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.MB_CATEGORY_CREATE) %>" class="<portlet:namespace />contentsTypeGroup" style="display:none;">
 					<aui:input name="categoryName" label="<%= categoryNameLabel %>" cssClass="lfr-textarea-container" >
 						<aui:validator name="required">
@@ -197,48 +198,12 @@
 	}
 </aui:script>
 
-<aui:script use="aui-base">
-	var createContentsType = document.getElementById('<portlet:namespace />createContentsType');
-	var handleClick = function() {
-
-		//--------------------------------
-		// Contents Creation fields switch
-		//--------------------------------
-		var cmp_str = "<portlet:namespace />contentsType" + createContentsType.value;
-
-		var ctg = document.getElementsByClassName("<portlet:namespace />contentsTypeGroup");
-		for (var i = 0; i < ctg.length; i++) {
-			ctg[i].style.display = (cmp_str === document.getElementById(this).getAttribute("id")) ? "block" : "none";
-		}
-
-		//--------------------------------
-		// At reply create, remove multiple for select site.
-		//--------------------------------
-		if(<%= String.valueOf(LDFPortletKeys.MB_REPLY_CREATE) %> == createContentsType.value) {
-			document.getElementsByClassName("<portlet:namespace />siteGroupIdWrap").style.display = "block";
-			document.getElementsByClassName("<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.MB_THREAD_CREATE) %>").style.display = "block";
-			document.getElementsByClassName("<portlet:namespace />categoryIdWrap").style.display = "none";
-			document.getElementsByClassName("<portlet:namespace />groupIdsWrap").style.display = "none";
-
-			//Update thread list
-			<portlet:namespace />threadListUpdate();
-		} else if(<%= String.valueOf(LDFPortletKeys.MB_CATEGORY_CREATE) %> == createContentsType.value) {
-			document.getElementsByClassName("<portlet:namespace />siteGroupIdWrap").style.display = "block";
-			document.getElementsByClassName("<portlet:namespace />categoryIdWrap").style.display = "none";
-			document.getElementsByClassName("<portlet:namespace />groupIdsWrap").style.display = "none";
-		} else {
-			document.getElementsByClassName("<portlet:namespace />siteGroupIdWrap").style.display = "none";
-			document.getElementsByClassName("<portlet:namespace />categoryIdWrap").style.display = "block";
-			document.getElementsByClassName("<portlet:namespace />groupIdsWrap").style.display = "block";
-		}
-
-	}
-	// Manage GroupID list display
-	createContentsType.addEventListener("change load", handleClick);
-</aui:script>
 
 <%-- Thread List Update --%>
-<portlet:resourceURL id="<%=LDFPortletKeys.CMD_MB_LIST %>" var="mbListURL" />
+<portlet:resourceURL id="<%=LDFPortletKeys.CMD_MB_LIST %>" var="mbListURL" >
+	<portlet:param name="<%=Constants.CMD %>" value="<%=MBMVCResourceCommand.CMD_THREAD_LIST%>" />
+<%--	<portlet:param name="siteGroupId" value="" />--%>
+</portlet:resourceURL>
 
 <script type="text/html" id="<portlet:namespace />message_options">
     <option value="<@= threadId @>" data-root-massage-id="<@= rootMessageId @>"><@= rootMessageSubject @></option>
@@ -248,7 +213,52 @@
     <option value="<@= categoryId @>" ><@= categoryName @></option>
 </script>
 
-<aui:script use="aui-base,liferay-form">
+<aui:script use="aui-base,aui-io-request,liferay-form">
+
+	var handleClick = function() {
+		const createContentsType = document.getElementById('<portlet:namespace />createContentsType');
+	
+		//--------------------------------
+		// Contents Creation fields switch
+		//--------------------------------
+		var cmp_str = "<portlet:namespace />contentsType" + createContentsType.value;
+
+		var ctg = document.getElementsByClassName("<portlet:namespace />contentsTypeGroup");
+		for (var i = 0; i < ctg.length; i++) {
+			ctg[i].style.display = (cmp_str === ctg[i].getAttribute("id")) ? "block" : "none";
+		}
+
+		//--------------------------------
+		// At reply create, remove multiple for select site.
+		//--------------------------------
+		if(<%= String.valueOf(LDFPortletKeys.MB_REPLY_CREATE) %> == createContentsType.value) {
+			document.getElementById("<portlet:namespace />siteGroupIdWrap").style.display = "block";
+			document.getElementById("<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.MB_REPLY_CREATE) %>").style.display = "block";
+			document.getElementById("<portlet:namespace />categoryIdWrap").style.display = "none";
+			document.getElementById("<portlet:namespace />groupIdsWrap").style.display = "none";
+
+			//Update thread list
+			<portlet:namespace />threadListUpdate();
+
+		} else if(<%= String.valueOf(LDFPortletKeys.MB_CATEGORY_CREATE) %> == createContentsType.value) {
+			document.getElementById("<portlet:namespace />siteGroupIdWrap").style.display = "block";
+			document.getElementById("<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.MB_CATEGORY_CREATE) %>").style.display = "block";
+			document.getElementById("<portlet:namespace />categoryIdWrap").style.display = "none";
+			document.getElementById("<portlet:namespace />groupIdsWrap").style.display = "none";
+		} else {
+			document.getElementById("<portlet:namespace />siteGroupIdWrap").style.display = "none";
+			document.getElementById("<portlet:namespace />contentsType<%= String.valueOf(LDFPortletKeys.MB_THREAD_CREATE) %>").style.display = "block";
+			document.getElementById("<portlet:namespace />categoryIdWrap").style.display = "block";
+			document.getElementById("<portlet:namespace />groupIdsWrap").style.display = "block";
+		}
+
+	}
+	// Manage GroupID list display
+	document.getElementById('<portlet:namespace />createContentsType')
+	.addEventListener('change', handleClick);
+	document.getElementById('<portlet:namespace />createContentsType')
+	.addEventListener('load', handleClick);
+
 	function ajax(cmd, path, data, handler) {
 		var xmlhttp = new XMLHttpRequest();
 
@@ -256,7 +266,7 @@
 			if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
 				if (xmlhttp.status == 200) {
 					var jsonData = JSON.parse(xmlhttp.response);
-					handler(jsonData)
+					handler(jsonData);
 				}
 				else {
 					console.error('status: ' + xmlhttp.status);
@@ -286,7 +296,7 @@
 					var _ = _lodash;
 
 					//Load Template
-					var tmpl = _.template(document.getElementsByClassName('<portlet:namespace />message_options').innerHTML);
+					var tmpl = _.template(document.getElementById('<portlet:namespace />message_options').innerHTML);
 					var listAll = "";
 					_.map(data,function(n) {
 						listAll +=
@@ -298,9 +308,18 @@
 						  }
 						);
 					});
-					var pageObj = document.getElementsByClassName('<portlet:namespace />threadId');
-					pageObj.empty();
-					pageObj.append(listAll);
+					
+					Liferay.Loader.require("<%=jqueryResolver %>", function(_jq) {
+						(function() {
+							var $ = _jq;
+							console.log(listAll);
+							const pageObj = $('#<portlet:namespace />threadId');
+							pageObj.empty();
+							pageObj.append(listAll);
+						})()
+					}, function(error) {
+						console.error(error)
+					});
 
 				})()
 			}, function(error) {
@@ -308,7 +327,20 @@
 			});
 
 		}
-		ajax("POST", '<%= mbListURL.toString() %>', data, threadListUpdateHandlerFunc )
+		Liferay.Util.fetch(
+			'<%= mbListURL.toString() %>',
+			{
+				body: data,
+				method: 'POST',
+			}
+		)
+		.then((response) => {
+			return response.json();
+		})
+		.then((data) => {
+			threadListUpdateHandlerFunc(data);
+		});
+		// ajax("POST", '<%= mbListURL.toString() %>', data, threadListUpdateHandlerFunc )
 	}
 
 	function <portlet:namespace />categoryListUpdate() {
@@ -356,13 +388,13 @@
 	}
 
 	document.createElement("<portlet:namespace/>siteGroupId")
-	.addEventListener("change load", function(event) {
+	.addEventListener('change', function(event) {
 		//Update thread list
 		<portlet:namespace />threadListUpdate();
-	})
+	});
 
 	document.createElement("<portlet:namespace/>groupIds")
-	.addEventListener("change load", function(event) {
+	.addEventListener('change', function(event) {
 		var groupIds = document.createElement("<portlet:namespace/>groupIds").value;
 		if(groupIds.length == 1) {
 			//Update category list
@@ -371,7 +403,8 @@
 		} else {
 			document.getElementById("<portlet:namespace />categoryIdWrap").style.display = "none";
 		}
-	})
+	});
+
 
 </aui:script>
 
