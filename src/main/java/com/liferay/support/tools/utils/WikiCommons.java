@@ -1,5 +1,6 @@
 package com.liferay.support.tools.utils;
 
+
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -11,22 +12,22 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
 import com.liferay.wiki.configuration.WikiGroupServiceConfiguration;
+import com.liferay.wiki.constants.WikiPageConstants;
 import com.liferay.wiki.engine.WikiEngine;
 import com.liferay.wiki.engine.WikiEngineRenderer;
 import com.liferay.wiki.model.WikiNode;
 import com.liferay.wiki.model.WikiPage;
-import com.liferay.wiki.model.WikiPageConstants;
 import com.liferay.wiki.service.WikiNodeLocalService;
-import com.liferay.wiki.service.WikiNodeLocalServiceUtil;
 import com.liferay.wiki.service.WikiPageLocalService;
 import com.liferay.wiki.service.WikiPageLocalServiceUtil;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+import javax.portlet.PortletRequest;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-import javax.portlet.PortletRequest;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * Utilities for Wiki
@@ -35,37 +36,6 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(immediate = true, service = WikiCommons.class)
 public class WikiCommons {
-
-  private static final Log _log = LogFactoryUtil.getLog(WikiCommons.class);
-
-  private WikiEngineRenderer _wikiEngineRenderer;
-  private WikiGroupServiceConfiguration _wikiGroupServiceConfiguration;
-  private WikiNodeLocalService _wikiNodeLocalService;
-  private WikiPageLocalService _wikiPageLocalService;
-
-  @Reference(unbind = "-")
-  protected void setWikiEngineRenderer(
-      WikiEngineRenderer wikiEngineRenderer) {
-
-    _wikiEngineRenderer = wikiEngineRenderer;
-  }
-
-  @Reference(unbind = "-")
-  protected void setWikiGroupServiceConfiguration(
-      WikiGroupServiceConfiguration wikiGroupServiceConfiguration) {
-
-    _wikiGroupServiceConfiguration = wikiGroupServiceConfiguration;
-  }
-
-  @Reference(unbind = "-")
-  protected void setWikiNodeLocalService(WikiNodeLocalService wikiNodeLocalService) {
-    _wikiNodeLocalService = wikiNodeLocalService;
-  }
-
-  @Reference(unbind = "-")
-  protected void setWikiPageLocalService(WikiPageLocalService wikiPageLocalService) {
-    _wikiPageLocalService = wikiPageLocalService;
-  }
 
   /**
    * Get Wiki format list
@@ -152,7 +122,7 @@ public class WikiCommons {
       WorkflowThreadLocal.setEnabled(false);
 
       WikiPageLocalServiceUtil.addPage(
-          themeDisplay.getDefaultUserId(), nodeId,
+          themeDisplay.getGuestUserId(), nodeId,
           _wikiGroupServiceConfiguration.frontPageName(), null,
           WikiPageConstants.NEW, true, serviceContext);
     } catch (Exception e) {
@@ -209,11 +179,41 @@ public class WikiCommons {
 
     serviceContext.setScopeGroupId(scopeGroupId);
     node = _wikiNodeLocalService.addDefaultNode(
-        themeDisplay.getDefaultUserId(), serviceContext);
+        themeDisplay.getGuestUserId(), serviceContext);
 
     _log.info("Wiki Node has been initialized");
 
     return node;
   }
 
+  private static final Log _log = LogFactoryUtil.getLog(WikiCommons.class);
+
+  private WikiEngineRenderer _wikiEngineRenderer;
+  private WikiGroupServiceConfiguration _wikiGroupServiceConfiguration;
+  private WikiNodeLocalService _wikiNodeLocalService;
+  private WikiPageLocalService _wikiPageLocalService;
+
+  @Reference(unbind = "-")
+  protected void setWikiEngineRenderer(
+          WikiEngineRenderer wikiEngineRenderer) {
+
+    _wikiEngineRenderer = wikiEngineRenderer;
+  }
+
+  @Reference(unbind = "-")
+  protected void setWikiGroupServiceConfiguration(
+          WikiGroupServiceConfiguration wikiGroupServiceConfiguration) {
+
+    _wikiGroupServiceConfiguration = wikiGroupServiceConfiguration;
+  }
+
+  @Reference(unbind = "-")
+  protected void setWikiNodeLocalService(WikiNodeLocalService wikiNodeLocalService) {
+    _wikiNodeLocalService = wikiNodeLocalService;
+  }
+
+  @Reference(unbind = "-")
+  protected void setWikiPageLocalService(WikiPageLocalService wikiPageLocalService) {
+    _wikiPageLocalService = wikiPageLocalService;
+  }
 }

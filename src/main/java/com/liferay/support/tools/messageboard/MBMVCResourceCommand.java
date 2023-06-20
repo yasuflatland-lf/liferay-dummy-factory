@@ -18,23 +18,17 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Constants;
-import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.util.*;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.utils.CommonUtil;
-
-import java.util.List;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.servlet.http.HttpServletResponse;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import java.util.List;
 
 /**
  * Message Board resources
@@ -64,10 +58,10 @@ public class MBMVCResourceCommand extends BaseMVCResourceCommand {
 		String serializedJson = "";
 
 		if(cmd.equals(CMD_THREAD_LIST)) {
-			serializedJson = getThreadList(resourceRequest,resourceResponse );
+			serializedJson = getThreadList(resourceRequest);
 
 		} else if (cmd.equals(CMD_CATEGORY_LIST)) {
-			serializedJson = getCategoryList(resourceRequest,resourceResponse );
+			serializedJson = getCategoryList(resourceRequest);
 
 		} else {
 			_log.error("Unknown command is passed <" + cmd + ">");
@@ -85,11 +79,10 @@ public class MBMVCResourceCommand extends BaseMVCResourceCommand {
 	 * Get Category list
 	 *
 	 * @param resourceRequest
-	 * @param resourceResponse
 	 * @return
 	 * @throws PortalException
 	 */
-	private String getCategoryList(ResourceRequest resourceRequest, ResourceResponse resourceResponse) throws PortalException {
+	private String getCategoryList(ResourceRequest resourceRequest) throws PortalException {
 		ThemeDisplay themeDisplay = (ThemeDisplay) resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
@@ -100,7 +93,7 @@ public class MBMVCResourceCommand extends BaseMVCResourceCommand {
 		long siteGroupId = groupIds[0];
 
 		if(_log.isDebugEnabled()) {
-			_log.debug("SiteGroup Id <" + String.valueOf(siteGroupId) + ">");
+			_log.debug("SiteGroup Id <" + siteGroupId + ">");
 		}
 
 		List<MBCategory> categories = _mbCategoryService.getCategories(
@@ -134,11 +127,10 @@ public class MBMVCResourceCommand extends BaseMVCResourceCommand {
 	 * Depending on the passed site groupd id, fetch all pages in the site and return JSON object list.
 	 *
 	 * @param resourceRequest
-	 * @param resourceResponse
 	 * @return
 	 * @throws PortalException
 	 */
-	protected String getThreadList(ResourceRequest resourceRequest, ResourceResponse resourceResponse)
+	protected String getThreadList(ResourceRequest resourceRequest)
 			throws PortalException {
 		ThemeDisplay themeDisplay = (ThemeDisplay) resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
@@ -146,7 +138,7 @@ public class MBMVCResourceCommand extends BaseMVCResourceCommand {
 		long siteGroupId = ParamUtil.getLong(resourceRequest, "siteGroupId", themeDisplay.getSiteGroupId());
 
 		if(_log.isDebugEnabled()) {
-			_log.debug("SiteGroup Id <" + String.valueOf(siteGroupId) + ">");
+			_log.debug("SiteGroup Id <" + siteGroupId + ">");
 		}
 
 		List<MBThread> threads = _mbThreadService.getGroupThreads(
@@ -167,8 +159,8 @@ public class MBMVCResourceCommand extends BaseMVCResourceCommand {
 				_log.debug("----------");
 			}
 
-			String subject = message.getSubject() + " (" + thread.getCategory().getName() + ")";
-			curUserJSONObject.put("rootMessageSubject" , subject);
+			// String subject = message.getSubject() + " (" + thread.getCategory().getName() + ")";
+			curUserJSONObject.put("rootMessageSubject" , message.getSubject() + thread.getThreadId());
 			curUserJSONObject.put("threadId" , thread.getThreadId());
 			curUserJSONObject.put("rootMessageId" , thread.getRootMessageId());
 

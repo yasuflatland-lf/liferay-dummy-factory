@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true, 
 	property = { 
 		"javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
-		"mvc.command.name=" + LDFPortletKeys.ORGANIZAION
+		"mvc.command.name=" + LDFPortletKeys.ORGANIZATION
 	}, 
 	service = MVCActionCommand.class
 )

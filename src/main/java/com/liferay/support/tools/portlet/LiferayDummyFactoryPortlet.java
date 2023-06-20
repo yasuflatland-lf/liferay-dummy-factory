@@ -50,7 +50,8 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=administrator,power-user,user",
-		"javax.portlet.supports.mime-type=text/html"
+		"javax.portlet.supports.mime-type=text/html",
+		"javax.portlet.version=3.0"
 	},
 	service = Portlet.class
 )

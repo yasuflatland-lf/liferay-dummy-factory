@@ -11,10 +11,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.exception.UserScreenNameException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Organization;
-import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.model.RoleConstants;
-import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.*;
 import com.liferay.portal.kernel.security.access.control.AccessControlled;
 import com.liferay.portal.kernel.service.*;
 import com.liferay.portal.kernel.transaction.Isolation;
@@ -37,11 +34,11 @@ import java.util.stream.Collectors;
 @Component(service = UserDataService.class)
 @ProviderType
 @Transactional(
-    isolation = Isolation.PORTAL,
-    rollbackFor = {
-        PortalException.class,
-        SystemException.class
-    }
+        isolation = Isolation.PORTAL,
+        rollbackFor = {
+                PortalException.class,
+                SystemException.class
+        }
 )
 public class UserDataService {
 
@@ -64,48 +61,53 @@ public class UserDataService {
      * @throws PortalException
      */
     public User createUserData(
-        ServiceContext serviceContext, long[] organizationIds, long[] groupIds,
-        long[] roleIds, long[] userGroupIds, boolean male, boolean fakerEnable,
-        String password, String screenName, String emailAddress,
-        String baseScreenName, long index, String localeStr)
-        throws PortalException {
+            ServiceContext serviceContext, long[] organizationIds, long[] groupIds,
+            long[] roleIds, long[] userGroupIds, boolean male, boolean fakerEnable,
+            String password, String screenName, String emailAddress,
+            String baseScreenName, long index, String localeStr)
+            throws PortalException {
 
         // For generating dummy user name
         Faker faker = _commonUtil.createFaker(localeStr);
 
         // Generate first / last name
         String firstName =
-            (fakerEnable) ? faker.name().firstName() : baseScreenName;
+                (fakerEnable) ? faker.name().firstName() : baseScreenName;
         String lastName =
-            (fakerEnable) ? faker.name().lastName() : String.valueOf(index);
+                (fakerEnable) ? faker.name().lastName() : String.valueOf(index);
 
         User user = null;
 
         try {
             // Create User
             user = _userLocalService.addUserWithWorkflow(
-                serviceContext.getUserId(), serviceContext.getCompanyId(), // companyId,
-                false, // autoPassword,
-                password, // password1,
-                password, // password2,
-                false, // autoScreenName,
-                screenName.toString(),
-                emailAddress.toString(),
-                LocaleUtil.getDefault(), // locale,
-                firstName, // firstName,
-                StringPool.BLANK, // middleName,
-                lastName, // lastName,
-                0, // prefixId,
-                0, // suffixId,
-                male, // male
-                1, // birthdayMonth,
-                1, // birthdayDay,
-                1970, // birthdayYear,
-                StringPool.BLANK, // jobTitle,
-                groupIds, organizationIds, getRegularRoleIds(roleIds), // this is only for the regular roles
-                userGroupIds, // userGroupIds,
-                false, // sendEmail
-                serviceContext // serviceContext
+                    serviceContext.getUserId(),
+                    serviceContext.getCompanyId(), // companyId,
+                    false, // autoPassword,
+                    password, // password1,
+                    password, // password2,
+                    false, // autoScreenName,
+                    screenName,
+                    emailAddress,
+                    LocaleUtil.getDefault(), // locale,
+                    firstName, // firstName,
+                    StringPool.BLANK, // middleName,
+                    lastName, // lastName,
+                    0, // prefixId,
+                    0, // suffixId,
+                    male, // male
+                    1, // birthdayMonth,
+                    1, // birthdayDay,
+                    1970, // birthdayYear,
+                    StringPool.BLANK, // jobTitle,
+                    // TODO : User Type may want to be configurable moving forward
+                    UserConstants.TYPE_REGULAR,
+                    groupIds,
+                    organizationIds,
+                    getRegularRoleIds(roleIds), // this is only for the regular roles
+                    userGroupIds, // userGroupIds,
+                    false, // sendEmail
+                    serviceContext // serviceContext
             );
 
             if (_log.isDebugEnabled()) {
@@ -137,16 +139,16 @@ public class UserDataService {
     public List<Locale> getFakerAvailableLocales(Set<Locale> locales) {
 
         List<String> fakerList = new ArrayList<>(
-            Arrays.asList(
-                "bg", "ca", "ca-CAT", "da-DK", "de", "de-AT", "de-CH", "en",
-                "en-AU", "en-au-ocker", "en-BORK", "en-CA", "en-GB", "en-IND",
-                "en-NEP", "en-NG", "en-NZ", "en-PAK", "en-SG", "en-UG", "en-US",
-                "en-ZA", "es", "es-MX", "fa", "fi-FI", "fr", "he", "in-ID",
-                "it", "ja", "ko", "nb-NO", "nl", "pl", "pt", "pt-BR", "ru",
-                "sk", "sv", "sv-SE", "tr", "uk", "vi", "zh-CN", "zh-TW"));
+                Arrays.asList(
+                        "bg", "ca", "ca-CAT", "da-DK", "de", "de-AT", "de-CH", "en",
+                        "en-AU", "en-au-ocker", "en-BORK", "en-CA", "en-GB", "en-IND",
+                        "en-NEP", "en-NG", "en-NZ", "en-PAK", "en-SG", "en-UG", "en-US",
+                        "en-ZA", "es", "es-MX", "fa", "fi-FI", "fr", "he", "in-ID",
+                        "it", "ja", "ko", "nb-NO", "nl", "pl", "pt", "pt-BR", "ru",
+                        "sk", "sv", "sv-SE", "tr", "uk", "vi", "zh-CN", "zh-TW"));
         return locales.stream().filter(
-            locale -> fakerList.contains(locale.getLanguage())).collect(
-            Collectors.toList());
+                locale -> fakerList.contains(locale.getLanguage())).collect(
+                Collectors.toList());
     }
 
     /**
@@ -157,7 +159,7 @@ public class UserDataService {
      * @throws PortalException
      */
     public long[] getRegularRoleIds(long[] roleIds)
-        throws PortalException {
+            throws PortalException {
 
         Map<Integer, List<Role>> roles = _commonUtil.filterRoles(roleIds);
         List<Role> regularRoles = roles.get(RoleConstants.TYPE_REGULAR);
@@ -168,8 +170,8 @@ public class UserDataService {
 
         if (_log.isDebugEnabled()) {
             String regularids = regularRoles.stream().map(
-                r -> String.valueOf(r.getRoleId())).collect(
-                Collectors.joining(","));
+                    r -> String.valueOf(r.getRoleId())).collect(
+                    Collectors.joining(","));
             _log.debug("Regular ids : " + regularids);
         }
 
@@ -186,7 +188,7 @@ public class UserDataService {
      * @throws PortalException
      */
     public void setOrgRoles(long userId, long[] organizationIds, long[] roleIds)
-        throws PortalException {
+            throws PortalException {
 
         Map<Integer, List<Role>> roles = _commonUtil.filterRoles(roleIds);
         List<Role> orgRoles = roles.get(RoleConstants.TYPE_ORGANIZATION);
@@ -199,8 +201,8 @@ public class UserDataService {
 
         if (_log.isDebugEnabled()) {
             String orgids = orgRoles.stream().map(
-                o -> String.valueOf(o.getPrimaryKey())).collect(
-                Collectors.joining(","));
+                    o -> String.valueOf(o.getPrimaryKey())).collect(
+                    Collectors.joining(","));
             _log.debug("Organization ids : " + orgids);
         }
 
@@ -210,13 +212,13 @@ public class UserDataService {
         }
 
         List<Organization> orgs =
-            _organizationLocalService.getOrganizations(organizationIds);
+                _organizationLocalService.getOrganizations(organizationIds);
         long[] orgGroupdIds =
-            orgs.stream().mapToLong(Organization::getGroupId).toArray();
+                orgs.stream().mapToLong(Organization::getGroupId).toArray();
 
         for (long orgGroupdId : orgGroupdIds) {
             _userGroupRoleLocalService.addUserGroupRoles(
-                userId, orgGroupdId, orgIds);
+                    userId, orgGroupdId, orgIds);
         }
     }
 
@@ -230,7 +232,7 @@ public class UserDataService {
      * @throws PortalException
      */
     public void setSiteRoles(long userId, long[] groupIds, long[] roleIds)
-        throws PortalException {
+            throws PortalException {
 
         Map<Integer, List<Role>> roles = _commonUtil.filterRoles(roleIds);
         List<Role> siteRoles = roles.get(RoleConstants.TYPE_SITE);
@@ -240,12 +242,12 @@ public class UserDataService {
         }
 
         long[] siteIds =
-            siteRoles.stream().mapToLong(Role::getRoleId).toArray();
+                siteRoles.stream().mapToLong(Role::getRoleId).toArray();
 
         if (_log.isDebugEnabled()) {
             String siteids = siteRoles.stream().map(
-                s -> String.valueOf(s.getRoleId())).collect(
-                Collectors.joining(","));
+                    s -> String.valueOf(s.getRoleId())).collect(
+                    Collectors.joining(","));
             _log.debug("Site ids : " + siteids);
         }
 
@@ -256,7 +258,7 @@ public class UserDataService {
 
         for (long groupId : groupIds) {
             _userGroupRoleLocalService.addUserGroupRoles(
-                userId, groupId, siteIds);
+                    userId, groupId, siteIds);
         }
     }
 
@@ -268,14 +270,14 @@ public class UserDataService {
      * @throws PortalException
      */
     public void updateAnnouncementsDeliveries(
-        long userId, List<AnnouncementsDelivery> announcementsDeliveries)
-        throws PortalException {
+            long userId, List<AnnouncementsDelivery> announcementsDeliveries)
+            throws PortalException {
 
         for (AnnouncementsDelivery announcementsDelivery : announcementsDeliveries) {
 
             _announcementsDeliveryLocalService.updateDelivery(
-                userId, announcementsDelivery.getType(),
-                announcementsDelivery.isEmail(), announcementsDelivery.isSms());
+                    userId, announcementsDelivery.getType(),
+                    announcementsDelivery.isEmail(), announcementsDelivery.isSms());
         }
     }
 
@@ -298,5 +300,5 @@ public class UserDataService {
     private OrganizationLocalService _organizationLocalService;
 
     private static final Log _log =
-        LogFactoryUtil.getLog(UserDataService.class);
+            LogFactoryUtil.getLog(UserDataService.class);
 }

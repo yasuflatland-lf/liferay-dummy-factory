@@ -42,8 +42,8 @@ apply plugin: 'com.github.kt3k.coveralls'
 dependencies {
     compile 'com.google.errorprone:error_prone_annotations:2.3.1'
     compile 'commons-digester:commons-digester:2.1'
-    compile "com.google.guava:guava:27.1-jre"
-    compile "commons-io:commons-io:2.5"
+    compile 'com.google.guava:guava:30.0-jre'
+    compile 'commons-io:commons-io:2.7'
     compile "commons-validator:commons-validator:1.6"
     compile "org.apache.commons:commons-lang3:3.9"
     compile "com.github.mifmif:generex:1.0.2"
@@ -64,6 +64,11 @@ dependencies {
     compile group: "org.apache.felix", name: "org.apache.felix.gogo.runtime", version: "1.1.+"
 
     compileOnly group: "com.liferay.portal", name: "release.dxp.api"
+    compileOnly 'com.liferay.portal:com.liferay.portal.kernel'
+    compileOnly 'com.liferay.portal:com.liferay.portal.impl'
+    compileOnly 'com.liferay:com.liferay.dynamic.data.mapping.api'
+    compileOnly 'com.liferay:com.liferay.journal.api'
+    compileOnly 'com.liferay:com.liferay.message.boards.api'
 
     testCompile 'org.codehaus.groovy:groovy-all:2.5.+'
     testCompile group: 'cglib', name: 'cglib-nodep', version: 'latest.integration'
@@ -93,7 +98,7 @@ test {
 jacocoTestReport {
     reports {
         xml.enabled true
-        html.enabled = true
+        html.enabled = false
     }
 }
 

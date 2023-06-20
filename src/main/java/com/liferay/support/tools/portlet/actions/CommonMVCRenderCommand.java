@@ -11,13 +11,14 @@ import com.liferay.support.tools.utils.CommonUtil;
 import com.liferay.support.tools.utils.JqueryResolver;
 import com.liferay.support.tools.utils.LodashResolver;
 import com.liferay.support.tools.utils.WikiCommons;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import javax.portlet.PortletException;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * Render command for all jsps
@@ -28,7 +29,7 @@ import org.osgi.service.component.annotations.Reference;
     immediate = true, 
     property = { 
         "javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
-        "mvc.command.name=" + LDFPortletKeys.ORGANIZAION,
+        "mvc.command.name=" + LDFPortletKeys.ORGANIZATION,
         "mvc.command.name=" + LDFPortletKeys.SITES,
         "mvc.command.name=" + LDFPortletKeys.PAGES,
         "mvc.command.name=" + LDFPortletKeys.USERS,
@@ -37,7 +38,7 @@ import org.osgi.service.component.annotations.Reference;
         "mvc.command.name=" + LDFPortletKeys.MB,
         "mvc.command.name=" + LDFPortletKeys.CATEGORY,
         "mvc.command.name=" + LDFPortletKeys.BLOGS,
-        "mvc.command.name=" + LDFPortletKeys.WIKI,
+        // "mvc.command.name=" + LDFPortletKeys.WIKI,
         "mvc.command.name=" + LDFPortletKeys.COMMON
     }, 
     service = MVCRenderCommand.class
@@ -56,9 +57,9 @@ public class CommonMVCRenderCommand implements MVCRenderCommand {
 		// Carry around mode
 		renderRequest.setAttribute(LDFPortletKeys.MODE, mode);
 		
-		// Component libralies
-		renderRequest.setAttribute(LDFPortletWebKeys.WIKI_COMMONS, _wikiCommons);
-
+//		// Component libralies
+//		renderRequest.setAttribute(LDFPortletWebKeys.WIKI_COMMONS, _wikiCommons);
+//
 		if(_log.isDebugEnabled()) {
 			_log.debug("mode <" + mode + ">");
 			_log.debug("jsp  <" + _commonUtil
@@ -76,13 +77,13 @@ public class CommonMVCRenderCommand implements MVCRenderCommand {
 				.getOrDefault(mode, LDFPortletKeys.JSP_ORGANIZAION);
 	}
 
-	@Reference
+	@Reference(bind = "-")
 	private CommonUtil _commonUtil;
 	
-	@Reference
-	private WikiCommons _wikiCommons;
-	
-    @Reference
+//	@Reference(bind = "-")
+//	private WikiCommons _wikiCommons;
+//
+	@Reference(bind = "-")
     private NPMResolver _npmResolver;
 
 	private static Log _log = LogFactoryUtil

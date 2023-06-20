@@ -2,6 +2,7 @@ package com.liferay.support.tools.journal;
 
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMStructureService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
@@ -9,15 +10,13 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.support.tools.utils.ProgressManager;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
+import javax.portlet.ActionRequest;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.portlet.ActionRequest;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * Structure / Template selected Journal Articles Generator
@@ -42,9 +41,6 @@ public class JournalStructureTemplateDummyGenerator extends JournalStructureBase
 			_DDMStructureLocalService.getStructure(
 				paramContext.getDdmStructureId()
 			);
-
-		String structureKey =
-			ddmStructure.getStructureKey();
 		
 		// Template key
 		String templateKey = 
@@ -97,13 +93,14 @@ public class JournalStructureTemplateDummyGenerator extends JournalStructureBase
 				try {
 					// Create article
 					JournalArticle createdArticle = _journalArticleLocalService.addArticle(
+						null,
 						paramContext.getServiceContext().getUserId(), 	// userId,
 						groupId, 										// groupId,
 						paramContext.getFolderId(),						// folderId
 						titleMap, 										// titleMap
 						paramContext.getDescriptionMap(),				// descriptionMap
 						content, 										// content
-						structureKey,									// ddmStructureKey,
+						ddmStructure.getStructureId(),					// ddmStructureId,
 						templateKey, 									// ddmTemplateKey,
 						paramContext.getServiceContext()				// serviceContext
 					);
@@ -139,6 +136,9 @@ public class JournalStructureTemplateDummyGenerator extends JournalStructureBase
 	private DDMStructureLocalService _DDMStructureLocalService;
 
 	@Reference
-	private DDMTemplateLocalService _DDMTemplateLocalService;	
+	private DDMTemplateLocalService _DDMTemplateLocalService;
+
+	@Reference
+	private DDMStructureService _ddmStructureService;
 
 }

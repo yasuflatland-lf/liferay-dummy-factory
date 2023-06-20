@@ -8,3 +8,4 @@ package-lock.json
 node_modules
 .classpath
 .project
+.vscode/settings.json

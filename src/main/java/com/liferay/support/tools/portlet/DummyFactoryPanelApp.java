@@ -15,23 +15,26 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	immediate = true,
 	property = {
-		"panel.app.order:Integer=100",
+		"panel.app.order:Integer=600",
 		"panel.category.key=" + PanelCategoryKeys.CONTROL_PANEL_APPS
 	},
 	service = PanelApp.class
 )
 public class DummyFactoryPanelApp extends BasePanelApp {
+
+	@Override
+	public Portlet getPortlet() {
+		return _portlet;
+	}
+
 	@Override
 	public String getPortletId() {
 		return LDFPortletKeys.LIFERAY_DUMMY_FACTORY;
 	}
 
-	@Override
 	@Reference(
 		target = "(javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY + ")",
 		unbind = "-"
 	)
-	public void setPortlet(Portlet portlet) {
-		super.setPortlet(portlet);
-	}
+	private Portlet _portlet;
 }

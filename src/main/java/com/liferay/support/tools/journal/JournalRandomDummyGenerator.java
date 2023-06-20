@@ -1,9 +1,12 @@
 package com.liferay.support.tools.journal;
 
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.service.DDMStructureService;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.utils.ProgressManager;
@@ -46,6 +49,11 @@ public class JournalRandomDummyGenerator extends JournalStructureBaseDummyGenera
 			System.out.println(
 					"Starting to create " + paramContext.getNumberOfArticles() + " articles for site id <"
 					+ _groupLocalService.getGroup(groupId).getDescriptiveName() + ">");
+
+			DDMStructure ddmStructure = _ddmStructureService.getStructure(
+					PortalUtil.getSiteGroupId(groupId),
+					PortalUtil.getClassNameId(com.liferay.journal.model.JournalArticle.class.getName()),
+					LDFPortletKeys._DDM_STRUCTURE_KEY, true);
 
 			for (long i = 1; i <= paramContext.getNumberOfArticles(); i++) {
 				// Update progress
@@ -94,13 +102,14 @@ public class JournalRandomDummyGenerator extends JournalStructureBaseDummyGenera
 				try {
 					// Create article
 					JournalArticle createdArticle = _journalArticleLocalService.addArticle(
+						null,
 						paramContext.getServiceContext().getUserId(), 	// userId,
 						groupId, 										// groupId,
 						paramContext.getFolderId(),						// folderId
 						titleMap, 										// titleMap
 						paramContext.getDescriptionMap(),				// descriptionMap
 						content, 										// content
-						LDFPortletKeys._DDM_STRUCTURE_KEY,				// ddmStructureKey,
+						ddmStructure.getStructureId(),
 						LDFPortletKeys._DDM_TEMPLATE_KEY, 				// ddmTemplateKey,
 						paramContext.getServiceContext()				// serviceContext
 					);
@@ -133,6 +142,9 @@ public class JournalRandomDummyGenerator extends JournalStructureBaseDummyGenera
 	private GroupLocalService _groupLocalService;	
 	
 	@Reference
-	private RandomizeContentGenerator _randomizeContentGenerator;	
+	private RandomizeContentGenerator _randomizeContentGenerator;
+
+	@Reference
+	private DDMStructureService _ddmStructureService;
 
 }

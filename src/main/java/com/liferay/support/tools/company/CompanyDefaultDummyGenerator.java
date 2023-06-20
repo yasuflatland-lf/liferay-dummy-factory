@@ -5,12 +5,15 @@ import com.liferay.portal.instances.service.PortalInstancesLocalService;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
+import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.ProgressManager;
-import javax.portlet.ActionRequest;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+
+import javax.portlet.ActionRequest;
 
 /**
  * Company Generator
@@ -49,21 +52,22 @@ public class CompanyDefaultDummyGenerator extends DummyGenerator<CompanyContext>
 
       //Create company web id
       StringBundler webId = new StringBundler(2);
-      webId.append(paramContext.getWebId());
 
       //Create company Virtual Host Name
       StringBundler virtualHostname = new StringBundler(2);
-      virtualHostname.append(paramContext.getVirtualHostname());
 
       //Create company Mail Domain
       StringBundler mx = new StringBundler(2);
-      mx.append(paramContext.getMx());
 
-      //Add number more then one company
+      //Add number more than one company
       if (1 < paramContext.getNumberOfCompanies()) {
-        webId.append(i);
-        virtualHostname.append(i);
-        mx.append(i);
+        webId.append(String.valueOf(i)).append(paramContext.getWebId());
+        virtualHostname.append(String.valueOf(i)).append(paramContext.getVirtualHostname());
+        mx.append(String.valueOf(i)).append(paramContext.getMx());
+      } else {
+        webId.append(paramContext.getWebId());
+        virtualHostname.append(paramContext.getVirtualHostname());
+        mx.append(paramContext.getMx());
       }
 
       try {
@@ -72,21 +76,15 @@ public class CompanyDefaultDummyGenerator extends DummyGenerator<CompanyContext>
         }
 
         Company company = _companyLocalService.addCompany(
+            null,
             webId.toString(),
             virtualHostname.toString(),
             mx.toString(),
-            paramContext.isSystem(),
             paramContext.getMaxUsers(),
             paramContext.isActive());
 
-        _portalInstancesLocalService.initializePortalInstance(
-            company.getCompanyId(), company.getWebId(),
-            paramContext.getServletContext());
-
-      } catch (Exception e) {
-        //Finish progress
-        progressManager.finish();
-        throw e;
+      } catch (Throwable e) {
+        _log.error(e,e);
       }
     }
 
@@ -96,5 +94,4 @@ public class CompanyDefaultDummyGenerator extends DummyGenerator<CompanyContext>
     System.out.println("Finished creating " + paramContext.getNumberOfCompanies() + " companies");
 
   }
-
 }

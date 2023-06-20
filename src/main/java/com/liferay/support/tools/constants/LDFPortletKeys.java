@@ -35,7 +35,7 @@ public class LDFPortletKeys {
 	
 	// Command
 	public static final String COMMON = "/ldf/common";
-	public static final String ORGANIZAION = "/ldf/org";
+	public static final String ORGANIZATION = "/ldf/org";
 	public static final String SITES = "/ldf/sites";
 	public static final String PAGES = "/ldf/pages";
 	public static final String USERS = "/ldf/users";

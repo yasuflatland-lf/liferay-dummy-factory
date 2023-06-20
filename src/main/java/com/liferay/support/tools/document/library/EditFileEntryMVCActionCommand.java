@@ -38,7 +38,11 @@ import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
 import com.liferay.portal.kernel.settings.TypedSettings;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.upload.*;
+import com.liferay.portal.kernel.upload.LiferayFileItemException;
+import com.liferay.portal.kernel.upload.UploadException;
+import com.liferay.portal.kernel.upload.UploadPortletRequest;
+import com.liferay.portal.kernel.upload.UploadRequestSizeException;
+import com.liferay.portal.kernel.upload.configuration.UploadServletRequestConfigurationProvider;
 import com.liferay.portal.kernel.util.*;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.support.tools.constants.LDFPortletKeys;
@@ -53,14 +57,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-@Component(
-    property = {
-        "javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
-        "mvc.command.name=/df/document/edit_file_entry",
-        "mvc.command.name=/df/document/upload_multiple_file_entries"
-    },
-    service = MVCActionCommand.class
-)
+@Component(property = {"javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY, "mvc.command.name=/df/document/edit_file_entry", "mvc.command.name=/df/document/upload_multiple_file_entries"}, service = MVCActionCommand.class)
 public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
     @Override
@@ -110,14 +107,12 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
                 deleteTempFileEntry(actionRequest, actionResponse);
             }
 
-            if (cmd.equals(Constants.ADD_TEMP) ||
-                cmd.equals(Constants.DELETE_TEMP)) {
+            if (cmd.equals(Constants.ADD_TEMP) || cmd.equals(Constants.DELETE_TEMP)) {
                 MutableRenderParameters mutableRenderParameters = actionResponse.getRenderParameters();
                 mutableRenderParameters.setValue("mvcPath", "/null.jsp");
             } else {
                 String redirect = ParamUtil.getString(actionRequest, "redirect");
-                int workflowAction = ParamUtil.getInteger(actionRequest, "workflowAction",
-                    WorkflowConstants.ACTION_SAVE_DRAFT);
+                int workflowAction = ParamUtil.getInteger(actionRequest, "workflowAction", WorkflowConstants.ACTION_SAVE_DRAFT);
 
                 if ((fileEntry != null) && (workflowAction == WorkflowConstants.ACTION_SAVE_DRAFT)) {
 
@@ -141,30 +136,20 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
      * @return
      * @throws Exception
      */
-    protected String getSaveAndContinueRedirect(
-        PortletConfig portletConfig, ActionRequest actionRequest,
-        FileEntry fileEntry, String redirect)
-        throws Exception {
+    protected String getSaveAndContinueRedirect(PortletConfig portletConfig, ActionRequest actionRequest, FileEntry fileEntry, String redirect) throws Exception {
 
-        ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(
-            WebKeys.THEME_DISPLAY);
+        ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-        LiferayPortletURL portletURL = PortletURLFactoryUtil.create(
-            actionRequest, portletConfig.getPortletName(), themeDisplay.getLayout(),
-            PortletRequest.RENDER_PHASE);
+        LiferayPortletURL portletURL = PortletURLFactoryUtil.create(actionRequest, portletConfig.getPortletName(), themeDisplay.getLayout(), PortletRequest.RENDER_PHASE);
 
         MutableRenderParameters mutableRenderParameters = portletURL.getRenderParameters();
 
-        mutableRenderParameters.setValues(
-            "mvcRenderCommandName", "/df/document/edit_file_entry");
+        mutableRenderParameters.setValues("mvcRenderCommandName", "/df/document/edit_file_entry");
         mutableRenderParameters.setValues(Constants.CMD, Constants.UPDATE);
         mutableRenderParameters.setValues("redirect", redirect);
-        mutableRenderParameters.setValues(
-            "groupId", String.valueOf(fileEntry.getGroupId()));
-        mutableRenderParameters.setValues(
-            "fileEntryId", String.valueOf(fileEntry.getFileEntryId()));
-        mutableRenderParameters.setValues(
-            "version", String.valueOf(fileEntry.getVersion()));
+        mutableRenderParameters.setValues("groupId", String.valueOf(fileEntry.getGroupId()));
+        mutableRenderParameters.setValues("fileEntryId", String.valueOf(fileEntry.getFileEntryId()));
+        mutableRenderParameters.setValues("version", String.valueOf(fileEntry.getVersion()));
         portletURL.setWindowState(actionRequest.getWindowState());
 
         return portletURL.toString();
@@ -267,8 +252,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
             String mimeType = uploadPortletRequest.getContentType("file");
 
-            FileEntry fileEntry = _dlAppService.addTempFileEntry(themeDisplay.getScopeGroupId(), folderId,
-                TEMP_FOLDER_NAME, tempFileName, inputStream, mimeType);
+            FileEntry fileEntry = _dlAppService.addTempFileEntry(themeDisplay.getScopeGroupId(), folderId, TEMP_FOLDER_NAME, tempFileName, inputStream, mimeType);
 
             JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
@@ -292,8 +276,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
      * @return
      * @throws Exception
      */
-    public FileEntry updateFileEntry(PortletConfig portletConfig, ActionRequest actionRequest,
-                                     ActionResponse actionResponse) throws Exception {
+    public FileEntry updateFileEntry(PortletConfig portletConfig, ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 
         UploadPortletRequest uploadPortletRequest = PortalUtil.getUploadPortletRequest(actionRequest);
 
@@ -309,13 +292,9 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
         String title = ParamUtil.getString(uploadPortletRequest, "title");
         String description = ParamUtil.getString(uploadPortletRequest, "description");
         String changeLog = ParamUtil.getString(uploadPortletRequest, "changeLog");
-        DLVersionNumberIncrease dlVersionNumberIncrease =
-            DLVersionNumberIncrease.valueOf(
-                uploadPortletRequest.getParameter("versionIncrease"),
-                DLVersionNumberIncrease.AUTOMATIC);
+        DLVersionNumberIncrease dlVersionNumberIncrease = DLVersionNumberIncrease.valueOf(uploadPortletRequest.getParameter("versionIncrease"), DLVersionNumberIncrease.AUTOMATIC);
 
-        boolean updateVersionDetails = ParamUtil.getBoolean(
-            uploadPortletRequest, "updateVersionDetails");
+        boolean updateVersionDetails = ParamUtil.getBoolean(uploadPortletRequest, "updateVersionDetails");
 
         if (!updateVersionDetails) {
             dlVersionNumberIncrease = DLVersionNumberIncrease.AUTOMATIC;
@@ -342,47 +321,19 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
             inputStream = uploadPortletRequest.getFileAsStream("file");
 
-            ServiceContext serviceContext = ServiceContextFactory.getInstance(DLFileEntry.class.getName(),
-                uploadPortletRequest);
+            ServiceContext serviceContext = ServiceContextFactory.getInstance(DLFileEntry.class.getName(), uploadPortletRequest);
 
             FileEntry fileEntry = null;
 
             if (cmd.equals(Constants.ADD)) {
 
                 // Add file entry
-                fileEntry = _dlAppService.addFileEntry(
-                    null,
-                    repositoryId,
-                    folderId,
-                    sourceFileName,
-                    contentType,
-                    title,
-                    StringPool.BLANK,
-                    description,
-                    changeLog,
-                    inputStream,
-                    size,
-                    (Date)null,
-                    (Date)null,
-                    serviceContext);
+                fileEntry = _dlAppService.addFileEntry(null, repositoryId, folderId, sourceFileName, contentType, title, StringPool.BLANK, description, changeLog, inputStream, size, (Date) null, (Date) null, serviceContext);
 
             } else {
 
                 // Update file entry
-                fileEntry = _dlAppService.updateFileEntry(
-                    fileEntryId,
-                    sourceFileName,
-                    contentType,
-                    title,
-                    StringPool.BLANK,
-                    description,
-                    changeLog,
-                    dlVersionNumberIncrease,
-                    inputStream,
-                    size,
-                    (Date)null,
-                    (Date)null,
-                    serviceContext);
+                fileEntry = _dlAppService.updateFileEntry(fileEntryId, sourceFileName, contentType, title, StringPool.BLANK, description, changeLog, dlVersionNumberIncrease, inputStream, size, (Date) null, (Date) null, serviceContext);
             }
 
             return fileEntry;
@@ -401,21 +352,14 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
      * @param e
      * @throws Exception
      */
-    protected void handleUploadException(PortletConfig portletConfig, ActionRequest actionRequest,
-                                         ActionResponse actionResponse, String cmd, Exception e) throws Exception {
+    protected void handleUploadException(PortletConfig portletConfig, ActionRequest actionRequest, ActionResponse actionResponse, String cmd, Exception e) throws Exception {
 
         if (e instanceof AssetCategoryException || e instanceof AssetTagException) {
 
             SessionErrors.add(actionRequest, e.getClass(), e);
-        } else if (e instanceof AntivirusScannerException || e instanceof DuplicateFileEntryException
-            || e instanceof DuplicateFolderNameException || e instanceof FileExtensionException
-            || e instanceof FileMimeTypeException || e instanceof FileNameException
-            || e instanceof FileSizeException || e instanceof LiferayFileItemException
-            || e instanceof NoSuchFolderException || e instanceof SourceFileNameException
-            || e instanceof StorageFieldRequiredException || e instanceof UploadRequestSizeException) {
+        } else if (e instanceof AntivirusScannerException || e instanceof DuplicateFileEntryException || e instanceof DuplicateFolderNameException || e instanceof FileExtensionException || e instanceof FileMimeTypeException || e instanceof FileNameException || e instanceof FileSizeException || e instanceof LiferayFileItemException || e instanceof NoSuchFolderException || e instanceof SourceFileNameException || e instanceof StorageFieldRequiredException || e instanceof UploadRequestSizeException) {
 
-            if (!cmd.equals(Constants.ADD_DYNAMIC) && !cmd.equals(Constants.ADD_MULTIPLE)
-                && !cmd.equals(Constants.ADD_TEMP)) {
+            if (!cmd.equals(Constants.ADD_DYNAMIC) && !cmd.equals(Constants.ADD_MULTIPLE) && !cmd.equals(Constants.ADD_TEMP)) {
 
                 if (e instanceof AntivirusScannerException) {
                     SessionErrors.add(actionRequest, e.getClass(), e);
@@ -428,9 +372,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
                 hideDefaultErrorMessage(actionRequest);
             }
 
-            if (e instanceof AntivirusScannerException || e instanceof DuplicateFileEntryException
-                || e instanceof FileExtensionException || e instanceof FileNameException
-                || e instanceof FileSizeException || e instanceof UploadRequestSizeException) {
+            if (e instanceof AntivirusScannerException || e instanceof DuplicateFileEntryException || e instanceof FileExtensionException || e instanceof FileNameException || e instanceof FileSizeException || e instanceof UploadRequestSizeException) {
 
                 HttpServletResponse response = PortalUtil.getHttpServletResponse(actionResponse);
 
@@ -455,18 +397,15 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
                     errorMessage = themeDisplay.translate("please-enter-a-unique-document-name");
                     errorType = ServletResponseConstants.SC_DUPLICATE_FILE_EXCEPTION;
                 } else if (e instanceof FileExtensionException) {
-                    errorMessage = themeDisplay.translate("please-enter-a-file-with-a-valid-extension-x",
-                        StringUtil.merge(getAllowedFileExtensions(portletConfig, actionRequest, actionResponse)));
+                    errorMessage = themeDisplay.translate("please-enter-a-file-with-a-valid-extension-x", StringUtil.merge(getAllowedFileExtensions(portletConfig, actionRequest, actionResponse)));
                     errorType = ServletResponseConstants.SC_FILE_EXTENSION_EXCEPTION;
                 } else if (e instanceof FileNameException) {
                     errorMessage = themeDisplay.translate("please-enter-a-file-with-a-valid-file-name");
                     errorType = ServletResponseConstants.SC_FILE_NAME_EXCEPTION;
                 } else if (e instanceof FileSizeException) {
-                    long fileMaxSize = _uploadServletRequestConfigurationHelper.getMaxSize();
+                    long fileMaxSize = _uploadServletRequestConfigurationProvider.getMaxSize();
 
-                    errorMessage = themeDisplay.translate(
-                        "please-enter-a-file-with-a-valid-file-size-no-larger" + "-than-x",
-                        TextFormatter.formatStorageSize(fileMaxSize, themeDisplay.getLocale()));
+                    errorMessage = themeDisplay.translate("please-enter-a-file-with-a-valid-file-size-no-larger" + "-than-x", TextFormatter.formatStorageSize(fileMaxSize, themeDisplay.getLocale()));
 
                     errorType = ServletResponseConstants.SC_FILE_SIZE_EXCEPTION;
                 }
@@ -484,9 +423,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
             } else {
                 SessionErrors.add(actionRequest, e.getClass());
             }
-        } else if (e instanceof DuplicateLockException || e instanceof FileEntryLockException.MustOwnLock
-            || e instanceof InvalidFileVersionException || e instanceof NoSuchFileEntryException
-            || e instanceof PrincipalException) {
+        } else if (e instanceof DuplicateLockException || e instanceof FileEntryLockException.MustOwnLock || e instanceof InvalidFileVersionException || e instanceof NoSuchFileEntryException || e instanceof PrincipalException) {
 
             if (e instanceof DuplicateLockException) {
                 DuplicateLockException dle = (DuplicateLockException) e;
@@ -518,15 +455,13 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
      * @return
      * @throws PortalException
      */
-    protected String[] getAllowedFileExtensions(PortletConfig portletConfig, PortletRequest portletRequest,
-                                                PortletResponse portletResponse) throws PortalException {
+    protected String[] getAllowedFileExtensions(PortletConfig portletConfig, PortletRequest portletRequest, PortletResponse portletResponse) throws PortalException {
 
         ThemeDisplay themeDisplay = (ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
         PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
-        Settings settings = SettingsFactoryUtil
-            .getSettings(new PortletInstanceSettingsLocator(themeDisplay.getLayout(), portletDisplay.getId()));
+        Settings settings = SettingsFactoryUtil.getSettings(new PortletInstanceSettingsLocator(themeDisplay.getLayout(), portletDisplay.getId()));
 
         TypedSettings typedSettings = new TypedSettings(settings);
 
@@ -551,13 +486,8 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
         _dlTrashService = dlTrashService;
     }
 
-    @Reference(unbind = "-")
-    protected void setUploadServletRequestConfigurationHelper(UploadServletRequestConfigurationHelper uploadServletRequestConfigurationHelper) {
-        _uploadServletRequestConfigurationHelper = uploadServletRequestConfigurationHelper;
-    }
-
-    private UploadServletRequestConfigurationHelper
-        _uploadServletRequestConfigurationHelper;
+    @Reference
+    private UploadServletRequestConfigurationProvider _uploadServletRequestConfigurationProvider;
 
     private DLAppService _dlAppService;
     private DLTrashService _dlTrashService;
