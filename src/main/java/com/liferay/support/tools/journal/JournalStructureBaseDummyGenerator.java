@@ -164,6 +164,8 @@ public class JournalStructureBaseDummyGenerator extends DummyGenerator<JournalCo
 				paramContext.isNeverReview(),
 				createdArticle.isIndexable(),
 				createdArticle.isSmallImage(),
+				createdArticle.getSmallImageId(),
+				createdArticle.getSmallImageSource(),
 				createdArticle.getSmallImageURL(),
 				null,
 				null,
