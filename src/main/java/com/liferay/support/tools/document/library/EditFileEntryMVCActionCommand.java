@@ -10,7 +10,7 @@ import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLTrashService;
 import com.liferay.document.library.kernel.util.DLUtil;
-import com.liferay.dynamic.data.mapping.kernel.StorageFieldRequiredException;
+import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -18,7 +18,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.lock.DuplicateLockException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
+import com.liferay.portal.configuration.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletURL;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
@@ -34,11 +34,12 @@ import com.liferay.portal.kernel.servlet.ServletResponseConstants;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.settings.PortletInstanceSettingsLocator;
 import com.liferay.portal.kernel.settings.Settings;
-import com.liferay.portal.kernel.settings.SettingsFactoryUtil;
+import com.liferay.portal.kernel.settings.FallbackKeysSettingsUtil;
 import com.liferay.portal.kernel.settings.TypedSettings;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.upload.LiferayFileItemException;
+import com.liferay.dynamic.data.mapping.exception.StorageFieldRequiredException;
 import com.liferay.portal.kernel.upload.UploadException;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.upload.UploadRequestSizeException;
@@ -357,7 +358,13 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
         if (e instanceof AssetCategoryException || e instanceof AssetTagException) {
 
             SessionErrors.add(actionRequest, e.getClass(), e);
-        } else if (e instanceof AntivirusScannerException || e instanceof DuplicateFileEntryException || e instanceof DuplicateFolderNameException || e instanceof FileExtensionException || e instanceof FileMimeTypeException || e instanceof FileNameException || e instanceof FileSizeException || e instanceof LiferayFileItemException || e instanceof NoSuchFolderException || e instanceof SourceFileNameException || e instanceof StorageFieldRequiredException || e instanceof UploadRequestSizeException) {
+        } else if (
+                e instanceof AntivirusScannerException ||
+                e instanceof DuplicateFileEntryException ||
+                e instanceof DuplicateFolderNameException ||
+                e instanceof FileExtensionException ||
+                e instanceof FileMimeTypeException ||
+                e instanceof FileNameException || e instanceof FileSizeException || e instanceof LiferayFileItemException || e instanceof NoSuchFolderException || e instanceof SourceFileNameException || e instanceof StorageFieldRequiredException || e instanceof UploadRequestSizeException) {
 
             if (!cmd.equals(Constants.ADD_DYNAMIC) && !cmd.equals(Constants.ADD_MULTIPLE) && !cmd.equals(Constants.ADD_TEMP)) {
 
@@ -461,7 +468,7 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
         PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
-        Settings settings = SettingsFactoryUtil.getSettings(new PortletInstanceSettingsLocator(themeDisplay.getLayout(), portletDisplay.getId()));
+        Settings settings = FallbackKeysSettingsUtil.getSettings(new PortletInstanceSettingsLocator(themeDisplay.getLayout(), portletDisplay.getId()));
 
         TypedSettings typedSettings = new TypedSettings(settings);
 

@@ -3,7 +3,7 @@ package com.liferay.support.tools.wiki;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
+import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.support.tools.common.DummyGenerator;
@@ -48,7 +48,7 @@ public class WikiPageDummyGenerator extends DummyGenerator<WikiContext> {
 		
 		WikiGroupServiceOverriddenConfiguration
 		wikiGroupServiceOverriddenConfiguration =
-			configurationProvider.getConfiguration(
+			_configurationProvider.getConfiguration(
 				WikiGroupServiceOverriddenConfiguration.class,
 				new GroupServiceSettingsLocator(
 					node.getGroupId(), WikiConstants.SERVICE_NAME));
@@ -173,7 +173,7 @@ public class WikiPageDummyGenerator extends DummyGenerator<WikiContext> {
 	protected WikiNodeLocalService _wikiNodeLocalService;	
 	
 	@Reference
-	protected ConfigurationProvider configurationProvider;	
+	protected ConfigurationProvider _configurationProvider;
 	
 	private static final Log _log = LogFactoryUtil.getLog(WikiPageDummyGenerator.class);	
 	

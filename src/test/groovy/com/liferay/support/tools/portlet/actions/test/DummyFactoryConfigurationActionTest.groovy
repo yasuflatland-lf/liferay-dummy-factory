@@ -1,7 +1,6 @@
 package com.liferay.support.tools.portlet.actions.test
 
 import com.liferay.support.tools.portlet.actions.DummyFactoryConfigurationAction
-
 import spock.lang.Specification
 import spock.lang.Unroll
 

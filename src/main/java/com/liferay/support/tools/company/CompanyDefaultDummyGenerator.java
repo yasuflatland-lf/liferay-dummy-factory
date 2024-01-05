@@ -6,7 +6,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
-import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.CompanyService;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.ProgressManager;
@@ -26,7 +26,7 @@ public class CompanyDefaultDummyGenerator extends DummyGenerator<CompanyContext>
   private static final Log _log = LogFactoryUtil.getLog(CompanyDefaultDummyGenerator.class);
 
   @Reference
-  private CompanyLocalService _companyLocalService;
+  private CompanyService _companyService;
 
   @Reference
   private PortalInstancesLocalService _portalInstancesLocalService;
@@ -75,8 +75,8 @@ public class CompanyDefaultDummyGenerator extends DummyGenerator<CompanyContext>
           _log.debug("-----");
         }
 
-        Company company = _companyLocalService.addCompany(
-            null,
+        Company company = _companyService.addCompany(
+            0L,
             webId.toString(),
             virtualHostname.toString(),
             mx.toString(),
