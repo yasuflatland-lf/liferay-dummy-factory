@@ -10,7 +10,7 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.sites.kernel.util.SitesUtil;
+import com.liferay.sites.kernel.util.Sites;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.ProgressManager;
 
@@ -90,7 +90,7 @@ public class SiteDefaultDummyGenerator extends DummyGenerator<SiteContext> {
 					paramContext.getServiceContext()); //serviceContext
 				
 				// Set Site Template if it's selected.
-				SitesUtil.updateLayoutSetPrototypesLinks(
+				_sites.updateLayoutSetPrototypesLinks(
 					liveGroup, 
 					paramContext.getPublicLayoutSetPrototypeId(),
 					0,
@@ -122,8 +122,11 @@ public class SiteDefaultDummyGenerator extends DummyGenerator<SiteContext> {
 	}
 
 	@Reference
-	private GroupLocalService _groupLocalService;	
-	
+	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private Sites _sites;
+
 	private static final Log _log = LogFactoryUtil.getLog(
 			SiteDefaultDummyGenerator.class);		
 

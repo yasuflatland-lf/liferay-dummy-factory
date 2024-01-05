@@ -7,7 +7,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.sites.kernel.util.SitesUtil;
+import com.liferay.sites.kernel.util.Sites;
 import com.liferay.support.tools.common.DummyGenerator;
 import com.liferay.support.tools.utils.ProgressManager;
 
@@ -86,7 +86,7 @@ public class UserDefaultDummyGenerator extends DummyGenerator<UserContext> {
 					user.getUserId(), paramContext.getAnnouncementsDeliveries());
 				
 				// My Profile and My Dashboard Template
-				SitesUtil.updateLayoutSetPrototypesLinks(
+				_sites.updateLayoutSetPrototypesLinks(
 					user.getGroup(), 
 					paramContext.getPublicLayoutSetPrototypeId(),
 					paramContext.getPrivateLayoutSetPrototypeId(),
@@ -117,6 +117,9 @@ public class UserDefaultDummyGenerator extends DummyGenerator<UserContext> {
 
 	@Reference
 	private UserLayoutUtil _userLayoutUtil;
+
+	@Reference
+	private Sites _sites;
 
 	private static final Log _log =
 		LogFactoryUtil.getLog(UserDefaultDummyGenerator.class);

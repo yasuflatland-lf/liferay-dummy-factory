@@ -1,7 +1,6 @@
 package com.liferay.support.tools.utils.test
 
 import com.liferay.support.tools.utils.ProgressManager
-
 import spock.lang.Specification
 import spock.lang.Unroll
 
