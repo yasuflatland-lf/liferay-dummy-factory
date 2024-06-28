@@ -69,7 +69,7 @@ public class DLDefaultDummyGenerator extends DummyGenerator<DLContext> {
 
             try {
 
-                if (paramContext.getTempFileEntries().size() == 0) {
+                if (paramContext.getTempFileEntries().isEmpty()) {
 
                     _dLAppLocalService.addFileEntry(
                         null, // externalReferenceCode
@@ -83,6 +83,7 @@ public class DLDefaultDummyGenerator extends DummyGenerator<DLContext> {
                         paramContext.getBaseDocumentDescription(), //description,
                         StringPool.BLANK, //changeLog,
                         new File(System.getProperty("java.io.tmpdir"), "dummy"), //file,
+                        (Date)null, // displayDate
                         (Date)null, // expirationDate
                         (Date)null, // reviewDate
                         paramContext.getServiceContext());
@@ -104,6 +105,7 @@ public class DLDefaultDummyGenerator extends DummyGenerator<DLContext> {
                         StringPool.BLANK, //changeLog,
                         tf.getContentStream(), //file,
                         tf.getSize(),
+                        (Date)null, // displayDate
                         (Date)null, // expirationDate
                         (Date)null, // reviewDate
                         paramContext.getServiceContext());
@@ -135,9 +137,6 @@ public class DLDefaultDummyGenerator extends DummyGenerator<DLContext> {
 
     /**
      * Delete All temp file entries
-     *
-     * @param tempFileEntries
-     * @throws PortalException
      */
     protected void deleteAllTempFileEntries(List<FileEntry> tempFileEntries) throws PortalException {
 
@@ -148,10 +147,6 @@ public class DLDefaultDummyGenerator extends DummyGenerator<DLContext> {
 
     /**
      * Delete all files in a temp folder.
-     *
-     * @param request
-     * @param paramContext
-     * @throws PortalException
      */
     protected void deleteAllFilesInFolder(ActionRequest request, DLContext paramContext) throws PortalException {
         ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
