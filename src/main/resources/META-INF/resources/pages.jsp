@@ -141,7 +141,7 @@
 
 <aui:script>
     function <portlet:namespace/>execCommand() {
-        <%= progressId %>.startProgress();
+        
         submitForm(document.<portlet:namespace/>fm);
     }
 </aui:script>

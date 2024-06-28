@@ -159,9 +159,9 @@
                 <%
                     // Because of bug of lifeary-ui:upload-progress, you need to add the following parameter in the request.
                     String progressSessionKey = ProgressTracker.PERCENT + progressId;
-                    request.setAttribute("liferay-ui:progress:sessionKey", progressSessionKey);
+                    request.setAttribute("liferay-document-library:progress:sessionKey", progressSessionKey);
                 %>
-                <liferay-ui:upload-progress
+                <liferay-document-library:upload-progress
                         id="<%= progressId %>"
                         message="creating..."
                         height="20"
@@ -175,7 +175,7 @@
 
 <aui:script>
     function <portlet:namespace/>execCommand() {
-    <%= progressId %>.startProgress();
+
     submitForm(document.<portlet:namespace/>fm);
     }
 </aui:script>
