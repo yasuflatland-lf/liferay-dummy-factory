@@ -92,7 +92,7 @@
 	String mode = ParamUtil.getString(request, LDFPortletKeys.MODE, LDFPortletKeys.MODE_ORGANIZAION);
 
 	// Generate Progress ID
-	String progressId = PortalUtil.generateRandomKey(request, "progressId");
+	String progressId = PortalUtil.generateRandomKey(request, "_com_liferay_support_tools_portlet_LiferayDummyFactoryPortlet_commonProgressId");
 
 	DummyFactoryConfiguration dummyFactoryConfiguration =
 	        (DummyFactoryConfiguration)

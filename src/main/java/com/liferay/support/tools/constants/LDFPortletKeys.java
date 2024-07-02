@@ -109,6 +109,6 @@ public class LDFPortletKeys {
     public static final int W_PAGE = 1;
     
     // Progress Tracker parameter in request
-    public static final String COMMON_PROGRESS_ID = "commonProgressId";
+    public static final String COMMON_PROGRESS_ID = "progressId";
     
 }
