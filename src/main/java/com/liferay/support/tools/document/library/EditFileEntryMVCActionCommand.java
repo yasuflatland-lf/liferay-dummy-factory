@@ -341,7 +341,6 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
                         size,
                         (Date) null,
                         (Date) null,
-                        (Date) null,
                         serviceContext);
 
             } else {
@@ -357,7 +356,6 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
                         dlVersionNumberIncrease,
                         inputStream,
                         size,
-                        (Date) null,
                         (Date) null,
                         (Date) null,
                         serviceContext);
