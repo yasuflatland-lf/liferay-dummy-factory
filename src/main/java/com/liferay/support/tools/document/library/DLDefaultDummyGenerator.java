@@ -83,6 +83,7 @@ public class DLDefaultDummyGenerator extends DummyGenerator<DLContext> {
                         paramContext.getBaseDocumentDescription(), //description,
                         StringPool.BLANK, //changeLog,
                         new File(System.getProperty("java.io.tmpdir"), "dummy"), //file,
+                        (Date)null, // displayDate
                         (Date)null, // expirationDate
                         (Date)null, // reviewDate
                         paramContext.getServiceContext());
@@ -104,6 +105,7 @@ public class DLDefaultDummyGenerator extends DummyGenerator<DLContext> {
                         StringPool.BLANK, //changeLog,
                         tf.getContentStream(), //file,
                         tf.getSize(),
+                        (Date)null, // displayDate
                         (Date)null, // expirationDate
                         (Date)null, // reviewDate
                         paramContext.getServiceContext());
