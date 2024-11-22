@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Dummy Factory Portlet
 Bundle-SymbolicName: liferay.dummy.factory
-Bundle-Version: 7.4.2024.Q3.5
+Bundle-Version: 7.4.2024.Q3.9
 Web-ContextPath: /liferay-dummy-factory
 -dsannotations-options: inherit
 -sources: true
