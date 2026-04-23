@@ -1,0 +1,46 @@
+apply plugin: 'jacoco'
+
+dependencies {
+	compileOnly group: "com.liferay.portal", name: "release.dxp.api", version: "default"
+
+	compileInclude group: "net.datafaker", name: "datafaker", version: "2.5.4"
+
+	testImplementation group: "com.liferay.portal", name: "release.dxp.api", version: "default"
+	testImplementation group: "org.junit.jupiter", name: "junit-jupiter", version: "5.10.2"
+
+	// DXP release.dxp.api does not bundle log4j; provide it for the test JVM
+	// so Liferay's Log4jLogFactoryImpl static init can resolve LogManager.
+	testRuntimeOnly group: "org.apache.logging.log4j", name: "log4j-core", version: "2.24.3"
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+}
+
+jacoco {
+	toolVersion = '0.8.14'
+}
+
+test {
+	useJUnitPlatform()
+	jvmArgs '--add-opens=java.base/java.lang=ALL-UNNAMED',
+		'--add-opens=java.base/java.lang.reflect=ALL-UNNAMED',
+		'--add-opens=java.base/java.lang.invoke=ALL-UNNAMED',
+		'--add-opens=java.base/java.util=ALL-UNNAMED'
+}
+
+test.finalizedBy jacocoTestReport
+
+task copyJarToLatest(type: Copy) {
+	from jar.archiveFile
+	into "${rootProject.projectDir}/latest"
+}
+
+jacocoTestReport {
+	reports {
+		xml.required = true
+		html.required = true
+		csv.required = false
+	}
+}

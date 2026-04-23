@@ -1,0 +1,73 @@
+{
+  "input": {},
+  "schemaVersion": "1.0",
+  "steps": [
+    {
+      "id": "createCompany",
+      "idempotencyKey": "sample-company-1",
+      "onError": {
+        "policy": "FAIL_FAST"
+      },
+      "operation": "company.create",
+      "params": [
+        {
+          "name": "count",
+          "value": 1
+        },
+        {
+          "name": "webId",
+          "value": "sample-workflow-company"
+        },
+        {
+          "name": "virtualHostname",
+          "value": "sample-workflow-company.local"
+        },
+        {
+          "name": "mx",
+          "value": "sample-workflow-company.local"
+        }
+      ]
+    },
+    {
+      "id": "createUser",
+      "idempotencyKey": "sample-user-1",
+      "onError": {
+        "policy": "FAIL_FAST"
+      },
+      "operation": "user.create",
+      "params": [
+        {
+          "name": "count",
+          "value": 1
+        },
+        {
+          "name": "baseName",
+          "value": "sample-workflow-user"
+        },
+        {
+          "name": "emailDomain",
+          "value": "example.com"
+        }
+      ]
+    },
+    {
+      "id": "createOrganization",
+      "idempotencyKey": "sample-org-1",
+      "onError": {
+        "policy": "FAIL_FAST"
+      },
+      "operation": "organization.create",
+      "params": [
+        {
+          "name": "count",
+          "value": 1
+        },
+        {
+          "name": "baseName",
+          "value": "sample-workflow-organization"
+        }
+      ]
+    }
+  ],
+  "workflowId": "sample-company-user-organization"
+}

@@ -1,0 +1,22 @@
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        target: auto
+flags:
+  backend:
+    paths:
+      - modules/liferay-dummy-factory/src/main/java/
+    carryforward: true
+  integration:
+    paths:
+      - modules/liferay-dummy-factory/src/main/java/
+    carryforward: true
+  frontend:
+    paths:
+      - modules/liferay-dummy-factory/src/main/resources/META-INF/resources/js/
+    carryforward: true

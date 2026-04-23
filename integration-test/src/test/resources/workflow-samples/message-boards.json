@@ -1,0 +1,103 @@
+{
+  "input": {},
+  "schemaVersion": "1.0",
+  "steps": [
+    {
+      "id": "createSite",
+      "idempotencyKey": "sample-mb-site-1",
+      "onError": {
+        "policy": "FAIL_FAST"
+      },
+      "operation": "site.create",
+      "params": [
+        {
+          "name": "count",
+          "value": 1
+        },
+        {
+          "name": "baseName",
+          "value": "sample-mb-site"
+        }
+      ]
+    },
+    {
+      "id": "createMBCategory",
+      "idempotencyKey": "sample-mb-category-1",
+      "onError": {
+        "policy": "FAIL_FAST"
+      },
+      "operation": "mbCategory.create",
+      "params": [
+        {
+          "name": "count",
+          "value": 1
+        },
+        {
+          "name": "baseName",
+          "value": "sample-mb-category"
+        },
+        {
+          "name": "groupId",
+          "from": "steps.createSite.items[0].groupId"
+        },
+        {
+          "name": "description",
+          "value": "Sample message board category."
+        }
+      ]
+    },
+    {
+      "id": "createMBThread",
+      "idempotencyKey": "sample-mb-thread-1",
+      "onError": {
+        "policy": "FAIL_FAST"
+      },
+      "operation": "mbThread.create",
+      "params": [
+        {
+          "name": "count",
+          "value": 1
+        },
+        {
+          "name": "baseName",
+          "value": "sample-mb-thread"
+        },
+        {
+          "name": "groupId",
+          "from": "steps.createSite.items[0].groupId"
+        },
+        {
+          "name": "categoryId",
+          "from": "steps.createMBCategory.items[0].categoryId"
+        },
+        {
+          "name": "body",
+          "value": "Sample message board thread body."
+        }
+      ]
+    },
+    {
+      "id": "createMBReply",
+      "idempotencyKey": "sample-mb-reply-1",
+      "onError": {
+        "policy": "FAIL_FAST"
+      },
+      "operation": "mbReply.create",
+      "params": [
+        {
+          "name": "count",
+          "value": 1
+        },
+        {
+          "name": "threadId",
+          "from": "steps.createMBThread.items[0].threadId"
+        },
+        {
+          "name": "body",
+          "value": "Sample message board reply body."
+        }
+      ]
+    }
+  ],
+  "workflowId": "sample-message-boards"
+}

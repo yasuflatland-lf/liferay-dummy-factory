@@ -1,0 +1,73 @@
+{
+  "input": {},
+  "schemaVersion": "1.0",
+  "steps": [
+    {
+      "id": "createSite",
+      "idempotencyKey": "sample-vocabulary-site-1",
+      "onError": {
+        "policy": "FAIL_FAST"
+      },
+      "operation": "site.create",
+      "params": [
+        {
+          "name": "count",
+          "value": 1
+        },
+        {
+          "name": "baseName",
+          "value": "sample-vocabulary-site"
+        }
+      ]
+    },
+    {
+      "id": "createVocabulary",
+      "idempotencyKey": "sample-vocabulary-1",
+      "onError": {
+        "policy": "FAIL_FAST"
+      },
+      "operation": "vocabulary.create",
+      "params": [
+        {
+          "name": "count",
+          "value": 1
+        },
+        {
+          "name": "baseName",
+          "value": "sample-vocabulary"
+        },
+        {
+          "name": "groupId",
+          "from": "steps.createSite.items[0].groupId"
+        }
+      ]
+    },
+    {
+      "id": "createCategory",
+      "idempotencyKey": "sample-category-1",
+      "onError": {
+        "policy": "FAIL_FAST"
+      },
+      "operation": "category.create",
+      "params": [
+        {
+          "name": "count",
+          "value": 1
+        },
+        {
+          "name": "baseName",
+          "value": "sample-category"
+        },
+        {
+          "name": "groupId",
+          "from": "steps.createSite.items[0].groupId"
+        },
+        {
+          "name": "vocabularyId",
+          "from": "steps.createVocabulary.items[0].vocabularyId"
+        }
+      ]
+    }
+  ],
+  "workflowId": "sample-vocabulary-and-category"
+}

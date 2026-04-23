@@ -1,0 +1,74 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20.12.2'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Run unit tests
+        run: ./gradlew :modules:liferay-dummy-factory:test --no-daemon
+
+      - name: Run frontend tests with coverage
+        working-directory: modules/liferay-dummy-factory
+        run: npx vitest run --coverage
+
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: |
+            modules/liferay-dummy-factory/build/reports/jacoco/test/jacocoTestReport.xml
+            modules/liferay-dummy-factory/coverage/lcov.info
+          flags: backend,frontend
+          fail_ci_if_error: false
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: unit-test-report
+          path: modules/liferay-dummy-factory/build/reports/tests/test/
+          retention-days: 14
+
+      - name: Upload test results (XML)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: unit-test-results
+          path: modules/liferay-dummy-factory/build/test-results/test/
+          retention-days: 14
+
+      - name: Upload JaCoCo coverage report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: jacoco-coverage-report
+          path: modules/liferay-dummy-factory/build/reports/jacoco/test/
+          retention-days: 14
