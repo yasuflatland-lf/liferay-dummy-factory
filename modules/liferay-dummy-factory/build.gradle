@@ -35,7 +35,10 @@ test.finalizedBy jacocoTestReport
 task copyJarToLatest(type: Copy) {
 	from jar.archiveFile
 	into "${rootProject.projectDir}/latest"
+	rename { 'liferay-dummy-factory.jar' }
 }
+
+jar.finalizedBy copyJarToLatest
 
 jacocoTestReport {
 	reports {
