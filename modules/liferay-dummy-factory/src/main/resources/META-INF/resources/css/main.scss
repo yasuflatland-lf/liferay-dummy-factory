@@ -1,0 +1,217 @@
+.portlet-liferay-dummy-factory {
+	.container-fluid {
+		padding-top: 1.5rem;
+	}
+
+	.navigation-bar .container-fluid {
+		padding-top: 0;
+	}
+
+	.workflow-json-workspace {
+		container-type: inline-size;
+
+		.form-control.workflow-json-textarea {
+			font-family: monospace;
+			min-height: 18rem;
+		}
+
+		.workflow-json-result-errors {
+			list-style: disc inside;
+			margin: 0;
+			padding-left: 0;
+		}
+
+		.workflow-json-result-summary {
+			margin: 0;
+			white-space: pre-wrap;
+			word-break: break-word;
+		}
+
+		.workflow-json-sample-operations {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.25rem;
+			margin-top: 0.5rem;
+		}
+
+		.workflow-json-source {
+			border-radius: 0.25rem;
+			font-size: 0.6875rem;
+			font-weight: 700;
+			letter-spacing: 0.04em;
+			padding: 0.125rem 0.5rem;
+			text-transform: uppercase;
+		}
+
+		.workflow-json-source--ajv {
+			background: var(--lavender-l3, #e6e3f9);
+			color: var(--lavender-d3, #5c3aa3);
+		}
+
+		.workflow-json-source--plan {
+			background: var(--primary-l3, #e7edff);
+			color: var(--primary-d3, #0b5fff);
+		}
+
+		.workflow-json-source--execute {
+			background: var(--success-l3, #d4f4dd);
+			color: var(--success-d3, #287d3c);
+		}
+
+		.workflow-json-source--load {
+			background: var(--neutral-l3, #e7e7ed);
+			color: var(--neutral-d3, #272833);
+		}
+
+		.workflow-json-toolbar {
+			align-items: center;
+			background: var(--color-white, #ffffff);
+			border: 1px solid var(--color-neutral-3, #e7e7ed);
+			border-radius: 0.25rem;
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 0.5rem;
+			padding: 0.625rem 1rem;
+		}
+
+		.workflow-json-toolbar-left {
+			align-items: center;
+			display: flex;
+			gap: 0.75rem;
+		}
+
+		.workflow-json-toolbar-title {
+			color: var(--color-gray-9, #272833);
+			font-size: 0.9375rem;
+			font-weight: 600;
+		}
+
+		.workflow-json-toolbar-tag {
+			background: var(--primary-l3, #e7edff);
+			border-radius: 0.25rem;
+			color: var(--primary-d3, #0b5fff);
+			font-size: 0.6875rem;
+			font-weight: 700;
+			letter-spacing: 0.04em;
+			padding: 0.125rem 0.5rem;
+			text-transform: uppercase;
+		}
+
+		.workflow-json-toolbar-right {
+			align-items: center;
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		.workflow-json-split {
+			display: grid;
+			gap: 0.75rem;
+			grid-template-columns: 1fr 1fr;
+		}
+
+		@container (max-width: 1100px) {
+			.workflow-json-split {
+				grid-template-columns: 1fr;
+			}
+		}
+
+		@supports not (container-type: inline-size) {
+			@media (max-width: 1100px) {
+				.workflow-json-split {
+					grid-template-columns: 1fr;
+				}
+			}
+		}
+
+		.workflow-json-pane {
+			border: 1px solid var(--color-neutral-3, #e7e7ed);
+			border-radius: 0.25rem;
+			display: flex;
+			flex-direction: column;
+			min-height: clamp(280px, 50vh, 560px);
+			overflow: hidden;
+		}
+
+		.workflow-json-pane--editor {
+			background: var(--color-white, #ffffff);
+		}
+
+		.workflow-json-pane--result {
+			background: var(--color-neutral-1, #fafbfd);
+		}
+
+		.workflow-json-pane-label {
+			background: var(--color-neutral-2, #f7f8f9);
+			border-bottom: 1px solid var(--color-neutral-3, #e7e7ed);
+			color: var(--color-gray-7, #6b6c7e);
+			font-size: 0.6875rem;
+			font-weight: 600;
+			letter-spacing: 0.06em;
+			margin: 0;
+			padding: 0.375rem 0.625rem;
+			text-transform: uppercase;
+		}
+
+		.workflow-json-pane--editor .workflow-json-textarea {
+			border: none;
+			border-radius: 0;
+			flex: 1;
+			font-family: monospace;
+			min-height: auto;
+			padding: 0.625rem 0.75rem;
+			resize: none;
+			width: 100%;
+		}
+
+		.workflow-json-pane--result > .alert {
+			border: none;
+			border-radius: 0;
+			flex: 1;
+			margin: 0;
+			overflow: auto;
+		}
+
+		.workflow-json-pane-empty {
+			align-items: center;
+			color: var(--color-gray-7, #6b6c7e);
+			display: flex;
+			flex: 1;
+			font-size: 0.875rem;
+			justify-content: center;
+			padding: 1rem;
+			text-align: center;
+		}
+
+		.progress.progress-indeterminate {
+			background: var(--color-neutral-3, #e7e7ed);
+			border-radius: 0.125rem;
+			height: 0.25rem;
+			margin-bottom: 0.75rem;
+			overflow: hidden;
+			position: relative;
+
+			.progress-bar {
+				animation: workflow-json-progress-indeterminate 1.4s
+					cubic-bezier(0.4, 0, 0.2, 1) infinite;
+				background: var(--primary, #0b5fff);
+				border-radius: 0.125rem;
+				height: 100%;
+				left: -40%;
+				position: absolute;
+				top: 0;
+				width: 40%;
+			}
+		}
+
+	}
+}
+
+@keyframes workflow-json-progress-indeterminate {
+	0% {
+		left: -40%;
+	}
+
+	100% {
+		left: 100%;
+	}
+}

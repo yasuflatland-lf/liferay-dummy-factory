@@ -1,0 +1,249 @@
+import java.time.Duration
+
+plugins {
+	id 'groovy'
+	id 'jacoco'
+}
+
+// jacocoIntegrationReport references sourceSets.main of the liferay-dummy-factory
+// project. Force that project to be fully evaluated first so sourceSets are
+// available regardless of settings.gradle include order.
+evaluationDependsOn(':modules:liferay-dummy-factory')
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
+repositories {
+	mavenCentral()
+	maven { url 'https://repository-cdn.liferay.com/nexus/content/groups/public' }
+}
+
+jacoco {
+	toolVersion = '0.8.14'
+}
+
+def spockVersion = project.property('test.spock.version')
+def groovyVersion = project.property('test.groovy.version')
+def playwrightVersion = project.property('test.playwright.version')
+
+dependencies {
+	testImplementation "org.apache.groovy:groovy:${groovyVersion}"
+	testImplementation "org.apache.groovy:groovy-json:${groovyVersion}"
+	testImplementation "org.spockframework:spock-core:${spockVersion}"
+	testImplementation "com.microsoft.playwright:playwright:${playwrightVersion}"
+	testImplementation 'ch.qos.logback:logback-classic:1.4.14'
+	testImplementation 'commons-net:commons-net:3.10.0'
+	testImplementation 'org.jacoco:org.jacoco.core:0.8.14'
+	testImplementation 'org.jacoco:org.jacoco.agent:0.8.14:runtime'
+}
+
+// ----- License resolution: env var -> configs/local/deploy/activation-key.xml -----
+def resolveLicenseFile = tasks.register('resolveLicenseFile') {
+	group = 'liferay'
+	description = 'Resolve DXP activation key from env vars into configs/local/deploy/activation-key.xml'
+	doFirst {
+		def target = rootProject.file('configs/local/deploy/activation-key.xml')
+		def licenseFile = System.getenv('LIFERAY_DXP_LICENSE_FILE')
+		def licenseBase64 = System.getenv('LIFERAY_DXP_LICENSE_BASE64')
+
+		if (licenseFile) {
+			def src = file(licenseFile)
+			if (!src.exists()) {
+				throw new GradleException("LIFERAY_DXP_LICENSE_FILE points to missing file: ${licenseFile}")
+			}
+			target.parentFile.mkdirs()
+			target.bytes = src.bytes
+			logger.lifecycle("License: copied from ${licenseFile} (${src.length()} bytes)")
+		}
+		else if (licenseBase64) {
+			target.parentFile.mkdirs()
+			target.bytes = Base64.decoder.decode(licenseBase64.trim())
+			logger.lifecycle("License: decoded from LIFERAY_DXP_LICENSE_BASE64 (${target.length()} bytes)")
+		}
+		else {
+			throw new GradleException(
+				'DXP activation key not found.\n' +
+				'  Local:  export LIFERAY_DXP_LICENSE_FILE=/path/to/activation-key.xml\n' +
+				'  CI:     set LIFERAY_DXP_LICENSE_BASE64 secret (base64-encoded XML)'
+			)
+		}
+	}
+}
+
+// ----- Workspace Docker tasks wiring -----
+// The workspace plugin registers createDockerContainer / buildDockerImage /
+// dockerDeploy / startDockerContainer / stopDockerContainer on the root project.
+// resolveLicenseFile must run before buildDockerImage invokes dockerDeploy so the
+// activation key is laid down in configs/local/deploy/.
+//
+// NOTE: gradle.projectsEvaluated runs after *all* projects have been evaluated,
+// so the root-project tasks registered by the workspace plugin are already
+// available regardless of which project is evaluated first.
+def requireWorkspaceTask = { String path ->
+	def task = tasks.findByPath(path)
+	if (task == null) {
+		throw new GradleException(
+			"Workspace plugin did not register '${path}' — check plugin version (expect 16.0.5)."
+		)
+	}
+	return task
+}
+
+gradle.projectsEvaluated {
+	requireWorkspaceTask(':dockerDeploy').dependsOn(resolveLicenseFile)
+
+	requireWorkspaceTask(':createDockerContainer').configure {
+		// LIFERAY_JVM_OPTS injection: JaCoCo tcpserver agent for coverage collection.
+		withEnvVar 'LIFERAY_JVM_OPTS',
+			'-javaagent:/opt/liferay/jacocoagent.jar=output=tcpserver,address=0.0.0.0,port=6300'
+
+		// Publish the JaCoCo tcpserver port on all interfaces (same as the other
+		// workspace-plugin ports 8080/11311/8000). Binding to 127.0.0.1 only
+		// caused "Connection refused" on GitHub Actions because Java 21 resolves
+		// "localhost" to ::1 (IPv6) while the 127.0.0.1-only binding has no IPv6
+		// counterpart. Binding without a host-IP prefix lets Docker publish on
+		// both 127.0.0.1 and ::1, so ExecDumpClient reaches the agent regardless
+		// of which address the JVM picks for "localhost".
+		//
+		// exposePorts is ALSO required: unlike 8080/11311/8000 which are EXPOSE'd
+		// in liferay/dxp:2026.q1.3-lts, port 6300 is unknown to the base image.
+		// Docker silently drops portBindings for ports that are neither EXPOSE'd
+		// by the image nor added to the container's ExposedPorts, producing the
+		// symptom that 6300 appears in HostConfig.PortBindings but never reaches
+		// NetworkSettings.Ports.
+		exposePorts('tcp', [6300])
+		hostConfig.portBindings.add('6300:6300')
+
+		// Override workspace plugin 16.0.5 default (autoRemove=true at
+		// RootProjectConfigurator.java:540). Keeping the container after
+		// stopDockerContainer preserves logs, JaCoCo exec dumps, and volume
+		// state for post-mortem inspection (see ADR-0008 D4).
+		hostConfig.autoRemove.set(false)
+
+		// Mount the JaCoCo agent JAR at configuration time. bmuschko's
+		// DockerCreateContainer annotates `binds` as @Input, so Gradle
+		// finalizes the MapProperty before task actions run — binds.put(...)
+		// MUST happen at configuration time, not in doFirst. Gradle 7+ warns
+		// about configuration-time resolution of configurations; accept the
+		// warning as a known tradeoff since doFirst breaks the task with
+		// "binds is final and cannot be changed any further". The filter
+		// matches both the legacy 'jacocoagent.jar' name and the
+		// Maven-classifier form 'org.jacoco.agent-<ver>-runtime.jar' in the
+		// Gradle cache.
+		def jacocoJar = configurations.testRuntimeClasspath.find {
+			it.name.contains('jacocoagent') ||
+				(it.name.contains('org.jacoco.agent') && it.name.contains('runtime'))
+		}
+		if (jacocoJar == null) {
+			throw new GradleException(
+				'jacocoagent.jar not found on testRuntimeClasspath. ' +
+				'Ensure org.jacoco:org.jacoco.agent:0.8.14:runtime is declared as a testImplementation dependency.'
+			)
+		}
+		// Mount read-only (:ro) so a compromised container cannot tamper with the host-side agent JAR.
+		hostConfig.binds.put(jacocoJar.absolutePath, '/opt/liferay/jacocoagent.jar:ro')
+	}
+}
+
+// ----- awaitLiferayReady task -----
+tasks.register('awaitLiferayReady') {
+	group = 'liferay'
+	description = 'Poll Liferay login page until ready (max 8 min). Host/port from liferay.host / liferay.http.port.'
+	mustRunAfter ':startDockerContainer'
+	doLast {
+		def liferayHost = project.findProperty('liferay.host') ?: System.getProperty('liferay.host', 'localhost')
+		def liferayHttpPort = project.findProperty('liferay.http.port') ?: System.getProperty('liferay.http.port', '8080')
+		def url = new URL("http://${liferayHost}:${liferayHttpPort}/c/portal/login")
+		def deadline = System.currentTimeMillis() + 8 * 60 * 1000
+		int attempt = 0
+		while (System.currentTimeMillis() < deadline) {
+			attempt++
+			try {
+				def conn = url.openConnection()
+				conn.connectTimeout = 3000
+				conn.readTimeout = 3000
+				conn.instanceFollowRedirects = false
+				int code = conn.responseCode
+				if (code == 200 || code == 302) {
+					logger.lifecycle("Liferay ready after ${attempt} attempts (${url})")
+					return
+				}
+				logger.lifecycle("awaitLiferayReady attempt ${attempt}: unexpected HTTP ${code} from ${url}")
+			}
+			catch (IOException e) {
+				logger.info("awaitLiferayReady attempt ${attempt}: ${e.class.simpleName}: ${e.message}")
+			}
+			sleep(5000)
+		}
+		throw new GradleException("Liferay not ready after 8 minutes (${attempt} attempts, ${url})")
+	}
+}
+
+// ----- integrationTest task -----
+test {
+	enabled = false
+}
+
+tasks.register('integrationTest', Test) {
+	useJUnitPlatform()
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+
+	jvmArgs "-Xms${project.property('test.jvm.minHeap')}",
+			"-Xmx${project.property('test.jvm.maxHeap')}"
+	timeout = Duration.ofMinutes(30)
+
+	systemProperty 'liferay.host', 'localhost'
+	systemProperty 'liferay.http.port', '8080'
+	systemProperty 'liferay.gogo.port', '11311'
+	systemProperty 'liferay.jacoco.port', '6300'
+	systemProperty 'liferay.container.name', "${rootProject.name}-liferay"
+	systemProperty 'liferay.admin.email', 'test@liferay.com'
+	systemProperty 'liferay.admin.password', 'test'
+	systemProperty 'project.root.dir', rootProject.projectDir.absolutePath
+	environment 'PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD', '1'
+
+	testLogging {
+		events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+		showStandardStreams = true
+	}
+
+	jacoco {
+		enabled = false
+	}
+
+	dependsOn ':modules:liferay-dummy-factory:jar'
+	dependsOn ':startDockerContainer'
+	dependsOn 'awaitLiferayReady'
+	dependsOn 'installPlaywrightBrowsers'
+	finalizedBy ':stopDockerContainer'
+	finalizedBy 'jacocoIntegrationReport'
+}
+
+tasks.register('installPlaywrightBrowsers', JavaExec) {
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'com.microsoft.playwright.CLI'
+	args = ['install', 'chromium']
+}
+
+tasks.register('jacocoIntegrationReport', JacocoReport) {
+	dependsOn ':modules:liferay-dummy-factory:classes'
+
+	executionData fileTree(layout.buildDirectory.dir('jacoco')).include('*.exec')
+
+	sourceDirectories.from files(project(':modules:liferay-dummy-factory').sourceSets.main.java.srcDirs)
+	classDirectories.from files(project(':modules:liferay-dummy-factory').sourceSets.main.output)
+
+	reports {
+		html.required = true
+		html.outputLocation = layout.buildDirectory.dir('reports/jacoco/integration')
+		xml.required = true
+		xml.outputLocation = layout.buildDirectory.file('reports/jacoco/integration/jacoco.xml')
+	}
+
+	onlyIf {
+		!fileTree(layout.buildDirectory.dir('jacoco')).include('*.exec').isEmpty()
+	}
+}

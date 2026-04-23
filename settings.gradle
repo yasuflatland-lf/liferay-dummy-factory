@@ -1,0 +1,16 @@
+buildscript {
+	dependencies {
+		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.workspace", version: "16.0.5"
+	}
+
+	repositories {
+		maven {
+			url "https://repository-cdn.liferay.com/nexus/content/groups/public"
+		}
+	}
+}
+
+apply plugin: "com.liferay.workspace"
+
+include 'integration-test'
+include 'modules:liferay-dummy-factory'

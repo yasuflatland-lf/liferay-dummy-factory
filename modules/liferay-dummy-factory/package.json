@@ -1,0 +1,33 @@
+{
+	"dependencies": {
+		"ajv": "^8.17.1",
+		"react": "19.2.5",
+		"react-dom": "19.2.5"
+	},
+	"devDependencies": {
+		"@liferay/npm-scripts": "51.2.0",
+		"@testing-library/react": "16.3.0",
+		"@testing-library/user-event": "14.5.1",
+		"@types/react": "19.2.3",
+		"@types/react-dom": "19.2.3",
+		"@vitejs/plugin-react": "4.3.4",
+		"@vitest/coverage-v8": "2.1.8",
+		"esbuild": "0.28.0",
+		"jsdom": "25.0.1",
+		"typescript": "5.9.3",
+		"vite": "6.2.7",
+		"vitest": "2.1.8"
+	},
+	"main": "js/index.ts",
+	"name": "liferay-dummy-factory",
+	"private": true,
+	"scripts": {
+		"build": "node scripts/build.mjs",
+		"checkFormat": "liferay-npm-scripts format --check",
+		"format": "liferay-npm-scripts format",
+		"test": "vitest run",
+		"test:coverage": "vitest run --coverage",
+		"test:watch": "vitest"
+	},
+	"version": "2.0.0"
+}

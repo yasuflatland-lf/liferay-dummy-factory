@@ -1,0 +1,77 @@
+{
+  "input": {},
+  "schemaVersion": "1.0",
+  "steps": [
+    {
+      "id": "createSite",
+      "idempotencyKey": "sample-blog-wc-site-1",
+      "onError": {
+        "policy": "FAIL_FAST"
+      },
+      "operation": "site.create",
+      "params": [
+        {
+          "name": "count",
+          "value": 1
+        },
+        {
+          "name": "baseName",
+          "value": "sample-blog-wc-site"
+        }
+      ]
+    },
+    {
+      "id": "createBlogs",
+      "idempotencyKey": "sample-blog-1",
+      "onError": {
+        "policy": "FAIL_FAST"
+      },
+      "operation": "blogs.create",
+      "params": [
+        {
+          "name": "count",
+          "value": 1
+        },
+        {
+          "name": "baseName",
+          "value": "sample-workflow-blog"
+        },
+        {
+          "name": "groupId",
+          "from": "steps.createSite.items[0].groupId"
+        },
+        {
+          "name": "subtitle",
+          "value": "Sample blog subtitle"
+        },
+        {
+          "name": "content",
+          "value": "Sample blog entry content."
+        }
+      ]
+    },
+    {
+      "id": "createWebContent",
+      "idempotencyKey": "sample-web-content-1",
+      "onError": {
+        "policy": "FAIL_FAST"
+      },
+      "operation": "webContent.create",
+      "params": [
+        {
+          "name": "count",
+          "value": 1
+        },
+        {
+          "name": "baseName",
+          "value": "sample-workflow-article"
+        },
+        {
+          "name": "groupIds",
+          "from": "steps.createSite.items[0].groupId"
+        }
+      ]
+    }
+  ],
+  "workflowId": "sample-blogs-and-web-content"
+}

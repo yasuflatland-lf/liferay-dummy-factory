@@ -1,0 +1,51 @@
+{
+  "input": {},
+  "schemaVersion": "1.0",
+  "steps": [
+    {
+      "id": "createSite",
+      "idempotencyKey": "sample-site-1",
+      "onError": {
+        "policy": "FAIL_FAST"
+      },
+      "operation": "site.create",
+      "params": [
+        {
+          "name": "count",
+          "value": 1
+        },
+        {
+          "name": "baseName",
+          "value": "sample-site"
+        }
+      ]
+    },
+    {
+      "id": "createPage",
+      "idempotencyKey": "sample-page-1",
+      "onError": {
+        "policy": "FAIL_FAST"
+      },
+      "operation": "layout.create",
+      "params": [
+        {
+          "name": "count",
+          "value": 1
+        },
+        {
+          "name": "baseName",
+          "value": "welcome"
+        },
+        {
+          "name": "groupId",
+          "from": "steps.createSite.items[0].groupId"
+        },
+        {
+          "name": "type",
+          "value": "portlet"
+        }
+      ]
+    }
+  ],
+  "workflowId": "sample-site-and-page"
+}

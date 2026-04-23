@@ -1,0 +1,33 @@
+{
+  "input": {},
+  "schemaVersion": "1.0",
+  "steps": [
+    {
+      "id": "createRole",
+      "idempotencyKey": "sample-role-1",
+      "onError": {
+        "policy": "FAIL_FAST"
+      },
+      "operation": "role.create",
+      "params": [
+        {
+          "name": "count",
+          "value": 1
+        },
+        {
+          "name": "baseName",
+          "value": "sample-workflow-role"
+        },
+        {
+          "name": "roleType",
+          "value": "REGULAR"
+        },
+        {
+          "name": "description",
+          "value": "Sample role created by workflow template."
+        }
+      ]
+    }
+  ],
+  "workflowId": "sample-role"
+}
