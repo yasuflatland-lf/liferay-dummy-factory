@@ -15,7 +15,7 @@
 		"esbuild": "0.28.0",
 		"jsdom": "25.0.1",
 		"typescript": "5.9.3",
-		"vite": "6.2.7",
+		"vite": "6.4.2",
 		"vitest": "2.1.8"
 	},
 	"main": "js/index.ts",
