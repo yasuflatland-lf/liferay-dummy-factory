@@ -1,5 +1,6 @@
 package com.liferay.support.tools.it.spec
 
+import com.liferay.support.tools.it.util.LdfResourceClient
 import com.liferay.support.tools.it.util.PlaywrightLifecycle
 
 import com.microsoft.playwright.Locator
@@ -22,6 +23,9 @@ class MBReplyFunctionalSpec extends BaseLiferaySpec {
 	private static final int REPLY_COUNT = 3
 
 	@Shared
+	LdfResourceClient ldf
+
+	@Shared
 	PlaywrightLifecycle pw
 
 	@Shared
@@ -39,11 +43,15 @@ class MBReplyFunctionalSpec extends BaseLiferaySpec {
 	def setupSpec() {
 		ensureBundleActive()
 
+		ldf = new LdfResourceClient(liferay.baseUrl)
+
 		pw = new PlaywrightLifecycle()
 
 		// Prime admin password via Playwright login so headless API calls
 		// can authenticate with the active credentials immediately.
 		loginAsAdmin(pw)
+
+		ldf.login()
 
 		// Discover Guest site groupId for prereq section creation.
 		def group = jsonwsGet(
@@ -107,6 +115,7 @@ class MBReplyFunctionalSpec extends BaseLiferaySpec {
 			}
 		}
 
+		ldf?.close()
 		pw?.close()
 	}
 
@@ -177,6 +186,37 @@ class MBReplyFunctionalSpec extends BaseLiferaySpec {
 
 		then: 'reply count matches (endpoint may include root or only replies)'
 		(items.size() == REPLY_COUNT) || (items.size() == REPLY_COUNT + 1)
+	}
+
+	def 'creates replies with randomized body when fakerEnable is true'() {
+		given:
+		Map payload = [
+			count      : 20,
+			baseName   : 'faker-reply',
+			threadId   : prereqThreadId,
+			body       : '',
+			format     : 'html',
+			fakerEnable: true,
+			locale     : 'en_US',
+		]
+
+		when:
+		Map response = ldf.post('/ldf/mb-reply', payload) as Map
+
+		then: 'batch contract — diagnostic-first per .claude/rules/testing.md §Spock then: ordering'
+		assert response.success == true : "creator failed: ${response}"
+		response.count == 20
+		response.requested == 20
+		response.containsKey('skipped')
+		(response.items as List).size() == 20
+
+		and: 'deterministic lock — regression guard on empty/identical bodies'
+		(response.items as List).every {
+			((it.body as String) ==~ /(?s)\S.{20,}/)
+		}
+
+		and: 'all-distinct — 20 Faker lorem outputs have collision probability near 0'
+		(response.items as List).collect { it.body as String }.toSet().size() == 20
 	}
 
 }

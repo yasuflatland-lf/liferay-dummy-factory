@@ -57,6 +57,16 @@ function EntityForm({
 		return allowedValues.includes(String(controlValue));
 	};
 
+	const isFieldDisabled = (field: FieldDefinition): boolean => {
+		if (!field.disabledWhen) {
+			return false;
+		}
+
+		const controlValue = values[field.disabledWhen.field];
+
+		return String(controlValue ?? '') === String(field.disabledWhen.value);
+	};
+
 	const requiredFields = config.fields.filter((f) => !f.advanced);
 	const advancedFields = config.fields.filter((f) => f.advanced);
 	const visibleAdvanced = advancedFields.filter(isFieldVisible);
@@ -169,6 +179,8 @@ function EntityForm({
 	};
 
 	const renderField = (field: FieldDefinition) => {
+		const disabled = isFieldDisabled(field);
+
 		if (field.dataSource) {
 			const dependsOnValue = field.dependsOn
 				? String(values[field.dependsOn.field] || '')
@@ -178,6 +190,7 @@ function EntityForm({
 				<DynamicSelect
 					dataResourceURL={dataResourceURL}
 					dependsOnValue={dependsOnValue}
+					disabled={disabled}
 					error={errors[field.name]}
 					field={field}
 					key={field.name + (dependsOnValue || '')}
@@ -190,6 +203,7 @@ function EntityForm({
 
 		return (
 			<FormField
+				disabled={disabled}
 				error={errors[field.name]}
 				field={field}
 				formValues={values}

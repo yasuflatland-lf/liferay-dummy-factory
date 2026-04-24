@@ -3,6 +3,7 @@ import {translate} from '../utils/i18n';
 import FileUploadArea from './FileUploadArea';
 
 interface FormFieldProps {
+	disabled?: boolean;
 	error?: string;
 	field: FieldDefinition;
 	formValues?: Record<string, string>;
@@ -34,6 +35,7 @@ function FieldError({error}: {error?: string}) {
 }
 
 function FormField({
+	disabled = false,
 	error,
 	field,
 	formValues,
@@ -50,9 +52,11 @@ function FormField({
 			<div className="form-group">
 				<label className="toggle-switch" htmlFor={field.name}>
 					<input
+						aria-disabled={disabled || undefined}
 						checked={value === 'true'}
 						className="toggle-switch-check"
 						data-testid={testId}
+						disabled={disabled}
 						id={field.name}
 						onChange={(e) =>
 							onChange(field.name, String(e.target.checked))
@@ -80,8 +84,10 @@ function FormField({
 				<FieldLabel field={field} />
 
 				<select
+					aria-disabled={disabled || undefined}
 					className="form-control"
 					data-testid={testId}
+					disabled={disabled}
 					id={field.name}
 					multiple
 					onChange={(e) => {
@@ -112,8 +118,10 @@ function FormField({
 				<FieldLabel field={field} />
 
 				<select
+					aria-disabled={disabled || undefined}
 					className="form-control"
 					data-testid={testId}
+					disabled={disabled}
 					id={field.name}
 					onChange={(e) => onChange(field.name, e.target.value)}
 					value={value}
@@ -138,8 +146,10 @@ function FormField({
 				<FieldLabel field={field} />
 
 				<textarea
+					aria-disabled={disabled || undefined}
 					className="form-control"
 					data-testid={testId}
+					disabled={disabled}
 					id={field.name}
 					onChange={(e) => onChange(field.name, e.target.value)}
 					rows={5}
@@ -172,8 +182,10 @@ function FormField({
 			<FieldLabel field={field} />
 
 			<input
+				aria-disabled={disabled || undefined}
 				className="form-control"
 				data-testid={testId}
+				disabled={disabled}
 				id={field.name}
 				onChange={(e) => onChange(field.name, e.target.value)}
 				type={field.type === 'number' ? 'number' : 'text'}

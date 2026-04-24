@@ -189,3 +189,9 @@ Report locations:
 **`jacocoIntegrationReport` is silently SKIPPED when no `.exec` files exist.** The task has an `onlyIf { !fileTree('build/jacoco').isEmpty() }` guard. When `ExecDumpClient` cannot connect (e.g., port 6300 was not published), no `.exec` files are written, the guard fires, and the task is skipped without any error. Codecov's `fail_ci_if_error: false` then uploads nothing and still reports green. Add an explicit file-existence check in CI (`[ ! -s "integration-test/build/reports/jacoco/integration/jacoco.xml" ] && exit 1`) as a diagnostic signal that coverage collection failed.
 
 **`evaluationDependsOn(':modules:X')` is required when `jacocoIntegrationReport` references cross-project `sourceSets`.** `jacocoIntegrationReport` reads `project(':modules:liferay-dummy-factory').sourceSets.main.*`. Gradle evaluates projects in settings.gradle `include` order by default; if `integration-test` is evaluated before `modules:liferay-dummy-factory`, `sourceSets.main` is not yet populated and the task configuration throws `NullPointerException`. Fix: add `evaluationDependsOn(':modules:liferay-dummy-factory')` at the top of `integration-test/build.gradle`.
+
+## Release-only task: `copyJarToLatest`
+
+`./gradlew :modules:liferay-dummy-factory:copyJarToLatest` publishes the built JAR to `latest/liferay-dummy-factory.jar` (the distribution path linked from `README.md` §Usage).
+
+The `jar.finalizedBy copyJarToLatest` auto-hook was removed in commit `ceda5e3` so ordinary dev-loop `jar` runs do not churn `latest/`. Run this task **only** when cutting a release, and commit the updated `latest/` JAR as part of the release PR. Do not re-add the auto-hook — every dev build would otherwise produce a spurious `latest/` diff.

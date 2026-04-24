@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.support.tools.service.BatchResult;
-import com.liferay.support.tools.service.BatchSpec;
+import com.liferay.support.tools.service.MBReplyBatchSpec;
 import com.liferay.support.tools.service.MBReplyCreator;
 import com.liferay.support.tools.utils.ProgressCallback;
 import com.liferay.support.tools.workflow.adapter.TestModelProxyUtil;
@@ -51,9 +51,9 @@ class MBReplyCreateWorkflowOperationAdapterTest {
 					"Reply 2")),
 			result.items());
 		assertEquals(71L, mbReplyCreator.userId);
-		assertEquals(1601L, mbReplyCreator.threadId);
-		assertEquals("reply body", mbReplyCreator.body);
-		assertEquals("html", mbReplyCreator.format);
+		assertEquals(1601L, mbReplyCreator.spec.threadId());
+		assertEquals("reply body", mbReplyCreator.spec.body());
+		assertEquals("html", mbReplyCreator.spec.format());
 		assertSame(ProgressCallback.NOOP, mbReplyCreator.progressCallback);
 	}
 
@@ -78,14 +78,16 @@ class MBReplyCreateWorkflowOperationAdapterTest {
 	void requestRejectsInvalidCount() {
 		assertThrows(
 			IllegalArgumentException.class,
-			() -> new MBReplyCreateRequest(71L, 1601L, 0, "reply body", ""));
+			() -> new MBReplyCreateRequest(
+				71L, 1601L, 0, "reply body", "", false, "en_US"));
 	}
 
 	@Test
 	void requestRejectsMissingBody() {
 		assertThrows(
 			IllegalArgumentException.class,
-			() -> new MBReplyCreateRequest(71L, 1601L, 1, null, ""));
+			() -> new MBReplyCreateRequest(
+				71L, 1601L, 1, null, "", false, "en_US"));
 	}
 
 	@Test
@@ -109,6 +111,24 @@ class MBReplyCreateWorkflowOperationAdapterTest {
 			"Only 1 of 2 MB replies were created.", result.error());
 	}
 
+	@Test
+	void executeHonorsFakerEnableAndLocale() throws Throwable {
+		StubMBReplyCreator mbReplyCreator = new StubMBReplyCreator(
+			List.of(_mbReply(1301L, 1401L, 1501L, 1601L, "Reply 1", "Body 1")));
+
+		MBReplyCreateWorkflowOperationAdapter adapter =
+			new MBReplyCreateWorkflowOperationAdapter(mbReplyCreator);
+
+		adapter.execute(
+			new WorkflowExecutionContext(71L),
+			Map.of(
+				"body", "reply body", "count", 1, "threadId", 1601L,
+				"fakerEnable", true, "locale", "ja_JP"));
+
+		assertTrue(mbReplyCreator.spec.fakerEnable());
+		assertEquals("ja_JP", mbReplyCreator.spec.locale());
+	}
+
 	private static MBMessage _mbReply(
 		long messageId, long groupId, long categoryId, long threadId,
 		String subject, String body) {
@@ -128,17 +148,14 @@ class MBReplyCreateWorkflowOperationAdapterTest {
 
 		@Override
 		public BatchResult<MBMessage> create(
-			long userId, long threadId, BatchSpec batchSpec, String body,
-			String format, ProgressCallback progress) {
+				long userId, MBReplyBatchSpec spec, ProgressCallback progress)
+			throws Throwable {
 
-			this.batchSpec = batchSpec;
-			this.body = body;
-			this.format = format;
+			this.spec = spec;
 			this.progressCallback = progress;
-			this.threadId = threadId;
 			this.userId = userId;
 
-			int requested = batchSpec.count();
+			int requested = spec.batch().count();
 
 			if (_replies.size() == requested) {
 				return BatchResult.success(requested, _replies, 0);
@@ -156,12 +173,9 @@ class MBReplyCreateWorkflowOperationAdapterTest {
 			_replies = replies;
 		}
 
-		private BatchSpec batchSpec;
-		private String body;
-		private String format;
+		private MBReplyBatchSpec spec;
 		private ProgressCallback progressCallback;
 		private final List<MBMessage> _replies;
-		private long threadId;
 		private long userId;
 
 	}

@@ -33,6 +33,108 @@ const selectField: FieldDefinition = {
 	type: 'select',
 };
 
+describe('FormField disabledWhen', () => {
+	it('passes disabled to the underlying text input', () => {
+		const field: FieldDefinition = {
+			label: 'name',
+			name: 'name',
+			required: false,
+			type: 'text',
+		};
+
+		render(<FormField disabled={true} field={field} onChange={noop} value="" />);
+
+		const input = screen.getByRole('textbox') as HTMLInputElement;
+
+		expect(input.disabled).toBe(true);
+		expect(input.getAttribute('aria-disabled')).toBe('true');
+	});
+
+	it('passes disabled to the underlying toggle input', () => {
+		const field: FieldDefinition = {
+			label: 'name',
+			name: 'name',
+			required: false,
+			type: 'toggle',
+		};
+
+		render(
+			<FormField disabled={true} field={field} onChange={noop} value="false" />
+		);
+
+		const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
+
+		expect(checkbox.disabled).toBe(true);
+		expect(checkbox.getAttribute('aria-disabled')).toBe('true');
+	});
+
+	it('passes disabled to the underlying select input', () => {
+		const field: FieldDefinition = {
+			label: 'role',
+			name: 'role',
+			options: [{label: 'administrator', value: 'admin'}],
+			required: false,
+			type: 'select',
+		};
+
+		render(<FormField disabled={true} field={field} onChange={noop} value="" />);
+
+		const select = screen.getByRole('combobox') as HTMLSelectElement;
+
+		expect(select.disabled).toBe(true);
+		expect(select.getAttribute('aria-disabled')).toBe('true');
+	});
+
+	it('passes disabled to the underlying multiselect input', () => {
+		const field: FieldDefinition = {
+			label: 'roles',
+			name: 'roles',
+			options: [{label: 'administrator', value: 'admin'}],
+			required: false,
+			type: 'multiselect',
+		};
+
+		render(<FormField disabled={true} field={field} onChange={noop} value="" />);
+
+		const select = screen.getByRole('listbox') as HTMLSelectElement;
+
+		expect(select.disabled).toBe(true);
+		expect(select.getAttribute('aria-disabled')).toBe('true');
+	});
+
+	it('passes disabled to the underlying textarea input', () => {
+		const field: FieldDefinition = {
+			label: 'description',
+			name: 'description',
+			required: false,
+			type: 'textarea',
+		};
+
+		render(<FormField disabled={true} field={field} onChange={noop} value="" />);
+
+		const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+
+		expect(textarea.disabled).toBe(true);
+		expect(textarea.getAttribute('aria-disabled')).toBe('true');
+	});
+
+	it('does not set disabled when prop is omitted (default)', () => {
+		const field: FieldDefinition = {
+			label: 'name',
+			name: 'name',
+			required: false,
+			type: 'text',
+		};
+
+		render(<FormField field={field} onChange={noop} value="" />);
+
+		const input = screen.getByRole('textbox') as HTMLInputElement;
+
+		expect(input.disabled).toBe(false);
+		expect(input.getAttribute('aria-disabled')).toBeNull();
+	});
+});
+
 describe('FormField i18n', () => {
 	it('renders the required validation i18n message when error is set on a text field', () => {
 		const requiredText = i18n('this-field-is-required');

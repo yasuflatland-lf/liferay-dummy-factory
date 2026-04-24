@@ -56,6 +56,10 @@ Before writing cleanup or verification code for a new entity type, check both: (
 
 ## Debugging test failures
 
+### Groovy compile task name is `compileTestGroovy`, not `compileGroovy`
+
+The integration-test project's sources live under `src/test/groovy/...`, so the production compile task `:integration-test:compileGroovy` reports `NO-SOURCE` and exits without checking anything. The task that actually compiles the specs is `:integration-test:compileTestGroovy`. When verifying "do the specs still compile after my edit?" without running the Liferay container, use `compileTestGroovy`; `compileGroovy` gives a false green.
+
 ### Gradle Incremental Build Trap (tests appear green but didn't actually run)
 
 `:integration-test:integrationTest` does NOT declare `package.json` as an input. Changing a JS dependency does not invalidate the task, so Gradle marks it `UP-TO-DATE` and **replays the previous run's result**. A regression in the JS toolchain shows up as a green build.
