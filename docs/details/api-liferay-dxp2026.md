@@ -285,6 +285,6 @@ addUserWithWorkflow(
     ServiceContext serviceContext)
 ```
 
-**Gotcha for future debugging**: `Calendar.JANUARY` (value 0) and `UserConstants.TYPE_GUEST` (value 0) appear on the same line in `UserCreator` (birthdayMonth and type arguments), so the two constants are visually indistinguishable. If a bug report mentions "my users are missing from the Control Panel" and you spot `0` on that line, check whether it is `Calendar.JANUARY` or `TYPE_GUEST`.
+**Gotcha for future debugging**: If this regression resurfaces (the `type` argument silently reverts to a literal `0`), `Calendar.JANUARY` (also `0`) earlier on the same line makes the regression visually invisible — when scanning the line for the offending `, 0,`, check column position, not just the digit. The original bug at this site went undetected for that reason.
 
 Reference: `UserCreator.java`.
