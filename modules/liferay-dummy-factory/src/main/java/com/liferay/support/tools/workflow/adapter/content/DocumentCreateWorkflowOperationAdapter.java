@@ -1,7 +1,9 @@
 package com.liferay.support.tools.workflow.adapter.content;
 
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.support.tools.service.AssetTagNames;
 import com.liferay.support.tools.service.BatchResult;
+import com.liferay.support.tools.service.DocumentBatchSpec;
 import com.liferay.support.tools.service.DocumentCreator;
 import com.liferay.support.tools.workflow.adapter.core.WorkflowResultNormalizer;
 import com.liferay.support.tools.workflow.spi.WorkflowExecutionContext;
@@ -37,10 +39,13 @@ public class DocumentCreateWorkflowOperationAdapter
 		DocumentCreateRequest request = DocumentCreateRequest.from(
 			workflowExecutionContext, parameters(parameters));
 
+		DocumentBatchSpec spec = new DocumentBatchSpec(
+			request.batchSpec(), request.groupId(), request.folderId(),
+			request.description(), request.uploadedFiles(),
+			AssetTagNames.EMPTY);
+
 		BatchResult<FileEntry> result = _documentCreator.create(
-			request.userId(), request.groupId(), request.batchSpec(),
-			request.folderId(), request.description(),
-			request.uploadedFiles(), progressCallback());
+			request.userId(), spec, progressCallback());
 
 		return WorkflowResultNormalizer.normalize(
 			result,

@@ -6,12 +6,14 @@ public record MBReplyBatchSpec(
 	String body,
 	String format,
 	boolean fakerEnable,
-	String locale) {
+	String locale,
+	AssetTagNames tags) {
 
 	public MBReplyBatchSpec {
 		format = ((format == null) || format.isEmpty()) ? "html" : format;
 		locale = ((locale == null) || locale.isEmpty()) ? "en_US" : locale;
 		body = (body == null) ? "" : body;
+		tags = (tags == null) ? AssetTagNames.EMPTY : tags;
 	}
 
 }

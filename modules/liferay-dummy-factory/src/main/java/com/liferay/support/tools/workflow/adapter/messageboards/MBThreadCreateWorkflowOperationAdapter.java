@@ -1,8 +1,10 @@
 package com.liferay.support.tools.workflow.adapter.messageboards;
 
 import com.liferay.message.boards.model.MBMessage;
+import com.liferay.support.tools.service.AssetTagNames;
 import com.liferay.support.tools.service.BatchResult;
 import com.liferay.support.tools.service.BatchSpec;
+import com.liferay.support.tools.service.MBThreadBatchSpec;
 import com.liferay.support.tools.service.MBThreadCreator;
 import com.liferay.support.tools.utils.ProgressCallback;
 import com.liferay.support.tools.workflow.WorkflowParameterValues;
@@ -47,10 +49,12 @@ public class MBThreadCreateWorkflowOperationAdapter
 			values.optionalLong("categoryId", 0L), _batchSpec(values),
 			values.requireText("body"), values.optionalString("format", "html"));
 
+		MBThreadBatchSpec spec = new MBThreadBatchSpec(
+			request.batch(), request.groupId(), request.categoryId(),
+			request.body(), request.format(), AssetTagNames.EMPTY);
+
 		BatchResult<MBMessage> result = _mbThreadCreator.create(
-			request.userId(), request.groupId(), request.categoryId(),
-			request.batch(), request.body(), request.format(),
-			ProgressCallback.NOOP);
+			request.userId(), spec, ProgressCallback.NOOP);
 
 		return WorkflowResultNormalizer.normalize(
 			result,

@@ -11,8 +11,10 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.support.tools.constants.LDFPortletKeys;
+import com.liferay.support.tools.service.AssetTagNames;
 import com.liferay.support.tools.service.BatchResult;
 import com.liferay.support.tools.service.BatchSpec;
+import com.liferay.support.tools.service.DocumentBatchSpec;
 import com.liferay.support.tools.service.DocumentCreator;
 
 import jakarta.portlet.ResourceRequest;
@@ -43,9 +45,7 @@ public class DocumentResourceCommand extends BaseMVCResourceCommand {
 
 				long groupId = GetterUtil.getLong(data.getString("groupId"));
 
-				if (groupId <= 0) {
-					throw new IllegalArgumentException("site is required");
-				}
+				ResourceCommandUtil.validatePositiveId(groupId, "groupId");
 
 				long folderId = GetterUtil.getLong(
 					data.getString("folderId"), 0L);
@@ -57,9 +57,14 @@ public class DocumentResourceCommand extends BaseMVCResourceCommand {
 					Validator.isNotNull(uploadedFilesStr) ?
 						uploadedFilesStr.split(",") : new String[0];
 
+				AssetTagNames tags = AssetTagNames.of(data.getString("tags"));
+
+				DocumentBatchSpec spec = new DocumentBatchSpec(
+					batchSpec, groupId, folderId, description, uploadedFiles,
+					tags);
+
 				BatchResult<FileEntry> result = _documentCreator.create(
-					context.getUserId(), groupId, batchSpec, folderId,
-					description, uploadedFiles, context.getProgressCallback());
+					context.getUserId(), spec, context.getProgressCallback());
 
 				return ResourceCommandUtil.toJson(
 					result,

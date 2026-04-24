@@ -10,6 +10,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.support.tools.constants.LDFPortletKeys;
+import com.liferay.support.tools.service.AssetTagNames;
 import com.liferay.support.tools.service.BatchResult;
 import com.liferay.support.tools.service.BatchSpec;
 import com.liferay.support.tools.service.MBReplyBatchSpec;
@@ -54,8 +55,11 @@ public class MBReplyResourceCommand extends BaseMVCResourceCommand {
 
 				ResourceCommandUtil.validatePositiveId(threadId, "threadId");
 
+				AssetTagNames tags = AssetTagNames.of(data.getString("tags"));
+
 				MBReplyBatchSpec spec = new MBReplyBatchSpec(
-					batchSpec, threadId, body, format, fakerEnable, locale);
+					batchSpec, threadId, body, format, fakerEnable, locale,
+					tags);
 
 				BatchResult<MBMessage> result = _mbReplyCreator.create(
 					context.getUserId(), spec, context.getProgressCallback());

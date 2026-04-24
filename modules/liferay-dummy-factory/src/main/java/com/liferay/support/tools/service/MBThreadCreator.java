@@ -18,9 +18,14 @@ import org.osgi.service.component.annotations.Reference;
 public class MBThreadCreator {
 
 	public BatchResult<MBMessage> create(
-			long userId, long groupId, long categoryId, BatchSpec batchSpec,
-			String body, String format, ProgressCallback progress)
+			long userId, MBThreadBatchSpec spec, ProgressCallback progress)
 		throws Throwable {
+
+		long groupId = spec.groupId();
+		long categoryId = spec.categoryId();
+		String body = spec.body();
+		String format = spec.format();
+		BatchSpec batchSpec = spec.batch();
 
 		int count = batchSpec.count();
 
@@ -30,6 +35,10 @@ public class MBThreadCreator {
 
 		serviceContext.setScopeGroupId(groupId);
 		serviceContext.setUserId(userId);
+
+		if (!spec.tags().isEmpty()) {
+			serviceContext.setAssetTagNames(spec.tags().toArray());
+		}
 
 		List<MBMessage> messages = new ArrayList<>(count);
 

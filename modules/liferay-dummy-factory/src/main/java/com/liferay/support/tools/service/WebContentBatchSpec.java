@@ -31,13 +31,15 @@ public record WebContentBatchSpec(
 	int randomAmount,
 	String linkLists,
 	long ddmStructureId,
-	long ddmTemplateId) {
+	long ddmTemplateId,
+	AssetTagNames tags) {
 
 	public WebContentBatchSpec {
 		groupIds = _nullToEmpty(groupIds);
 		locales = _nullToEmptyStringArray(locales);
 		baseArticle = (baseArticle == null) ? "" : baseArticle;
 		linkLists = (linkLists == null) ? "" : linkLists;
+		tags = (tags == null) ? AssetTagNames.EMPTY : tags;
 	}
 
 	private static long[] _nullToEmpty(long[] array) {

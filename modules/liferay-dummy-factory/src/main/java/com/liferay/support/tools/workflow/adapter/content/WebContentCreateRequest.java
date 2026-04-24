@@ -3,6 +3,7 @@ package com.liferay.support.tools.workflow.adapter.content;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.support.tools.service.AssetTagNames;
 import com.liferay.support.tools.service.BatchSpec;
 import com.liferay.support.tools.service.WebContentBatchSpec;
 import com.liferay.support.tools.workflow.spi.WorkflowExecutionContext;
@@ -37,7 +38,8 @@ record WebContentCreateRequest(long userId, WebContentBatchSpec batchSpec) {
 				workflowParameterValues.optionalInt("randomAmount", 3),
 				workflowParameterValues.optionalString("linkLists", ""),
 				workflowParameterValues.optionalLong("ddmStructureId", 0L),
-				workflowParameterValues.optionalLong("ddmTemplateId", 0L)));
+				workflowParameterValues.optionalLong("ddmTemplateId", 0L),
+				AssetTagNames.EMPTY));
 	}
 
 	private static String[] _resolveLocales(

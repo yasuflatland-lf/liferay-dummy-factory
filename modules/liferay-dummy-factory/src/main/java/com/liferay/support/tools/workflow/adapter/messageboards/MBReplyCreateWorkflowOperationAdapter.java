@@ -1,6 +1,7 @@
 package com.liferay.support.tools.workflow.adapter.messageboards;
 
 import com.liferay.message.boards.model.MBMessage;
+import com.liferay.support.tools.service.AssetTagNames;
 import com.liferay.support.tools.service.BatchResult;
 import com.liferay.support.tools.service.BatchSpec;
 import com.liferay.support.tools.service.MBReplyBatchSpec;
@@ -48,7 +49,7 @@ public class MBReplyCreateWorkflowOperationAdapter
 		MBReplyBatchSpec spec = new MBReplyBatchSpec(
 			new BatchSpec(request.count(), "reply"), request.threadId(),
 			request.body(), request.format(), request.fakerEnable(),
-			request.locale());
+			request.locale(), AssetTagNames.EMPTY);
 
 		BatchResult<MBMessage> result = _mbReplyCreator.create(
 			request.userId(), spec, ProgressCallback.NOOP);

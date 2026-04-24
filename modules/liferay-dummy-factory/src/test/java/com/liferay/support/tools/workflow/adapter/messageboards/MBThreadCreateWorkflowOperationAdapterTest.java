@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.support.tools.service.BatchResult;
 import com.liferay.support.tools.service.BatchSpec;
+import com.liferay.support.tools.service.MBThreadBatchSpec;
 import com.liferay.support.tools.service.MBThreadCreator;
 import com.liferay.support.tools.utils.ProgressCallback;
 import com.liferay.support.tools.workflow.adapter.TestModelProxyUtil;
@@ -133,18 +134,18 @@ class MBThreadCreateWorkflowOperationAdapterTest {
 
 		@Override
 		public BatchResult<MBMessage> create(
-			long userId, long groupId, long categoryId, BatchSpec batchSpec,
-			String body, String format, ProgressCallback progress) {
+				long userId, MBThreadBatchSpec spec, ProgressCallback progress)
+			throws Throwable {
 
-			this.batchSpec = batchSpec;
-			this.body = body;
-			this.categoryId = categoryId;
-			this.format = format;
-			this.groupId = groupId;
+			this.batchSpec = spec.batch();
+			this.body = spec.body();
+			this.categoryId = spec.categoryId();
+			this.format = spec.format();
+			this.groupId = spec.groupId();
 			this.progressCallback = progress;
 			this.userId = userId;
 
-			int requested = batchSpec.count();
+			int requested = spec.batch().count();
 
 			if (_messages.size() == requested) {
 				return BatchResult.success(requested, _messages, 0);
