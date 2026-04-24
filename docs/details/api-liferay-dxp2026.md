@@ -288,3 +288,16 @@ addUserWithWorkflow(
 **Gotcha for future debugging**: If this regression resurfaces (the `type` argument silently reverts to a literal `0`), `Calendar.JANUARY` (also `0`) earlier on the same line makes the regression visually invisible — when scanning the line for the offending `, 0,`, check column position, not just the digit. The original bug at this site went undetected for that reason.
 
 Reference: `UserCreator.java`.
+
+## 22. `ServiceContext.setAssetTagNames(String[])` — auto-create and group scope
+
+Passing a non-empty `String[]` to `ServiceContext.setAssetTagNames(names)` before calling a content-creation service method triggers two behaviors at persist time:
+
+- **Tag attachment**: Liferay calls `AssetTagLocalServiceImpl.checkTags` internally, which links each tag to the just-created `AssetEntry` row.
+- **Auto-create**: if a named `AssetTag` does not yet exist for the current `scopeGroupId`, `checkTags` creates it automatically. No manual `AssetTagLocalService.addTag` call is needed.
+
+**Tags are group-scoped.** A Creator iterating over multiple groups (e.g. `WebContentCreator` across `groupIds[]`) produces independent `AssetTag` rows per group — same name, different `groupId`. This is correct for multi-site seed data.
+
+**Case handling**: `AssetTag.name` is stored as-written by `checkTags`. Normalizing to lowercase at our boundary (via `AssetTagNames.of(String)` — see `.claude/rules/writing-code.md`) keeps lookup deterministic and avoids duplicate rows that differ only by case.
+
+Reference: `com.liferay.asset.kernel.service.impl.AssetTagLocalServiceImpl.checkTags`; `AssetTagNames.java`.
