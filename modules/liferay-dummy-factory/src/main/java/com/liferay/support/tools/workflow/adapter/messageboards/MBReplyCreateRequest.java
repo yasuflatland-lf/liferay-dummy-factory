@@ -11,17 +11,13 @@ public record MBReplyCreateRequest(
 		threadId = WorkflowInputValidator.requirePositiveId(
 			threadId, "threadId");
 		count = WorkflowInputValidator.requireCount(count);
-		body = _requireText(body, "body");
-		format = WorkflowInputValidator.normalizeText(format, "html");
-		locale = WorkflowInputValidator.normalizeText(locale, "en_US");
-	}
 
-	private static String _requireText(String value, String fieldName) {
-		if ((value == null) || value.isBlank()) {
-			throw new IllegalArgumentException(fieldName + " is required");
+		if ((body == null) || body.isBlank()) {
+			throw new IllegalArgumentException("body is required");
 		}
 
-		return value;
+		format = WorkflowInputValidator.normalizeText(format, "html");
+		locale = WorkflowInputValidator.normalizeText(locale, "en_US");
 	}
 
 }

@@ -9,19 +9,9 @@ public record MBReplyBatchSpec(
 	String locale) {
 
 	public MBReplyBatchSpec {
-		format = _nullOrEmptyToDefault(format, "html");
-		locale = _nullOrEmptyToDefault(locale, "en_US");
+		format = ((format == null) || format.isEmpty()) ? "html" : format;
+		locale = ((locale == null) || locale.isEmpty()) ? "en_US" : locale;
 		body = (body == null) ? "" : body;
-	}
-
-	private static String _nullOrEmptyToDefault(
-		String value, String defaultValue) {
-
-		if ((value == null) || value.isEmpty()) {
-			return defaultValue;
-		}
-
-		return value;
 	}
 
 }

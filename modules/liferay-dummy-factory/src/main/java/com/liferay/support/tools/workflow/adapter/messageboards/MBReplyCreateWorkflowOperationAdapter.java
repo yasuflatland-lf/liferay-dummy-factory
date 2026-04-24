@@ -37,25 +37,9 @@ public class MBReplyCreateWorkflowOperationAdapter
 
 		WorkflowParameterValues values = new WorkflowParameterValues(parameters);
 
-		long userId = workflowExecutionContext.userId();
-
-		// Honor explicit per-step override if present; schema documents `userId`
-		// as an optional parameter for impersonation-like workflows.
-		if ((parameters != null) && parameters.containsKey("userId")) {
-			long overrideUserId = values.optionalLong("userId", Long.MIN_VALUE);
-
-			if (overrideUserId != Long.MIN_VALUE) {
-				if (overrideUserId <= 0) {
-					throw new IllegalArgumentException(
-						"userId must be positive");
-				}
-
-				userId = overrideUserId;
-			}
-		}
-
 		MBReplyCreateRequest request = new MBReplyCreateRequest(
-			userId, values.requirePositiveLong("threadId"),
+			_effectiveUserId(values, workflowExecutionContext),
+			values.requirePositiveLong("threadId"),
 			values.requireCount(), values.requireText("body"),
 			values.optionalString("format", "html"),
 			values.optionalBoolean("fakerEnable", false),
@@ -85,6 +69,20 @@ public class MBReplyCreateWorkflowOperationAdapter
 	@Override
 	public String operationName() {
 		return "mbReply.create";
+	}
+
+	private static long _effectiveUserId(
+		WorkflowParameterValues values,
+		WorkflowExecutionContext workflowExecutionContext) {
+
+		long userId = values.optionalLong(
+			"userId", workflowExecutionContext.userId());
+
+		if (userId <= 0) {
+			throw new IllegalArgumentException("userId must be positive");
+		}
+
+		return userId;
 	}
 
 	@Reference
