@@ -259,3 +259,32 @@ private static String _nullIfEmpty(String value) {
 ```
 
 The same empty-string behavior applies to other prototype-related accessors on `LayoutSet` (e.g. `getLayoutSetPrototypeKey()`). Reference: `UserCreateUseCase._toItemResult`, `SiteCreateUseCase._toItemResult`.
+
+## 21. `UserLocalService.addUserWithWorkflow` — new `int type` parameter at position 20
+
+DXP 2026 adds a required `int type` argument at position 20 (between `jobTitle` and `groupIds`). This parameter did not exist in CE 7.4 or earlier. **Always pass `UserConstants.TYPE_REGULAR` (value 1) for end-user accounts.**
+
+Passing `0` (= `UserConstants.TYPE_GUEST`) or any value other than `TYPE_REGULAR` makes the user invisible in Control Panel > Users and Organizations because that view filters on `type == 1`. The bug is silent — the user is created, but the Control Panel will not display it.
+
+Verified signature:
+
+```java
+addUserWithWorkflow(
+    long creatorUserId, long companyId,
+    boolean autoPassword, String password1, String password2,
+    boolean autoScreenName, String screenName, String emailAddress,
+    Locale locale,
+    String firstName, String middleName, String lastName,
+    long prefixListTypeId, long suffixListTypeId,
+    boolean male,
+    int birthdayMonth, int birthdayDay, int birthdayYear,
+    String jobTitle,
+    int type,                           // <-- position 20, NEW in DXP 2026: use UserConstants.TYPE_REGULAR
+    long[] groupIds, long[] organizationIds, long[] roleIds, long[] userGroupIds,
+    boolean sendEmail,
+    ServiceContext serviceContext)
+```
+
+**Gotcha for future debugging**: `Calendar.JANUARY` (value 0) and `UserConstants.TYPE_GUEST` (value 0) appear on the same line in `UserCreator` (birthdayMonth and type arguments), so the two constants are visually indistinguishable. If a bug report mentions "my users are missing from the Control Panel" and you spot `0` on that line, check whether it is `Calendar.JANUARY` or `TYPE_GUEST`.
+
+Reference: `UserCreator.java`.
