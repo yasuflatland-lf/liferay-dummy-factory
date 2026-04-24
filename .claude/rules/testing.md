@@ -35,6 +35,7 @@ L2 layer for test design, execution strategy, and verification. Read this when w
 - Liferay exposes remote `*Service` classes via `/api/jsonws/`, NOT `*LocalService`. If a method only exists on `*LocalService`, it cannot be called from a test.
 - Some remote services are blacklisted via `portal.properties` `json.service.invalid.class.names`. `CompanyServiceUtil` is one such entry — every JSON-WS path under `/api/jsonws/company/*` returns HTTP 404 regardless of method or parameter format.
 - Before writing cleanup or verification code for a new entity type, check both: (a) is there a remote `*Service` class with the method I need, and (b) is that class blacklisted? Catalogue of DXP 2026 API constraints: `docs/details/api-liferay-dxp2026.md`.
+- **`assetentry/get-entry` omits `tagNames`** — the JSONWS projection of `AssetEntry` does not include derived collection fields. Tests verifying tag attachment must make a secondary call to `assettag/get-tags?classNameId=<id>&classPK=<pk>`. Resolve `classNameId` via `classname/fetch-class-name-id`. See `docs/details/api-liferay-dxp2026.md` §23.
 
 ## Deploy verification
 

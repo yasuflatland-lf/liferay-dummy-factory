@@ -301,3 +301,21 @@ Passing a non-empty `String[]` to `ServiceContext.setAssetTagNames(names)` befor
 **Case handling**: `AssetTag.name` is stored as-written by `checkTags`. Normalizing to lowercase at our boundary (via `AssetTagNames.of(String)` — see `.claude/rules/writing-code.md`) keeps lookup deterministic and avoids duplicate rows that differ only by case.
 
 Reference: `com.liferay.asset.kernel.service.impl.AssetTagLocalServiceImpl.checkTags`; `AssetTagNames.java`.
+
+## 23. `/api/jsonws/assetentry/get-entry` omits derived collection fields such as `tagNames`
+
+The JSONWS JSON projection of `AssetEntry` in DXP 2026 serializes only persistent scalar fields (`classNameId`, `classPK`, `classUuid`, `entryId`, `modifiedDate`, `title`, `userId`, …). Derived collection fields — `tagNames` being the most commonly needed — are absent from the response.
+
+**Impact on tests**: asserting `entry.tagNames.size() > 0` dereferences `null` and produces a misleading NPE whose stack points at `.size()`, not at the missing field.
+
+**Correct verification pattern for tag attachment**: resolve the entity's `classNameId` first, then call the tag-listing endpoint:
+
+```bash
+# 1. Resolve classNameId
+GET /api/jsonws/classname/fetch-class-name-id?value=com.liferay.journal.model.JournalArticle
+
+# 2. Fetch tags for the entity
+GET /api/jsonws/assettag/get-tags?classNameId=<id>&classPK=<pk>
+```
+
+In Spock specs, use `jsonwsGet('assettag/get-tags', [classNameId: ..., classPK: ...])` after the class-name resolution step. Do NOT read `tagNames` off `assetentry/get-entry` — the field will always be null.
