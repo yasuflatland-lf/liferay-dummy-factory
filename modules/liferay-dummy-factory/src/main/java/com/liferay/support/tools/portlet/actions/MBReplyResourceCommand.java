@@ -12,6 +12,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.service.BatchResult;
 import com.liferay.support.tools.service.BatchSpec;
+import com.liferay.support.tools.service.MBReplyBatchSpec;
 import com.liferay.support.tools.service.MBReplyCreator;
 
 import jakarta.portlet.ResourceRequest;
@@ -46,12 +47,18 @@ public class MBReplyResourceCommand extends BaseMVCResourceCommand {
 					data.getString("body"), "This is a test reply.");
 				String format = GetterUtil.getString(
 					data.getString("format"), "html");
+				boolean fakerEnable = GetterUtil.getBoolean(
+					data.getString("fakerEnable"));
+				String locale = GetterUtil.getString(
+					data.getString("locale"), "en_US");
 
 				ResourceCommandUtil.validatePositiveId(threadId, "threadId");
 
+				MBReplyBatchSpec spec = new MBReplyBatchSpec(
+					batchSpec, threadId, body, format, fakerEnable, locale);
+
 				BatchResult<MBMessage> result = _mbReplyCreator.create(
-					context.getUserId(), threadId, batchSpec, body, format,
-					context.getProgressCallback());
+					context.getUserId(), spec, context.getProgressCallback());
 
 				return ResourceCommandUtil.toJson(
 					result,

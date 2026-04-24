@@ -8,6 +8,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.support.tools.utils.BatchTransaction;
 import com.liferay.support.tools.utils.ProgressCallback;
+import com.liferay.support.tools.utils.RandomizeContentGenerator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,13 +21,13 @@ import org.osgi.service.component.annotations.Reference;
 public class MBReplyCreator {
 
 	public BatchResult<MBMessage> create(
-			long userId, long threadId, BatchSpec batchSpec, String body,
-			String format, ProgressCallback progress)
+			long userId, MBReplyBatchSpec spec, ProgressCallback progress)
 		throws Throwable {
 
+		BatchSpec batchSpec = spec.batch();
 		int count = batchSpec.count();
 
-		MBThread thread = _mbThreadLocalService.getMBThread(threadId);
+		MBThread thread = _mbThreadLocalService.getMBThread(spec.threadId());
 
 		long groupId = thread.getGroupId();
 		long categoryId = thread.getCategoryId();
@@ -42,18 +43,25 @@ public class MBReplyCreator {
 		List<MBMessage> replies = new ArrayList<>(count);
 
 		for (int i = 0; i < count; i++) {
+			final int idx = i;
+
 			String subject =
-				"RE: " + BatchNaming.resolve(batchSpec.baseName(), count, i);
+				"RE: " + BatchNaming.resolve(batchSpec.baseName(), count, idx);
+
+			final String actualBody = spec.fakerEnable()
+				? _randomizeContentGenerator.generateRandomContents(
+					spec.locale(), 3, 0, "")
+				: spec.body();
 
 			replies.add(
 				BatchTransaction.run(
 					() -> _mbMessageLocalService.addMessage(
-						null, userId, userName, groupId, categoryId, threadId,
-						rootMessageId, subject, body, format,
-						Collections.emptyList(), false, 0.0, false,
-						serviceContext)));
+						null, userId, userName, groupId, categoryId,
+						spec.threadId(), rootMessageId, subject, actualBody,
+						spec.format(), Collections.emptyList(), false, 0.0,
+						false, serviceContext)));
 
-			progress.onProgress(i + 1, count);
+			progress.onProgress(idx + 1, count);
 		}
 
 		return BatchResult.success(count, replies, 0);
@@ -64,6 +72,9 @@ public class MBReplyCreator {
 
 	@Reference
 	private MBThreadLocalService _mbThreadLocalService;
+
+	@Reference
+	private RandomizeContentGenerator _randomizeContentGenerator;
 
 	@Reference
 	private UserLocalService _userLocalService;
