@@ -116,6 +116,7 @@ class UserFunctionalSpec extends BaseLiferaySpec {
 
 	def 'created users have type == 1 (TYPE_REGULAR) on the fakerEnable=false branch (regression for #57)'() {
 		given: 'parsed API response from the UI-driven create above'
+		assert !apiResponseBody.isEmpty() : 'prior UI-create feature method did not run; @Stepwise ordering broken'
 		Map response = new JsonSlurper().parseText(apiResponseBody) as Map
 		List<Map> items = (response.items as List).collect { it as Map }
 
@@ -132,6 +133,8 @@ class UserFunctionalSpec extends BaseLiferaySpec {
 			) as Map
 
 			assert user != null : "user not found for email ${email}"
+			assert (user.emailAddress as String)?.equalsIgnoreCase(email) :
+				"JSONWS returned user emailAddress=${user.emailAddress} but we asked for ${email} — error envelope or wrong record"
 			assert (user.type as Integer) == 1 :
 				"expected type=1 (TYPE_REGULAR) for ${email}, got ${user.type} " +
 				'(this regression hides users from Control Panel > Users and Organizations)'
@@ -175,6 +178,8 @@ class UserFunctionalSpec extends BaseLiferaySpec {
 			) as Map
 
 			assert user != null : "user not found for email ${email}"
+			assert (user.emailAddress as String)?.equalsIgnoreCase(email) :
+				"JSONWS returned user emailAddress=${user.emailAddress} but we asked for ${email} — error envelope or wrong record"
 			assert (user.type as Integer) == 1 :
 				"expected type=1 (TYPE_REGULAR) for ${email}, got ${user.type} " +
 				'(this regression hides users from Control Panel > Users and Organizations)'
