@@ -6,6 +6,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -109,7 +110,7 @@ public class UserCreator {
 							password, false, screenName, emailAddress,
 							LocaleUtil.getDefault(), firstName, "",
 							lastName, 0L, 0L, male,
-							Calendar.JANUARY, 1, 1970, jobTitle, 0,
+							Calendar.JANUARY, 1, 1970, jobTitle, UserConstants.TYPE_REGULAR,
 							new long[0], organizationIds, roleIds,
 							userGroupIds, false, serviceContext);
 
