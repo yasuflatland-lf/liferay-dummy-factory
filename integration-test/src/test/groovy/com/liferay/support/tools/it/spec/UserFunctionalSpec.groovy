@@ -1,9 +1,12 @@
 package com.liferay.support.tools.it.spec
 
+import com.liferay.support.tools.it.util.LdfResourceClient
 import com.liferay.support.tools.it.util.PlaywrightLifecycle
 
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
+
+import groovy.json.JsonSlurper
 
 import spock.lang.Shared
 import spock.lang.Stepwise
@@ -19,8 +22,15 @@ class UserFunctionalSpec extends BaseLiferaySpec {
 	private static final String BASE_USER_NAME = 'ITTestUser'
 	private static final int USER_COUNT = 3
 
+	private static final String FAKER_BASE_NAME =
+		"itfakeruser${System.currentTimeMillis()}"
+	private static final int FAKER_USER_COUNT = 2
+
 	@Shared
 	PlaywrightLifecycle pw
+
+	@Shared
+	LdfResourceClient ldf
 
 	@Shared
 	String apiResponseBody = ''
@@ -31,6 +41,7 @@ class UserFunctionalSpec extends BaseLiferaySpec {
 	}
 
 	def cleanupSpec() {
+		ldf?.close()
 		pw?.close()
 	}
 
@@ -101,6 +112,81 @@ class UserFunctionalSpec extends BaseLiferaySpec {
 		and: 'response uses items key (not legacy users key)'
 		apiResponseBody.contains('"items"')
 		!apiResponseBody.contains('"users"')
+	}
+
+	def 'created users have type == 1 (TYPE_REGULAR) on the fakerEnable=false branch (regression for #57)'() {
+		given: 'parsed API response from the UI-driven create above'
+		assert !apiResponseBody.isEmpty() : 'prior UI-create feature method did not run; @Stepwise ordering broken'
+		Map response = new JsonSlurper().parseText(apiResponseBody) as Map
+		List<Map> items = (response.items as List).collect { it as Map }
+
+		expect: 'every created user has type == 1 via JSONWS get-user-by-email-address'
+		items.size() == USER_COUNT
+
+		items.every { Map item ->
+			String email = item.emailAddress as String
+
+			Map user = jsonwsGet(
+				"user/get-user-by-email-address" +
+				"/company-id/${companyId}" +
+				"/email-address/${URLEncoder.encode(email, 'UTF-8')}"
+			) as Map
+
+			assert user != null : "user not found for email ${email}"
+			assert (user.emailAddress as String)?.equalsIgnoreCase(email) :
+				"JSONWS returned user emailAddress=${user.emailAddress} but we asked for ${email} — error envelope or wrong record"
+			assert (user.type as Integer) == 1 :
+				"expected type=1 (TYPE_REGULAR) for ${email}, got ${user.type} " +
+				'(this regression hides users from Control Panel > Users and Organizations)'
+
+			return true
+		}
+	}
+
+	def 'created users have type == 1 (TYPE_REGULAR) on the fakerEnable=true branch (regression for #57)'() {
+		given: 'an LDF resource client authenticated as admin'
+		if (ldf == null) {
+			ldf = new LdfResourceClient(liferay.baseUrl)
+			ldf.login()
+		}
+
+		when: 'POST /ldf/user with fakerEnable=true and locale=en_US'
+		Map response = ldf.createUser([
+			count      : FAKER_USER_COUNT,
+			baseName   : FAKER_BASE_NAME,
+			fakerEnable: true,
+			locale     : 'en_US'
+		])
+
+		then: 'response reports success'
+		assert response.error == null : "creator failed: ${response.error}"
+		assert response.success == true : "response=${response}"
+		(response.items as List).size() == FAKER_USER_COUNT
+
+		and: 'all returned screen names match Liferay-legal characters (deterministic lock for sanitized faker output)'
+		(response.items as List).every {
+			(it.screenName as String) ==~ /^[a-z0-9._-]+$/
+		}
+
+		and: 'every faker-generated user has type == 1 via JSONWS get-user-by-email-address'
+		(response.items as List).every { item ->
+			String email = (item as Map).emailAddress as String
+
+			Map user = jsonwsGet(
+				"user/get-user-by-email-address" +
+				"/company-id/${companyId}" +
+				"/email-address/${URLEncoder.encode(email, 'UTF-8')}"
+			) as Map
+
+			assert user != null : "user not found for email ${email}"
+			assert (user.emailAddress as String)?.equalsIgnoreCase(email) :
+				"JSONWS returned user emailAddress=${user.emailAddress} but we asked for ${email} — error envelope or wrong record"
+			assert (user.type as Integer) == 1 :
+				"expected type=1 (TYPE_REGULAR) for ${email}, got ${user.type} " +
+				'(this regression hides users from Control Panel > Users and Organizations)'
+
+			return true
+		}
 	}
 
 }

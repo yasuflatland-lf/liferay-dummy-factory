@@ -259,3 +259,32 @@ private static String _nullIfEmpty(String value) {
 ```
 
 The same empty-string behavior applies to other prototype-related accessors on `LayoutSet` (e.g. `getLayoutSetPrototypeKey()`). Reference: `UserCreateUseCase._toItemResult`, `SiteCreateUseCase._toItemResult`.
+
+## 21. `UserLocalService.addUserWithWorkflow` — new `int type` parameter at position 20
+
+DXP 2026 adds a required `int type` argument at position 20 (between `jobTitle` and `groupIds`). This parameter did not exist in CE 7.4 or earlier. **Always pass `UserConstants.TYPE_REGULAR` (value 1) for end-user accounts.**
+
+Passing `0` (= `UserConstants.TYPE_GUEST`) or any value other than `TYPE_REGULAR` makes the user invisible in Control Panel > Users and Organizations because that view filters on `type == 1`. The bug is silent — the user is created, but the Control Panel will not display it.
+
+Verified signature:
+
+```java
+addUserWithWorkflow(
+    long creatorUserId, long companyId,
+    boolean autoPassword, String password1, String password2,
+    boolean autoScreenName, String screenName, String emailAddress,
+    Locale locale,
+    String firstName, String middleName, String lastName,
+    long prefixListTypeId, long suffixListTypeId,
+    boolean male,
+    int birthdayMonth, int birthdayDay, int birthdayYear,
+    String jobTitle,
+    int type,                           // <-- position 20, NEW in DXP 2026: use UserConstants.TYPE_REGULAR
+    long[] groupIds, long[] organizationIds, long[] roleIds, long[] userGroupIds,
+    boolean sendEmail,
+    ServiceContext serviceContext)
+```
+
+**Gotcha for future debugging**: If this regression resurfaces (the `type` argument silently reverts to a literal `0`), `Calendar.JANUARY` (also `0`) earlier on the same line makes the regression visually invisible — when scanning the line for the offending `, 0,`, check column position, not just the digit. The original bug at this site went undetected for that reason.
+
+Reference: `UserCreator.java`.

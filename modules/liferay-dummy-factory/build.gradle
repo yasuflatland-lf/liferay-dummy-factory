@@ -38,8 +38,6 @@ task copyJarToLatest(type: Copy) {
 	rename { 'liferay-dummy-factory.jar' }
 }
 
-jar.finalizedBy copyJarToLatest
-
 jacocoTestReport {
 	reports {
 		xml.required = true
