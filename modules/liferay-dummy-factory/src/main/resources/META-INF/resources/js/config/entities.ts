@@ -23,6 +23,17 @@ function createBaseNameField(label: string): FieldDefinition {
 	};
 }
 
+function createTagsField(): FieldDefinition {
+	return {
+		advanced: true,
+		defaultValue: '',
+		label: 'tags',
+		name: 'tags',
+		required: false,
+		type: 'textarea',
+	};
+}
+
 const DOCUMENTS_CONFIG: EntityFormConfig = {
 	actionURL: '/ldf/doc',
 	entityType: ENTITY_TYPES.DOCUMENTS,
@@ -53,6 +64,7 @@ const DOCUMENTS_CONFIG: EntityFormConfig = {
 			required: false,
 			type: 'textarea',
 		},
+		createTagsField(),
 		{
 			advanced: true,
 			defaultValue: '',
@@ -133,6 +145,7 @@ const MB_THREAD_CONFIG: EntityFormConfig = {
 			required: true,
 			type: 'select',
 		},
+		createTagsField(),
 	],
 	helpText: 'mb-thread-help-text',
 	icon: 'message',
@@ -171,6 +184,7 @@ const MB_REPLY_CONFIG: EntityFormConfig = {
 			required: true,
 			type: 'select',
 		},
+		createTagsField(),
 		{
 			advanced: true,
 			defaultValue: false,
@@ -881,6 +895,7 @@ const WCM_CONFIG: EntityFormConfig = {
 			required: false,
 			type: 'toggle',
 		},
+		createTagsField(),
 	],
 	helpText: 'web-content-help-text',
 	icon: 'web-content',
