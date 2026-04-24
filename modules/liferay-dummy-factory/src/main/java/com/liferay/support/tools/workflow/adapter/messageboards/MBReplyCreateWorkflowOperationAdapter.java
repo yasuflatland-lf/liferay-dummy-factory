@@ -3,6 +3,7 @@ package com.liferay.support.tools.workflow.adapter.messageboards;
 import com.liferay.message.boards.model.MBMessage;
 import com.liferay.support.tools.service.BatchResult;
 import com.liferay.support.tools.service.BatchSpec;
+import com.liferay.support.tools.service.MBReplyBatchSpec;
 import com.liferay.support.tools.service.MBReplyCreator;
 import com.liferay.support.tools.utils.ProgressCallback;
 import com.liferay.support.tools.workflow.WorkflowParameterValues;
@@ -56,12 +57,17 @@ public class MBReplyCreateWorkflowOperationAdapter
 		MBReplyCreateRequest request = new MBReplyCreateRequest(
 			userId, values.requirePositiveLong("threadId"),
 			values.requireCount(), values.requireText("body"),
-			values.optionalString("format", "html"));
+			values.optionalString("format", "html"),
+			values.optionalBoolean("fakerEnable", false),
+			values.optionalString("locale", "en_US"));
+
+		MBReplyBatchSpec spec = new MBReplyBatchSpec(
+			new BatchSpec(request.count(), "reply"), request.threadId(),
+			request.body(), request.format(), request.fakerEnable(),
+			request.locale());
 
 		BatchResult<MBMessage> result = _mbReplyCreator.create(
-			request.userId(), request.threadId(),
-			new BatchSpec(request.count(), "reply"),
-			request.body(), request.format(), ProgressCallback.NOOP);
+			request.userId(), spec, ProgressCallback.NOOP);
 
 		return WorkflowResultNormalizer.normalize(
 			result,
