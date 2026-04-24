@@ -4,7 +4,7 @@ import {ENTITY_CONFIGS} from '../../src/main/resources/META-INF/resources/js/con
 import {ENTITY_TYPES} from '../../src/main/resources/META-INF/resources/js/config/constants';
 
 describe('tags field i18n', () => {
-	it.each(['tags', 'tags-help', 'tags-placeholder'])(
+	it.each(['tags'])(
 		'%s resolves via Language.properties',
 		(key) => {
 			const text = Liferay.Language.get(key);

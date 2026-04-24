@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.liferay.message.boards.model.MBMessage;
+import com.liferay.support.tools.service.AssetTagNames;
 import com.liferay.support.tools.service.BatchResult;
 import com.liferay.support.tools.service.BatchSpec;
 import com.liferay.support.tools.service.MBThreadBatchSpec;
@@ -62,6 +63,7 @@ class MBThreadCreateWorkflowOperationAdapterTest {
 		assertEquals("body", mbThreadCreator.body);
 		assertEquals("html", mbThreadCreator.format);
 		assertSame(ProgressCallback.NOOP, mbThreadCreator.progressCallback);
+		assertSame(AssetTagNames.EMPTY, mbThreadCreator.mbThreadBatchSpec.tags());
 	}
 
 	@Test
@@ -137,7 +139,7 @@ class MBThreadCreateWorkflowOperationAdapterTest {
 				long userId, MBThreadBatchSpec spec, ProgressCallback progress)
 			throws Throwable {
 
-			this.batchSpec = spec.batch();
+			this.mbThreadBatchSpec = spec;
 			this.body = spec.body();
 			this.categoryId = spec.categoryId();
 			this.format = spec.format();
@@ -164,7 +166,7 @@ class MBThreadCreateWorkflowOperationAdapterTest {
 		}
 
 		private final List<MBMessage> _messages;
-		private BatchSpec batchSpec;
+		private MBThreadBatchSpec mbThreadBatchSpec;
 		private String body;
 		private long categoryId;
 		private String format;

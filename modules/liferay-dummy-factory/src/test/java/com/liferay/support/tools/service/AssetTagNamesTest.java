@@ -2,6 +2,7 @@ package com.liferay.support.tools.service;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -68,6 +69,16 @@ class AssetTagNamesTest {
 	void of_preserves_insertion_order() {
 		assertEquals(
 			List.of("zeta", "alpha"), AssetTagNames.of("zeta,alpha").names());
+	}
+
+	@Test
+	void isEmpty_returns_true_for_EMPTY() {
+		assertTrue(AssetTagNames.EMPTY.isEmpty());
+	}
+
+	@Test
+	void isEmpty_returns_false_for_non_empty() {
+		assertFalse(AssetTagNames.of("foo").isEmpty());
 	}
 
 	@Test

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.liferay.message.boards.model.MBMessage;
+import com.liferay.support.tools.service.AssetTagNames;
 import com.liferay.support.tools.service.BatchResult;
 import com.liferay.support.tools.service.MBReplyBatchSpec;
 import com.liferay.support.tools.service.MBReplyCreator;
@@ -55,6 +56,7 @@ class MBReplyCreateWorkflowOperationAdapterTest {
 		assertEquals("reply body", mbReplyCreator.spec.body());
 		assertEquals("html", mbReplyCreator.spec.format());
 		assertSame(ProgressCallback.NOOP, mbReplyCreator.progressCallback);
+		assertSame(AssetTagNames.EMPTY, mbReplyCreator.spec.tags());
 	}
 
 	@Test

@@ -10,7 +10,7 @@ public record DocumentBatchSpec(
 
 	public DocumentBatchSpec {
 		description = (description == null) ? "" : description;
-		uploadedFiles = (uploadedFiles == null) ? new String[0] : uploadedFiles;
+		uploadedFiles = (uploadedFiles == null) ? new String[0] : uploadedFiles.clone();
 		tags = (tags == null) ? AssetTagNames.EMPTY : tags;
 	}
 

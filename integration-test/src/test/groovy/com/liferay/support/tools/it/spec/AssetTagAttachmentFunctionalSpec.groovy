@@ -47,16 +47,6 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 	@Shared
 	long prereqThreadId
 
-	// Cleanup lists — best-effort deletion in cleanupSpec
-	@Shared
-	List<Long> createdDocumentIds = []
-
-	@Shared
-	List<Long> createdMBThreadIds = []
-
-	@Shared
-	List<Long> createdMBReplyIds = []
-
 	def setupSpec() {
 		ensureBundleActive()
 
@@ -101,68 +91,11 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 	}
 
 	def cleanupSpec() {
-		createdDocumentIds.each { id ->
-			try {
-				jsonwsPost('dlapp/delete-file-entry', [fileEntryId: id])
-			}
-			catch (Exception e) {
-				log.warn('Failed to delete document {}: {}', id, e.message)
-			}
-		}
-
-		createdMBReplyIds.each { id ->
-			try {
-				jsonwsPost('mb.mbmessage/delete-message', [messageId: id])
-			}
-			catch (Exception e) {
-				log.warn('Failed to delete MB reply {}: {}', id, e.message)
-			}
-		}
-
-		createdMBThreadIds.each { id ->
-			try {
-				headlessDelete(
-					"/o/headless-delivery/v1.0/message-board-threads/${id}")
-			}
-			catch (Exception e) {
-				log.warn('Failed to delete MB thread {}: {}', id, e.message)
-			}
-		}
-
-		if (prereqThreadId > 0) {
-			try {
-				headlessDelete(
-					"/o/headless-delivery/v1.0/message-board-threads" +
-					"/${prereqThreadId}")
-			}
-			catch (Exception e) {
-				log.warn(
-					'Failed to clean up prereq thread {}: {}',
-					prereqThreadId, e.message)
-			}
-		}
-
-		if (prereqSectionId > 0) {
-			try {
-				headlessDelete(
-					"/o/headless-delivery/v1.0/message-board-sections" +
-					"/${prereqSectionId}")
-			}
-			catch (Exception e) {
-				log.warn(
-					'Failed to clean up prereq section {}: {}',
-					prereqSectionId, e.message)
-			}
-		}
-
+		// Container is disposable (withReuse(false)); explicit JSONWS/headless cleanup
+		// is unnecessary and best-effort try/catch is banned by testing.md §Cleanup.
 		ldf?.close()
 		pw?.close()
 	}
-
-	// ---------------------------------------------------------------------------
-	// WebContent — WCM response uses custom JSON: ok/totalCreated/totalRequested/perSite
-	// classPK is fetched via JSONWS after creation (articles list by groupId).
-	// ---------------------------------------------------------------------------
 
 	def 'WebContent batch with empty tags leaves AssetEntry tagNames empty'() {
 		given: 'a batch request with no tags (tags field omitted)'
@@ -185,6 +118,8 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		response.ok == true
 		(response.totalCreated as Integer) == 1
 		(response.totalRequested as Integer) == 1
+		response.containsKey('perSite')
+		(response.perSite as List).size() == 1
 
 		when: 'look up the article via JSONWS to get its resourcePrimKey (classPK)'
 		List articles = jsonwsGet(
@@ -206,7 +141,8 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		then: 'identity lock then assert no tags'
 		assert (entry.classPK as Long) == classPK :
 			"AssetEntry identity mismatch: expected classPK=${classPK}, got ${entry}"
-		(entry.tagNames as List).size() == 0
+		assert (entry.tagNames as List).size() == 0 :
+			"expected empty tagNames, got: ${entry}"
 	}
 
 	def 'WebContent batch with non-empty tags attaches exact tag set lowercased and deduped'() {
@@ -230,6 +166,8 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		assert response.error == null : "creator failed: ${response}"
 		response.ok == true
 		(response.totalCreated as Integer) == 1
+		response.containsKey('perSite')
+		(response.perSite as List).size() == 1
 
 		when: 'look up the article via JSONWS'
 		List articles = jsonwsGet(
@@ -256,11 +194,6 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		assert (entry.tagNames as Set) == (['foo', 'bar'] as Set) :
 			"expected exact tag set {foo, bar}, got: ${entry.tagNames}"
 	}
-
-	// ---------------------------------------------------------------------------
-	// Document — items have fileEntryId; classPK for AssetEntry is fileEntryId
-	// DocumentCreator creates .txt files when uploadedFiles is empty.
-	// ---------------------------------------------------------------------------
 
 	def 'Document batch with empty tags leaves AssetEntry tagNames empty'() {
 		given: 'a batch request with no tags'
@@ -293,12 +226,8 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		then: 'identity lock then assert no tags'
 		assert (entry.classPK as Long) == fileEntryId :
 			"AssetEntry identity mismatch: expected classPK=${fileEntryId}, got ${entry}"
-		(entry.tagNames as List).size() == 0
-
-		cleanup:
-		if (fileEntryId > 0) {
-			createdDocumentIds << fileEntryId
-		}
+		assert (entry.tagNames as List).size() == 0 :
+			"expected empty tagNames, got: ${entry}"
 	}
 
 	def 'Document batch with non-empty tags attaches exact tag set lowercased and deduped'() {
@@ -333,19 +262,13 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		and: 'exact tag set — lowercased + deduped'
 		assert (entry.tagNames as Set) == (['foo', 'bar'] as Set) :
 			"expected exact tag set {foo, bar}, got: ${entry.tagNames}"
-
-		cleanup:
-		if (fileEntryId > 0) {
-			createdDocumentIds << fileEntryId
-		}
 	}
 
-	// ---------------------------------------------------------------------------
-	// MBThread — items have messageId, threadId; AssetEntry classPK = messageId
-	// ---------------------------------------------------------------------------
-
 	def 'MBThread batch with empty tags leaves AssetEntry tagNames empty'() {
-		given: 'a batch request with no tags'
+		given: 'prereq ids are populated'
+		assert prereqSectionId > 0 : 'setupSpec failed to populate prereqSectionId'
+
+		and: 'a batch request with no tags'
 		Map payload = [
 			count     : 1,
 			baseName  : 'it-mbthread-tag-empty',
@@ -375,17 +298,15 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		then: 'identity lock then assert no tags'
 		assert (entry.classPK as Long) == messageId :
 			"AssetEntry identity mismatch: expected classPK=${messageId}, got ${entry}"
-		(entry.tagNames as List).size() == 0
-
-		cleanup:
-		Long threadId = (response?.items?.getAt(0) as Map)?.threadId as Long
-		if (threadId) {
-			createdMBThreadIds << threadId
-		}
+		assert (entry.tagNames as List).size() == 0 :
+			"expected empty tagNames, got: ${entry}"
 	}
 
 	def 'MBThread batch with non-empty tags attaches exact tag set lowercased and deduped'() {
-		given: 'a batch request with tags "Foo,bar,FOO"'
+		given: 'prereq ids are populated'
+		assert prereqSectionId > 0 : 'setupSpec failed to populate prereqSectionId'
+
+		and: 'a batch request with tags "Foo,bar,FOO"'
 		Map payload = [
 			count     : 1,
 			baseName  : 'it-mbthread-tag-nonempty',
@@ -416,21 +337,14 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		and: 'exact tag set — lowercased + deduped'
 		assert (entry.tagNames as Set) == (['foo', 'bar'] as Set) :
 			"expected exact tag set {foo, bar}, got: ${entry.tagNames}"
-
-		cleanup:
-		Long threadId = (response?.items?.getAt(0) as Map)?.threadId as Long
-		if (threadId) {
-			createdMBThreadIds << threadId
-		}
 	}
 
-	// ---------------------------------------------------------------------------
-	// MBReply — items have messageId; AssetEntry classPK = messageId
-	// Uses the prereq thread created in setupSpec.
-	// ---------------------------------------------------------------------------
-
 	def 'MBReply batch with empty tags leaves AssetEntry tagNames empty'() {
-		given: 'a batch request with no tags'
+		given: 'prereq ids are populated'
+		assert prereqSectionId > 0 : 'setupSpec failed to populate prereqSectionId'
+		assert prereqThreadId > 0 : 'setupSpec failed to populate prereqThreadId'
+
+		and: 'a batch request with no tags'
 		Map payload = [
 			count      : 1,
 			baseName   : 'it-mbreply-tag-empty',
@@ -460,17 +374,16 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		then: 'identity lock then assert no tags'
 		assert (entry.classPK as Long) == messageId :
 			"AssetEntry identity mismatch: expected classPK=${messageId}, got ${entry}"
-		(entry.tagNames as List).size() == 0
-
-		cleanup:
-		Long mid = (response?.items?.getAt(0) as Map)?.messageId as Long
-		if (mid) {
-			createdMBReplyIds << mid
-		}
+		assert (entry.tagNames as List).size() == 0 :
+			"expected empty tagNames, got: ${entry}"
 	}
 
 	def 'MBReply batch with non-empty tags attaches exact tag set lowercased and deduped'() {
-		given: 'a batch request with tags "Foo,bar,FOO"'
+		given: 'prereq ids are populated'
+		assert prereqSectionId > 0 : 'setupSpec failed to populate prereqSectionId'
+		assert prereqThreadId > 0 : 'setupSpec failed to populate prereqThreadId'
+
+		and: 'a batch request with tags "Foo,bar,FOO"'
 		Map payload = [
 			count      : 1,
 			baseName   : 'it-mbreply-tag-nonempty',
@@ -501,17 +414,9 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		and: 'exact tag set — lowercased + deduped'
 		assert (entry.tagNames as Set) == (['foo', 'bar'] as Set) :
 			"expected exact tag set {foo, bar}, got: ${entry.tagNames}"
-
-		cleanup:
-		Long mid = (response?.items?.getAt(0) as Map)?.messageId as Long
-		if (mid) {
-			createdMBReplyIds << mid
-		}
 	}
 
-	// ---------------------------------------------------------------------------
 	// In-file helpers (per .claude/rules/testing.md §"Helper extraction stays in-file")
-	// ---------------------------------------------------------------------------
 
 	/**
 	 * Fetch AssetEntry by className and classPK via JSONWS.
