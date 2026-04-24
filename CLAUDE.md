@@ -14,6 +14,7 @@ Liferay DXP 2026.Q1.3-LTS Workspace: MVCPortlet + React portlet + Spock integrat
 - Concrete commands, selectors, version pins, API constraints → `docs/details/` (read on demand)
 - Past architectural decisions and their rationale → `docs/ADR/` (read on demand)
 - Workflow API specifics live in `docs/details/workflow-api.md`; it is the source of truth for `site.create`, `organization.create`, and the taxonomy-only startup fallback.
+- `.claude/plan/` is gitignored — it is a scratch location for orchestration plans that never lands in PRs. Do not expect plan files to be part of a diff.
 
 ## Core contracts — break these and things go silently wrong
 
