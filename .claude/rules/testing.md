@@ -166,6 +166,50 @@ Authoring rules that emerged from the `ScreenNameSanitizer` work. Not framework 
 
 The Vitest migration gotcha catalogue (Mock typing, RTL cleanup, `vi.mock` hoisting, React double-resolution, ESM `setup.ts`) lives in `docs/details/ui-vitest-gotchas.md`. Read it when bumping the JS test toolchain.
 
+## Spock `then:` block evaluation order
+
+**Why**: Spock evaluates expressions in a `then:` block top-to-bottom and stops at the first failure. A bare expression assertion placed BEFORE an explicit `assert` with a diagnostic message means that on real failure the bare assertion fires first — Spock emits its generic `Condition not satisfied: ...` output and the explicit assert never runs. The diagnostic message you wrote is dead on failure.
+
+**How to apply**: in `then:` blocks, place `assert <expr> : "<message>"` assertions BEFORE bare expression assertions that cover the same data. If you want to keep the bare-expression style for a contract check, upgrade it to `assert <expr> : "<full payload dump>"` so a future regression surfaces the actual response instead of a terse boolean:
+
+```groovy
+then: 'user was created successfully'
+assert response.error == null : "creator failed: ${response}"   // diagnostic first
+response.success == true                                         // bare check second
+```
+
+**Reference**: PR #57, commits `223cb09` → `5ee66f7`.
+
+## JSONWS response identity lock
+
+**Why**: Liferay JSON-WS may return an error envelope for invalid requests. If the envelope happens to expose a field with a numeric type (e.g. `type: 0`), an assertion like `user.type == 1` can silently pass on the wrong record, producing a false negative.
+
+**How to apply**: before asserting on any field of a JSONWS response, add a **positive identity lock** that proves you are inspecting the entity you requested. For `user/get-user-by-email-address`, that lock is:
+
+```groovy
+assert (user.emailAddress as String)?.equalsIgnoreCase(email) :
+    "JSONWS returned a different user: ${user}"
+assert user.type == UserConstants.TYPE_REGULAR
+```
+
+Use `equalsIgnoreCase` because Liferay normalizes email to lowercase on persist. Add the identity lock before any field assertion whenever the response envelope could plausibly match on a type mismatch.
+
+**Reference**: PR #57, `UserFunctionalSpec` rounds 1–2.
+
+## `@Stepwise` shared-field non-empty guard
+
+**Why**: when a `@Stepwise` spec's later feature method consumes a `@Shared` field populated by an earlier feature method (e.g. `apiResponseBody` captured from a Playwright create step), reordering or splitting feature methods can leave the field at its empty-string initializer. `JsonSlurper().parseText('')` then throws `JsonException` — loud, but the stack points at the parse, not at the broken ordering.
+
+**How to apply**: before parsing or otherwise depending on a `@Stepwise`-propagated `@Shared` field, add an explicit guard so a future maintainer reads the cause immediately:
+
+```groovy
+assert !apiResponseBody.isEmpty() :
+    'prior feature method did not run or populate apiResponseBody; @Stepwise ordering broken'
+def parsed = new JsonSlurper().parseText(apiResponseBody)
+```
+
+**Reference**: PR #57, `UserFunctionalSpec`, commit `1380c26`.
+
 ## Gradle execution and the Incremental Build Trap
 
 The full Gradle wiring (`integrationTest` task graph, JaCoCo coverage, deploy verification, the package.json input gap) lives in `docs/details/testing-gradle.md`. The single most important fact: `:integration-test:integrationTest` does not declare `package.json` as an input, so frontend-toolchain regressions can replay a cached green build. For any change touching the frontend toolchain, always run with `clean`:
