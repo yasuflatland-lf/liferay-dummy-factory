@@ -159,8 +159,8 @@ class UserFunctionalSpec extends BaseLiferaySpec {
 		])
 
 		then: 'response reports success'
-		response.success == true
 		assert response.error == null : "creator failed: ${response.error}"
+		assert response.success == true : "response=${response}"
 		(response.items as List).size() == FAKER_USER_COUNT
 
 		and: 'all returned screen names match Liferay-legal characters (deterministic lock for sanitized faker output)'
