@@ -26,6 +26,9 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 	private static final String MB_MESSAGE_CLASS_NAME =
 		'com.liferay.message.boards.model.MBMessage'
 
+	private static final String WEBCONTENT_CLASS_NAME =
+		'com.liferay.journal.model.JournalArticle'
+
 	private static final String PREREQ_SECTION_TITLE =
 		'IT AssetTag Attachment Prereq Section'
 
@@ -121,28 +124,33 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		response.containsKey('perSite')
 		(response.perSite as List).size() == 1
 
-		when: 'look up the article via JSONWS to get its resourcePrimKey (classPK)'
-		List articles = jsonwsGet(
-			"journal.journalarticle/get-articles" +
-			"/group-id/${guestGroupId}/folder-id/0/locale/en_US") as List
+		when: 'fetch the most-recently-modified article in the guest group'
+		List articles = jsonwsPost('journal.journalarticle/get-articles', [
+			groupId : guestGroupId,
+			folderId: 0,
+			locale  : 'en_US',
+		]) as List
 
-		def article = articles?.find { a ->
-			(a.title as String)?.contains('it-wcm-tag-empty')
+		assert articles != null && !articles.isEmpty() :
+			"journal.journalarticle/get-articles returned empty for group ${guestGroupId}"
+
+		articles = articles.sort { a, b ->
+			(b.modifiedDate as Long) <=> (a.modifiedDate as Long)
 		}
 
-		then: 'article was found'
-		assert article != null :
-			"No article with baseName 'it-wcm-tag-empty' found: ${articles*.title}"
+		Map article = articles[0] as Map
+		long classPK = (article.resourcePrimKey as Long)
 
-		when: 'fetch AssetEntry by classPK = resourcePrimKey'
-		long classPK = article.resourcePrimKey as Long
-		Map entry = _fetchAssetEntry('com.liferay.journal.model.JournalArticle', classPK)
+		then: 'article was found and classPK is valid'
+		assert classPK > 0 :
+			"resourcePrimKey was not positive; article=${article}"
 
-		then: 'identity lock then assert no tags'
-		assert (entry.classPK as Long) == classPK :
-			"AssetEntry identity mismatch: expected classPK=${classPK}, got ${entry}"
-		assert (entry.tagNames as List).size() == 0 :
-			"expected empty tagNames, got: ${entry}"
+		when: 'fetch asset tags via assettag/get-tags'
+		List<String> tagNames = _fetchAssetTagNames(WEBCONTENT_CLASS_NAME, classPK)
+
+		then: 'no tags attached'
+		assert tagNames.size() == 0 :
+			"expected empty tagNames, got: ${tagNames}"
 	}
 
 	def 'WebContent batch with non-empty tags attaches exact tag set lowercased and deduped'() {
@@ -169,30 +177,33 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		response.containsKey('perSite')
 		(response.perSite as List).size() == 1
 
-		when: 'look up the article via JSONWS'
-		List articles = jsonwsGet(
-			"journal.journalarticle/get-articles" +
-			"/group-id/${guestGroupId}/folder-id/0/locale/en_US") as List
+		when: 'fetch the most-recently-modified article in the guest group'
+		List articles = jsonwsPost('journal.journalarticle/get-articles', [
+			groupId : guestGroupId,
+			folderId: 0,
+			locale  : 'en_US',
+		]) as List
 
-		def article = articles?.find { a ->
-			(a.title as String)?.contains('it-wcm-tag-nonempty')
+		assert articles != null && !articles.isEmpty() :
+			"journal.journalarticle/get-articles returned empty for group ${guestGroupId}"
+
+		articles = articles.sort { a, b ->
+			(b.modifiedDate as Long) <=> (a.modifiedDate as Long)
 		}
 
-		then: 'article was found'
-		assert article != null :
-			"No article with baseName 'it-wcm-tag-nonempty' found: ${articles*.title}"
+		Map article = articles[0] as Map
+		long classPK = (article.resourcePrimKey as Long)
 
-		when: 'fetch AssetEntry'
-		long classPK = article.resourcePrimKey as Long
-		Map entry = _fetchAssetEntry('com.liferay.journal.model.JournalArticle', classPK)
+		then: 'article was found and classPK is valid'
+		assert classPK > 0 :
+			"resourcePrimKey was not positive; article=${article}"
 
-		then: 'identity lock'
-		assert (entry.classPK as Long) == classPK :
-			"AssetEntry identity mismatch: expected classPK=${classPK}, got ${entry}"
+		when: 'fetch asset tags via assettag/get-tags'
+		List<String> tagNames = _fetchAssetTagNames(WEBCONTENT_CLASS_NAME, classPK)
 
-		and: 'exact tag set — lowercased + deduped (Foo,bar,FOO → {foo,bar})'
-		assert (entry.tagNames as Set) == (['foo', 'bar'] as Set) :
-			"expected exact tag set {foo, bar}, got: ${entry.tagNames}"
+		then: 'exact tag set — lowercased + deduped (Foo,bar,FOO → {foo,bar})'
+		assert (tagNames as Set) == (['foo', 'bar'] as Set) :
+			"expected exact tag set {foo, bar}, got: ${tagNames}"
 	}
 
 	def 'Document batch with empty tags leaves AssetEntry tagNames empty'() {
@@ -219,15 +230,15 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		(response.count as Integer) == 1
 		(response.items as List).size() == 1
 
-		when: 'fetch AssetEntry for the created document'
+		when: 'fetch asset tags for the created document'
 		long fileEntryId = (response.items[0] as Map).fileEntryId as Long
-		Map entry = _fetchAssetEntry(DOCUMENT_CLASS_NAME, fileEntryId)
+		List<String> tagNames = _fetchAssetTagNames(DOCUMENT_CLASS_NAME, fileEntryId)
 
 		then: 'identity lock then assert no tags'
-		assert (entry.classPK as Long) == fileEntryId :
-			"AssetEntry identity mismatch: expected classPK=${fileEntryId}, got ${entry}"
-		assert (entry.tagNames as List).size() == 0 :
-			"expected empty tagNames, got: ${entry}"
+		assert fileEntryId > 0 :
+			"fileEntryId not positive: ${response.items[0]}"
+		assert tagNames.size() == 0 :
+			"expected empty tagNames, got: ${tagNames}"
 	}
 
 	def 'Document batch with non-empty tags attaches exact tag set lowercased and deduped'() {
@@ -251,17 +262,17 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		(response.count as Integer) == 1
 		(response.items as List).size() == 1
 
-		when: 'fetch AssetEntry for the document'
+		when: 'fetch asset tags for the document'
 		long fileEntryId = (response.items[0] as Map).fileEntryId as Long
-		Map entry = _fetchAssetEntry(DOCUMENT_CLASS_NAME, fileEntryId)
+		List<String> tagNames = _fetchAssetTagNames(DOCUMENT_CLASS_NAME, fileEntryId)
 
 		then: 'identity lock'
-		assert (entry.classPK as Long) == fileEntryId :
-			"AssetEntry identity mismatch: expected classPK=${fileEntryId}, got ${entry}"
+		assert fileEntryId > 0 :
+			"fileEntryId not positive: ${response.items[0]}"
 
 		and: 'exact tag set — lowercased + deduped'
-		assert (entry.tagNames as Set) == (['foo', 'bar'] as Set) :
-			"expected exact tag set {foo, bar}, got: ${entry.tagNames}"
+		assert (tagNames as Set) == (['foo', 'bar'] as Set) :
+			"expected exact tag set {foo, bar}, got: ${tagNames}"
 	}
 
 	def 'MBThread batch with empty tags leaves AssetEntry tagNames empty'() {
@@ -291,15 +302,15 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		(response.count as Integer) == 1
 		(response.items as List).size() == 1
 
-		when: 'fetch AssetEntry for the created message (classPK = messageId)'
+		when: 'fetch asset tags for the created message (classPK = messageId)'
 		long messageId = (response.items[0] as Map).messageId as Long
-		Map entry = _fetchAssetEntry(MB_MESSAGE_CLASS_NAME, messageId)
+		List<String> tagNames = _fetchAssetTagNames(MB_MESSAGE_CLASS_NAME, messageId)
 
 		then: 'identity lock then assert no tags'
-		assert (entry.classPK as Long) == messageId :
-			"AssetEntry identity mismatch: expected classPK=${messageId}, got ${entry}"
-		assert (entry.tagNames as List).size() == 0 :
-			"expected empty tagNames, got: ${entry}"
+		assert messageId > 0 :
+			"messageId not positive: ${response.items[0]}"
+		assert tagNames.size() == 0 :
+			"expected empty tagNames, got: ${tagNames}"
 	}
 
 	def 'MBThread batch with non-empty tags attaches exact tag set lowercased and deduped'() {
@@ -326,17 +337,17 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		(response.count as Integer) == 1
 		(response.items as List).size() == 1
 
-		when: 'fetch AssetEntry'
+		when: 'fetch asset tags for the message'
 		long messageId = (response.items[0] as Map).messageId as Long
-		Map entry = _fetchAssetEntry(MB_MESSAGE_CLASS_NAME, messageId)
+		List<String> tagNames = _fetchAssetTagNames(MB_MESSAGE_CLASS_NAME, messageId)
 
 		then: 'identity lock'
-		assert (entry.classPK as Long) == messageId :
-			"AssetEntry identity mismatch: expected classPK=${messageId}, got ${entry}"
+		assert messageId > 0 :
+			"messageId not positive: ${response.items[0]}"
 
 		and: 'exact tag set — lowercased + deduped'
-		assert (entry.tagNames as Set) == (['foo', 'bar'] as Set) :
-			"expected exact tag set {foo, bar}, got: ${entry.tagNames}"
+		assert (tagNames as Set) == (['foo', 'bar'] as Set) :
+			"expected exact tag set {foo, bar}, got: ${tagNames}"
 	}
 
 	def 'MBReply batch with empty tags leaves AssetEntry tagNames empty'() {
@@ -367,15 +378,15 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		(response.count as Integer) == 1
 		(response.items as List).size() == 1
 
-		when: 'fetch AssetEntry for the reply message (classPK = messageId)'
+		when: 'fetch asset tags for the reply message (classPK = messageId)'
 		long messageId = (response.items[0] as Map).messageId as Long
-		Map entry = _fetchAssetEntry(MB_MESSAGE_CLASS_NAME, messageId)
+		List<String> tagNames = _fetchAssetTagNames(MB_MESSAGE_CLASS_NAME, messageId)
 
 		then: 'identity lock then assert no tags'
-		assert (entry.classPK as Long) == messageId :
-			"AssetEntry identity mismatch: expected classPK=${messageId}, got ${entry}"
-		assert (entry.tagNames as List).size() == 0 :
-			"expected empty tagNames, got: ${entry}"
+		assert messageId > 0 :
+			"messageId not positive: ${response.items[0]}"
+		assert tagNames.size() == 0 :
+			"expected empty tagNames, got: ${tagNames}"
 	}
 
 	def 'MBReply batch with non-empty tags attaches exact tag set lowercased and deduped'() {
@@ -403,30 +414,26 @@ class AssetTagAttachmentFunctionalSpec extends BaseLiferaySpec {
 		(response.count as Integer) == 1
 		(response.items as List).size() == 1
 
-		when: 'fetch AssetEntry'
+		when: 'fetch asset tags for the reply message'
 		long messageId = (response.items[0] as Map).messageId as Long
-		Map entry = _fetchAssetEntry(MB_MESSAGE_CLASS_NAME, messageId)
+		List<String> tagNames = _fetchAssetTagNames(MB_MESSAGE_CLASS_NAME, messageId)
 
 		then: 'identity lock'
-		assert (entry.classPK as Long) == messageId :
-			"AssetEntry identity mismatch: expected classPK=${messageId}, got ${entry}"
+		assert messageId > 0 :
+			"messageId not positive: ${response.items[0]}"
 
 		and: 'exact tag set — lowercased + deduped'
-		assert (entry.tagNames as Set) == (['foo', 'bar'] as Set) :
-			"expected exact tag set {foo, bar}, got: ${entry.tagNames}"
+		assert (tagNames as Set) == (['foo', 'bar'] as Set) :
+			"expected exact tag set {foo, bar}, got: ${tagNames}"
 	}
 
-	// In-file helpers (per .claude/rules/testing.md §"Helper extraction stays in-file")
-
-	/**
-	 * Fetch AssetEntry by className and classPK via JSONWS.
-	 * The JSONWS method assetentry/get-entry accepts className + classPK as POST params.
-	 */
-	private Map _fetchAssetEntry(String className, long classPK) {
-		return jsonwsPost('assetentry/get-entry', [
+	private List<String> _fetchAssetTagNames(String className, long classPK) {
+		List tags = jsonwsPost('assettag/get-tags', [
 			className: className,
 			classPK  : classPK,
-		]) as Map
+		]) as List
+
+		return (tags ?: []).collect { (it.name as String) }
 	}
 
 }

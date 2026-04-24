@@ -10,7 +10,7 @@ public record MBThreadBatchSpec(
 
 	public MBThreadBatchSpec {
 		body = (body == null) ? "This is a test message." : body;
-		format = (format == null || format.isEmpty()) ? "html" : format;
+		format = ((format == null) || format.isEmpty()) ? "html" : format;
 		tags = (tags == null) ? AssetTagNames.EMPTY : tags;
 	}
 
