@@ -7,6 +7,7 @@ import FormField from './FormField';
 interface DynamicSelectProps {
 	dataResourceURL?: string;
 	dependsOnValue?: string;
+	disabled?: boolean;
 	error?: string;
 	field: FieldDefinition;
 	onChange: (name: string, value: string) => void;
@@ -17,6 +18,7 @@ interface DynamicSelectProps {
 function DynamicSelect({
 	dataResourceURL,
 	dependsOnValue,
+	disabled = false,
 	error,
 	field,
 	onChange,
@@ -72,6 +74,7 @@ function DynamicSelect({
 
 	return (
 		<FormField
+			disabled={disabled}
 			error={error}
 			field={field}
 			onChange={onChange}

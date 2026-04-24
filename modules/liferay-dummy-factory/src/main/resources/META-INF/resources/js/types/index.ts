@@ -30,6 +30,10 @@ export interface FieldDefinition {
 		field: string;
 		paramName: string;
 	};
+	disabledWhen?: {
+		field: string;
+		value: unknown;
+	};
 	label: string;
 	name: string;
 	options?: SelectOption[];
