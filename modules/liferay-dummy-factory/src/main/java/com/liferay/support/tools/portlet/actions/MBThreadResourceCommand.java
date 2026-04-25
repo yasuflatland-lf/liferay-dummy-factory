@@ -10,8 +10,10 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.support.tools.constants.LDFPortletKeys;
+import com.liferay.support.tools.service.AssetTagNames;
 import com.liferay.support.tools.service.BatchResult;
 import com.liferay.support.tools.service.BatchSpec;
+import com.liferay.support.tools.service.MBThreadBatchSpec;
 import com.liferay.support.tools.service.MBThreadCreator;
 
 import jakarta.portlet.ResourceRequest;
@@ -48,6 +50,7 @@ public class MBThreadResourceCommand extends BaseMVCResourceCommand {
 					data.getString("body"), "This is a test message.");
 				String format = GetterUtil.getString(
 					data.getString("format"), "html");
+				AssetTagNames tags = AssetTagNames.of(data.getString("tags"));
 
 				ResourceCommandUtil.validatePositiveId(groupId, "groupId");
 
@@ -56,9 +59,11 @@ public class MBThreadResourceCommand extends BaseMVCResourceCommand {
 						"categoryId must be greater than or equal to 0");
 				}
 
+				MBThreadBatchSpec spec = new MBThreadBatchSpec(
+					batchSpec, groupId, categoryId, body, format, tags);
+
 				BatchResult<MBMessage> result = _mbThreadCreator.create(
-					context.getUserId(), groupId, categoryId, batchSpec, body,
-					format, context.getProgressCallback());
+					context.getUserId(), spec, context.getProgressCallback());
 
 				return ResourceCommandUtil.toJson(
 					result,

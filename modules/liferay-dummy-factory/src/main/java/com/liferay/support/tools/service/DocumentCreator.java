@@ -25,13 +25,17 @@ import org.osgi.service.component.annotations.Reference;
 public class DocumentCreator {
 
 	public BatchResult<FileEntry> create(
-			long userId, long groupId, BatchSpec spec, long folderId,
-			String description, String[] uploadedFiles,
-			ProgressCallback progress)
+			long userId, DocumentBatchSpec spec, ProgressCallback progress)
 		throws Throwable {
 
-		int count = spec.count();
-		String baseName = spec.baseName();
+		long groupId = spec.groupId();
+		long folderId = spec.folderId();
+		String description = spec.description();
+		String[] uploadedFiles = spec.uploadedFiles();
+		AssetTagNames tags = spec.tags();
+
+		int count = spec.batch().count();
+		String baseName = spec.batch().baseName();
 
 		List<FileEntry> created = new ArrayList<>(count);
 		int skipped = 0;
@@ -56,9 +60,7 @@ public class DocumentCreator {
 						fileEntry = BatchTransaction.run(
 							() -> {
 								ServiceContext serviceContext =
-									new ServiceContext();
-
-								serviceContext.setUserId(userId);
+									_newServiceContext(userId, tags);
 
 								return _dlAppLocalService.addFileEntry(
 									null, userId, groupId, folderId,
@@ -76,9 +78,7 @@ public class DocumentCreator {
 						fileEntry = BatchTransaction.run(
 							() -> {
 								ServiceContext serviceContext =
-									new ServiceContext();
-
-								serviceContext.setUserId(userId);
+									_newServiceContext(userId, tags);
 
 								return _dlAppLocalService.addFileEntry(
 									null, userId, groupId, folderId, fileName,
@@ -133,6 +133,20 @@ public class DocumentCreator {
 		}
 
 		return BatchResult.failure(count, created, skipped, errorMessage);
+	}
+
+	private ServiceContext _newServiceContext(
+		long userId, AssetTagNames tags) {
+
+		ServiceContext serviceContext = new ServiceContext();
+
+		serviceContext.setUserId(userId);
+
+		if (!tags.isEmpty()) {
+			serviceContext.setAssetTagNames(tags.toArray());
+		}
+
+		return serviceContext;
 	}
 
 	private void _cleanupTempFiles(List<FileEntry> entries) {

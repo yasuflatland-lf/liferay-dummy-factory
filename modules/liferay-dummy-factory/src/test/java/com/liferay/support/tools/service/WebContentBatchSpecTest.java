@@ -3,8 +3,11 @@ package com.liferay.support.tools.service;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.liferay.support.tools.service.AssetTagNames;
 
 import org.junit.jupiter.api.Test;
 
@@ -75,7 +78,8 @@ class WebContentBatchSpecTest {
 			6,
 			"http://link1\nhttp://link2",
 			500L,
-			600L);
+			600L,
+			AssetTagNames.EMPTY);
 
 		assertEquals(10, spec.batch().count());
 		assertEquals("WC", spec.batch().baseName());
@@ -126,7 +130,8 @@ class WebContentBatchSpecTest {
 			3,
 			null,
 			0L,
-			0L);
+			0L,
+			AssetTagNames.EMPTY);
 
 		assertEquals(1, spec.createContentsType());
 		assertArrayEquals(new String[0], spec.locales());
@@ -150,13 +155,36 @@ class WebContentBatchSpecTest {
 			0,
 			null,
 			300L,
-			400L);
+			400L,
+			AssetTagNames.EMPTY);
 
 		assertEquals(2, spec.createContentsType());
 		assertEquals(300L, spec.ddmStructureId());
 		assertEquals(400L, spec.ddmTemplateId());
 		assertEquals("", spec.baseArticle());
 		assertEquals("", spec.linkLists());
+	}
+
+	@Test
+	void tags_null_defaults_to_empty() {
+		WebContentBatchSpec spec = new WebContentBatchSpec(
+			new BatchSpec(1, "WC"),
+			new long[] {1L},
+			0L,
+			new String[] {"en_US"},
+			true,
+			true,
+			0,
+			"",
+			5,
+			3,
+			3,
+			"",
+			0L,
+			0L,
+			null);
+
+		assertSame(AssetTagNames.EMPTY, spec.tags());
 	}
 
 	private static _Builder _builder() {
@@ -182,7 +210,7 @@ class WebContentBatchSpecTest {
 				_batch, _groupIds, _folderId, _locales, _neverExpire,
 				_neverReview, _createContentsType, _baseArticle,
 				_titleWords, _totalParagraphs, _randomAmount, _linkLists,
-				_ddmStructureId, _ddmTemplateId);
+				_ddmStructureId, _ddmTemplateId, AssetTagNames.EMPTY);
 		}
 
 		_Builder groupIds(long[] groupIds) {

@@ -13,6 +13,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.support.tools.constants.LDFPortletKeys;
+import com.liferay.support.tools.service.AssetTagNames;
 import com.liferay.support.tools.service.BatchResult;
 import com.liferay.support.tools.service.WebContentBatchSpec;
 import com.liferay.support.tools.service.WebContentCreator;
@@ -53,6 +54,9 @@ public class WcmResourceCommand extends BaseMVCResourceCommand {
 						"groupIds must contain at least one positive group id");
 				}
 
+				AssetTagNames tags = AssetTagNames.of(
+					data.getString("tags"));
+
 				WebContentBatchSpec spec = new WebContentBatchSpec(
 					ResourceCommandUtil.parseBatchSpec(data),
 					groupIds,
@@ -73,7 +77,8 @@ public class WcmResourceCommand extends BaseMVCResourceCommand {
 						data.getString("randomAmount"), 3),
 					GetterUtil.getString(data.getString("linkLists")),
 					GetterUtil.getLong(data.getString("ddmStructureId")),
-					GetterUtil.getLong(data.getString("ddmTemplateId")));
+					GetterUtil.getLong(data.getString("ddmTemplateId")),
+					tags);
 
 				BatchResult<WebContentPerSiteResult> result =
 					_webContentCreator.create(

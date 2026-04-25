@@ -60,6 +60,7 @@ public class WebContentCreator {
 		String linkLists = spec.linkLists();
 		long ddmStructureId = spec.ddmStructureId();
 		long ddmTemplateId = spec.ddmTemplateId();
+		AssetTagNames tags = spec.tags();
 
 		int count = batch.count();
 		String baseName = batch.baseName();
@@ -73,7 +74,7 @@ public class WebContentCreator {
 			for (long groupId : groupIds) {
 				WebContentPerSiteResult siteResult = _createSimpleForSite(
 					userId, groupId, count, baseName, baseArticle, folderId,
-					locales, neverExpire, neverReview, progress,
+					locales, neverExpire, neverReview, tags, progress,
 					totalEntities, globalIndex);
 
 				perSiteResults.add(siteResult);
@@ -84,7 +85,7 @@ public class WebContentCreator {
 				WebContentPerSiteResult siteResult = _createDummyForSite(
 					userId, groupId, count, baseName, folderId, locales,
 					titleWords, totalParagraphs, randomAmount, linkLists,
-					neverExpire, neverReview, progress, totalEntities,
+					neverExpire, neverReview, tags, progress, totalEntities,
 					globalIndex);
 
 				perSiteResults.add(siteResult);
@@ -106,7 +107,7 @@ public class WebContentCreator {
 					_createWithStructureTemplateForSite(
 						userId, groupId, count, baseName, folderId, locales,
 						ddmStructureId, ddmTemplateId, neverExpire,
-						neverReview, progress, totalEntities, globalIndex);
+						neverReview, tags, progress, totalEntities, globalIndex);
 
 				perSiteResults.add(siteResult);
 			}
@@ -198,7 +199,7 @@ public class WebContentCreator {
 	private WebContentPerSiteResult _createSimpleForSite(
 		long userId, long groupId, int count, String baseName,
 		String baseArticle, long folderId, String[] locales,
-		boolean neverExpire, boolean neverReview,
+		boolean neverExpire, boolean neverReview, AssetTagNames tags,
 		ProgressCallback progress, int totalEntities,
 		AtomicInteger globalIndex) {
 
@@ -237,7 +238,7 @@ public class WebContentCreator {
 							groupId, locales, baseArticle);
 
 						ServiceContext serviceContext = _newServiceContext(
-							userId, groupId);
+							userId, groupId, tags);
 
 						JournalArticle added =
 							_journalArticleLocalService.addArticle(
@@ -282,7 +283,7 @@ public class WebContentCreator {
 		long userId, long groupId, int count, String baseName, long folderId,
 		String[] locales, int titleWords, int totalParagraphs, int randomAmount,
 		String linkLists, boolean neverExpire, boolean neverReview,
-		ProgressCallback progress, int totalEntities,
+		AssetTagNames tags, ProgressCallback progress, int totalEntities,
 		AtomicInteger globalIndex) {
 
 		String siteName = _resolveSiteName(groupId);
@@ -338,7 +339,7 @@ public class WebContentCreator {
 							groupId, locales, randomArticle);
 
 						ServiceContext serviceContext = _newServiceContext(
-							userId, groupId);
+							userId, groupId, tags);
 
 						JournalArticle added =
 							_journalArticleLocalService.addArticle(
@@ -382,7 +383,7 @@ public class WebContentCreator {
 	private WebContentPerSiteResult _createWithStructureTemplateForSite(
 		long userId, long groupId, int count, String baseName, long folderId,
 		String[] locales, long ddmStructureId, long ddmTemplateId,
-		boolean neverExpire, boolean neverReview,
+		boolean neverExpire, boolean neverReview, AssetTagNames tags,
 		ProgressCallback progress, int totalEntities,
 		AtomicInteger globalIndex) {
 
@@ -423,7 +424,7 @@ public class WebContentCreator {
 							groupId, ddmStructure, locales);
 
 						ServiceContext serviceContext = _newServiceContext(
-							userId, groupId);
+							userId, groupId, tags);
 
 						JournalArticle added =
 							_journalArticleLocalService.addArticle(
@@ -473,7 +474,8 @@ public class WebContentCreator {
 		return throwable.getClass().getSimpleName();
 	}
 
-	private ServiceContext _newServiceContext(long userId, long groupId)
+	private ServiceContext _newServiceContext(
+			long userId, long groupId, AssetTagNames tags)
 		throws Exception {
 
 		ServiceContext serviceContext = new ServiceContext();
@@ -488,6 +490,10 @@ public class WebContentCreator {
 		serviceContext.setAttribute("defaultLanguageId", LocaleUtil.toLanguageId(
 			_portal.getSiteDefaultLocale(groupId)));
 		serviceContext.setFormDate(new Date());
+
+		if (!tags.isEmpty()) {
+			serviceContext.setAssetTagNames(tags.toArray());
+		}
 
 		return serviceContext;
 	}

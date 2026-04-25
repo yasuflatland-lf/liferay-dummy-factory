@@ -288,3 +288,34 @@ addUserWithWorkflow(
 **Gotcha for future debugging**: If this regression resurfaces (the `type` argument silently reverts to a literal `0`), `Calendar.JANUARY` (also `0`) earlier on the same line makes the regression visually invisible — when scanning the line for the offending `, 0,`, check column position, not just the digit. The original bug at this site went undetected for that reason.
 
 Reference: `UserCreator.java`.
+
+## 22. `ServiceContext.setAssetTagNames(String[])` — auto-create and group scope
+
+Passing a non-empty `String[]` to `ServiceContext.setAssetTagNames(names)` before calling a content-creation service method triggers two behaviors at persist time:
+
+- **Tag attachment**: Liferay calls `AssetTagLocalServiceImpl.checkTags` internally, which links each tag to the just-created `AssetEntry` row.
+- **Auto-create**: if a named `AssetTag` does not yet exist for the current `scopeGroupId`, `checkTags` creates it automatically. No manual `AssetTagLocalService.addTag` call is needed.
+
+**Tags are group-scoped.** A Creator iterating over multiple groups (e.g. `WebContentCreator` across `groupIds[]`) produces independent `AssetTag` rows per group — same name, different `groupId`. This is correct for multi-site seed data.
+
+**Case handling**: `AssetTag.name` is stored as-written by `checkTags`. Normalizing to lowercase at our boundary (via `AssetTagNames.of(String)` — see `.claude/rules/writing-code.md`) keeps lookup deterministic and avoids duplicate rows that differ only by case.
+
+Reference: `com.liferay.asset.kernel.service.impl.AssetTagLocalServiceImpl.checkTags`; `AssetTagNames.java`.
+
+## 23. `/api/jsonws/assetentry/get-entry` omits derived collection fields such as `tagNames`
+
+The JSONWS JSON projection of `AssetEntry` in DXP 2026 serializes only persistent scalar fields (`classNameId`, `classPK`, `classUuid`, `entryId`, `modifiedDate`, `title`, `userId`, …). Derived collection fields — `tagNames` being the most commonly needed — are absent from the response.
+
+**Impact on tests**: asserting `entry.tagNames.size() > 0` dereferences `null` and produces a misleading NPE whose stack points at `.size()`, not at the missing field.
+
+**Correct verification pattern for tag attachment**: resolve the entity's `classNameId` first, then call the tag-listing endpoint:
+
+```bash
+# 1. Resolve classNameId
+GET /api/jsonws/classname/fetch-class-name-id?value=com.liferay.journal.model.JournalArticle
+
+# 2. Fetch tags for the entity
+GET /api/jsonws/assettag/get-tags?classNameId=<id>&classPK=<pk>
+```
+
+In Spock specs, use `jsonwsGet('assettag/get-tags', [classNameId: ..., classPK: ...])` after the class-name resolution step. Do NOT read `tagNames` off `assetentry/get-entry` — the field will always be null.

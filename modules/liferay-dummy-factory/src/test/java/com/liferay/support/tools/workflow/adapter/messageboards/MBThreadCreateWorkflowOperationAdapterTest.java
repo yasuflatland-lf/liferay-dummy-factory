@@ -7,8 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.liferay.message.boards.model.MBMessage;
+import com.liferay.support.tools.service.AssetTagNames;
 import com.liferay.support.tools.service.BatchResult;
 import com.liferay.support.tools.service.BatchSpec;
+import com.liferay.support.tools.service.MBThreadBatchSpec;
 import com.liferay.support.tools.service.MBThreadCreator;
 import com.liferay.support.tools.utils.ProgressCallback;
 import com.liferay.support.tools.workflow.adapter.TestModelProxyUtil;
@@ -61,6 +63,7 @@ class MBThreadCreateWorkflowOperationAdapterTest {
 		assertEquals("body", mbThreadCreator.body);
 		assertEquals("html", mbThreadCreator.format);
 		assertSame(ProgressCallback.NOOP, mbThreadCreator.progressCallback);
+		assertSame(AssetTagNames.EMPTY, mbThreadCreator.mbThreadBatchSpec.tags());
 	}
 
 	@Test
@@ -133,18 +136,18 @@ class MBThreadCreateWorkflowOperationAdapterTest {
 
 		@Override
 		public BatchResult<MBMessage> create(
-			long userId, long groupId, long categoryId, BatchSpec batchSpec,
-			String body, String format, ProgressCallback progress) {
+				long userId, MBThreadBatchSpec spec, ProgressCallback progress)
+			throws Throwable {
 
-			this.batchSpec = batchSpec;
-			this.body = body;
-			this.categoryId = categoryId;
-			this.format = format;
-			this.groupId = groupId;
+			this.mbThreadBatchSpec = spec;
+			this.body = spec.body();
+			this.categoryId = spec.categoryId();
+			this.format = spec.format();
+			this.groupId = spec.groupId();
 			this.progressCallback = progress;
 			this.userId = userId;
 
-			int requested = batchSpec.count();
+			int requested = spec.batch().count();
 
 			if (_messages.size() == requested) {
 				return BatchResult.success(requested, _messages, 0);
@@ -163,7 +166,7 @@ class MBThreadCreateWorkflowOperationAdapterTest {
 		}
 
 		private final List<MBMessage> _messages;
-		private BatchSpec batchSpec;
+		private MBThreadBatchSpec mbThreadBatchSpec;
 		private String body;
 		private long categoryId;
 		private String format;

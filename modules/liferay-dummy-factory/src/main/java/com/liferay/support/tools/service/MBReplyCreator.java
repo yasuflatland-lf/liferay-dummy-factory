@@ -40,6 +40,10 @@ public class MBReplyCreator {
 		serviceContext.setScopeGroupId(groupId);
 		serviceContext.setUserId(userId);
 
+		if (!spec.tags().isEmpty()) {
+			serviceContext.setAssetTagNames(spec.tags().toArray());
+		}
+
 		List<MBMessage> replies = new ArrayList<>(count);
 
 		for (int i = 0; i < count; i++) {
