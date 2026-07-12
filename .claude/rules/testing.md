@@ -13,7 +13,7 @@ L2 layer for test design, execution strategy, and verification. Read this when w
 
 ## Container setup
 
-- Docker image: `liferay/dxp:2026.q1.3-lts`.
+- Docker image: `liferay/dxp:2026.q1.9-lts`.
 - Singleton pattern: `LiferayContainer.getInstance()` provides configuration constants shared across all specs. Container lifecycle is managed by workspace Gradle tasks, not by `LiferayContainer`.
 - Startup timeout: **8 minutes** (`awaitLiferayReady` Gradle task polls `http://localhost:8080/c/portal/login`).
 - Fixed ports: **8080** (HTTP), **11311** (GoGo Shell), **8000** (JPDA). Access via system properties `liferay.http.port` / `liferay.gogo.port` set by `integrationTest` task.
