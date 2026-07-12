@@ -2,7 +2,7 @@
 
 L3 detail. Source of truth for Gradle task wiring, deploy verification, the incremental build trap, and JaCoCo coverage. Read on demand from `.claude/rules/testing.md` or `.claude/rules/debugging.md`.
 
-This file reflects the DXP 2026.Q1.3-LTS workspace-native Docker flow. The Testcontainers-based approach used for CE 7.4 GA132 has been removed. See `docs/ADR/adr-0008-dxp-2026-migration.md` for the migration decisions.
+This file reflects the DXP 2026.Q1.9-LTS workspace-native Docker flow. The Testcontainers-based approach used for CE 7.4 GA132 has been removed. See `docs/ADR/adr-0008-dxp-2026-migration.md` for the migration decisions.
 
 ## License requirement (DXP 2026)
 

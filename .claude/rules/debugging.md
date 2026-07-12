@@ -109,6 +109,6 @@ Silent skips and silently disabled type checking are easy to introduce. Mock typ
 
 ## Known DXP 2026 API constraints
 
-DXP 2026.Q1.3-LTS has several non-obvious API constraints (`GroupLocalService.addGroup` new 18-arg signature,
+DXP 2026.Q1.9-LTS has several non-obvious API constraints (`GroupLocalService.addGroup` new 18-arg signature,
 `CompanyService` blacklist, `MBThreadLocalService.getThreads` exact-match categoryId, `group/delete-group`
 returning 404, `bnd.bnd` javax.servlet exclusion, etc.). Full catalog in `docs/details/api-liferay-dxp2026.md`.
