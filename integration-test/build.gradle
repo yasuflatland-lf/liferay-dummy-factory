@@ -108,7 +108,7 @@ gradle.projectsEvaluated {
 		// of which address the JVM picks for "localhost".
 		//
 		// exposePorts is ALSO required: unlike 8080/11311/8000 which are EXPOSE'd
-		// in liferay/dxp:2026.q1.3-lts, port 6300 is unknown to the base image.
+		// in liferay/dxp:2026.q1.9-lts, port 6300 is unknown to the base image.
 		// Docker silently drops portBindings for ports that are neither EXPOSE'd
 		// by the image nor added to the container's ExposedPorts, producing the
 		// symptom that 6300 appears in HostConfig.PortBindings but never reaches

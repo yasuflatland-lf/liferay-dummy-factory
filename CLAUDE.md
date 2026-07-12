@@ -1,6 +1,6 @@
 # liferay-dummy-factory
 
-Liferay DXP 2026.Q1.3-LTS Workspace: MVCPortlet + React portlet + Spock integration tests against `liferay/dxp:2026.q1.3-lts`.
+Liferay DXP 2026.Q1.9-LTS Workspace: MVCPortlet + React portlet + Spock integration tests against `liferay/dxp:2026.q1.9-lts`.
 
 ## Routing — read the matching L2 file for the task you're starting
 
@@ -18,7 +18,7 @@ Liferay DXP 2026.Q1.3-LTS Workspace: MVCPortlet + React portlet + Spock integrat
 2. **Single source of truth** — every fact, rule, or contract lives in exactly one file. Other files link to it.
 3. **Creator + batch response contract** — `*Creator` classes wrap per-entity work in `TransactionInvokerUtil.invoke` + `throws Throwable` and return `{success, count, requested, skipped, error?, items}` with strict `success := created == requested`; `error` MUST be set whenever `success == false`. Detail in `.claude/rules/writing-code.md`.
 4. **JSONWS-first verification** — test post-conditions through `/api/jsonws/...`, not Playwright UI navigation. Detail in `.claude/rules/testing.md`.
-5. **`jakarta.portlet` 4.0** — DXP 2026.Q1.3-LTS uses `jakarta.portlet.*` imports and `jakarta.portlet.version=4.0` component properties. JSP taglib URI stays `http://xmlns.jcp.org/portlet_3_0` (JCP namespace). See `docs/ADR/adr-0008-dxp-2026-migration.md`.
+5. **`jakarta.portlet` 4.0** — DXP 2026.Q1.9-LTS uses `jakarta.portlet.*` imports and `jakarta.portlet.version=4.0` component properties. JSP taglib URI stays `http://xmlns.jcp.org/portlet_3_0` (JCP namespace). See `docs/ADR/adr-0008-dxp-2026-migration.md`.
 6. **`data-testid` is mechanically named** — `${entityKey}-${kebab(field)}-${typeSuffix}`. Do not invent ids; follow the contract in `.claude/rules/writing-code.md`.
 7. **One package manager per repo** — `yarn.lock` only. Never coexist with `package-lock.json`.
 
