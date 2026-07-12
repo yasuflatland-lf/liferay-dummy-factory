@@ -1,4 +1,4 @@
-# DXP 2026.Q1.3-LTS — Runtime and Environment Gotchas
+# DXP 2026.Q1.9-LTS — Runtime and Environment Gotchas
 
 L3 detail. Concrete pitfalls discovered during DXP 2026 migration. Read on demand from `.claude/rules/debugging.md`.
 
@@ -6,7 +6,7 @@ L3 detail. Concrete pitfalls discovered during DXP 2026 migration. Read on deman
 
 **Symptom**: Every JSONWS call returns HTTP 403 or "Access denied" immediately after the container starts. No `configs/` change seems to help.
 
-**Root cause**: `liferay/dxp:2026.q1.3-lts` bakes `/home/liferay/portal-liferay-online-config.properties` into the image. This file contains:
+**Root cause**: `liferay/dxp:2026.q1.9-lts` bakes `/home/liferay/portal-liferay-online-config.properties` into the image. This file contains:
 
 ```
 json.servlet.hosts.allowed=N/A

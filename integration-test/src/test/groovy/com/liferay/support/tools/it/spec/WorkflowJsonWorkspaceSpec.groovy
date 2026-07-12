@@ -213,10 +213,12 @@ class WorkflowJsonWorkspaceSpec extends BaseLiferaySpec {
 		editor.waitFor(new Locator.WaitForOptions().setTimeout(30_000))
 		editor.fill('')
 
-		and: 'Execute is clicked'
-		page.locator(
-			"[data-testid=\"${WORKFLOW_JSON_EXECUTE_TEST_ID}\"]"
-		).click(new Locator.ClickOptions().setForce(true))
+		and: 'Execute becomes enabled after the schema loads, then is clicked'
+		Locator executeButton = page.locator(
+			"[data-testid=\"${WORKFLOW_JSON_EXECUTE_TEST_ID}\"]:not([disabled])"
+		)
+		executeButton.waitFor(new Locator.WaitForOptions().setTimeout(30_000))
+		executeButton.click()
 
 		then: 'the result pane appears with an Ajv source badge'
 		Locator resultPanel = page.locator(

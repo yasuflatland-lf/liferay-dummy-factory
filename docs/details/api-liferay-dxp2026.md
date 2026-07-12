@@ -1,6 +1,6 @@
-# Liferay DXP 2026.Q1.3-LTS — API notes
+# Liferay DXP 2026.Q1.9-LTS — API notes
 
-L3 detail. Non-obvious API facts for DXP 2026.Q1.3-LTS. This file is the single source of truth for DXP 2026 API constraints. It replaces `api-liferay-ce74.md` (deleted). Read on demand from `.claude/rules/writing-code.md` or `.claude/rules/debugging.md`.
+L3 detail. Non-obvious API facts for DXP 2026.Q1.9-LTS. This file is the single source of truth for DXP 2026 API constraints. It replaces `api-liferay-ce74.md` (deleted). Read on demand from `.claude/rules/writing-code.md` or `.claude/rules/debugging.md`.
 
 ## 1. `release.dxp.api` BOM replaces individual API dependencies
 
@@ -142,7 +142,7 @@ Portal-core services use simple paths: `/api/jsonws/user/get-user-by-email-addre
 
 The module name matches the `Bundle-SymbolicName` prefix (e.g. `com.liferay.blogs.service` → `blogs`). Omitting the prefix returns HTTP 404.
 
-Note: DXP 2026.Q1.3-LTS exposes JSONWS at `/api/jsonws/` (unchanged from earlier releases). `BaseLiferaySpec.jsonwsGet/Post` centralizes this; individual specs pass only the path suffix.
+Note: DXP 2026.Q1.9-LTS exposes JSONWS at `/api/jsonws/` (unchanged from earlier releases). `BaseLiferaySpec.jsonwsGet/Post` centralizes this; individual specs pass only the path suffix.
 
 ## 12. `PanelCategoryKeys.CONTROL_PANEL_APPS` — `MARKETPLACE` constant does not exist in CE 7.4
 
@@ -164,7 +164,7 @@ Without this exclusion the bundle will show as UNSATISFIED in GoGo Shell even th
 
 ## 14. JSONWS base path is `/api/jsonws/`
 
-DXP 2026.Q1.3-LTS keeps the JSONWS base path at `/api/jsonws/`. Earlier migration notes speculated the path had moved to `/portal/api/jsonws/`, but `/portal/api/jsonws/*` is not registered in this release and returns 404.
+DXP 2026.Q1.9-LTS keeps the JSONWS base path at `/api/jsonws/`. Earlier migration notes speculated the path had moved to `/portal/api/jsonws/`, but `/portal/api/jsonws/*` is not registered in this release and returns 404.
 
 `BaseLiferaySpec.jsonwsGet/Post` centralizes the base path. Individual specs and cleanup code must never hard-code the full path — pass only the suffix (e.g. `'user/get-current-user'`). When sweeping for old-path references, grep both dotted access and string literals:
 
