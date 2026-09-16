@@ -7,8 +7,10 @@ L3 detail. Non-obvious API facts for DXP 2026.Q1.9-LTS. This file is the single 
 DXP 2026 ships a managed BOM artifact. Use it as the single dependency for all Liferay APIs in `modules/liferay-dummy-factory/build.gradle`:
 
 ```groovy
-compileOnly group: "com.liferay.portal", name: "release.dxp.api", version: "default"
+compileOnly group: "com.liferay.portal", name: "release.dxp.api"
 ```
+
+**Never write `version: "default"`.** `com.liferay.gradle.plugins` (`LiferayBasePlugin`) installs a resolution rule that rewrites `default` to Gradle's dynamic version `latest.release` (`LiferayExtension.getDefaultVersion`), so it always picks the newest `release.dxp.api` published to the Liferay repository — it does NOT read `liferay.workspace.product`. In September 2026 Liferay published `2026.q3.3`, `default` silently jumped from `2026.q1.9` to `2026.q3.3` (conflict resolution beats the BOM constraint), and `compileJava` broke on `AssetCategoryLocalService.addCategory` (a new `boolean` parameter) with zero changes in this repo. Omitting the version lets `release.dxp.bom.compile.only:<liferay.workspace.target.platform.version>` (applied by the workspace target-platform plugin) pin `release.dxp.api` to `2026.q1.9` on every classpath, so the API only moves when `gradle.properties` is bumped deliberately.
 
 The BOM includes journals (`com.liferay.journal.api`), DDM (`com.liferay.dynamic.data.mapping.api`), message boards (`com.liferay.message.boards.api`), blogs, vocabulary/category, and all portal-kernel artifacts at the correct version. Adding individual API dependencies alongside `release.dxp.api` causes version skew and runtime `ClassCastException` or `NoClassDefFoundError`. Do not add per-API entries.
 
