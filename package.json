@@ -4,5 +4,8 @@
 		"packages": [
 			"modules/liferay-dummy-factory"
 		]
+	},
+	"resolutions": {
+		"vite": "7.3.5"
 	}
 }
