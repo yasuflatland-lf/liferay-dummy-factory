@@ -117,7 +117,7 @@ If `Status` is `Up (healthy)` and Gradle insists it is not up, stop first. If st
 
 1. The module JAR is baked into the Docker image via `dockerDeploy` (copied to `configs/<env>/deploy/`). On container start, the workspace plugin copies it to `/mnt/liferay/deploy/`, and Liferay's AutoDeployScanner picks it up.
 2. Bundle activation is verified via GoGo Shell: the `lb` output must contain `Liferay Dummy Factory` with state `Active`.
-3. The `ensureBundleActive()` method in `BaseLiferaySpec` polls GoGo Shell every 5 seconds for up to 5 minutes until the bundle is active. It is `synchronized` and runs only once per test suite.
+3. The `ensureBundleActive()` method in `BaseLiferaySpec` copies the module JAR into the running container, then polls container logs every 2 seconds for up to 180 seconds for a `STOPPED liferay.dummy.factory_` line followed by a `STARTED liferay.dummy.factory_` line. Logs are read from 2 seconds before the copy to allow for host/container clock skew; a timeout fails with the last 30 log lines. After the restart, it polls GoGo Shell `lb` every 5 seconds for up to 5 minutes until the bundle is `Active`. It is `static synchronized` and runs only once per test suite, with later calls short-circuited by `bundleVerified`.
 4. For mid-session re-deployment (without rebuilding the image), `LiferayContainer.deployJar(path)` uses `docker cp` + `docker exec chown` to place the JAR in the running container's deploy directory.
 
 ## Gradle Incremental Build Trap
