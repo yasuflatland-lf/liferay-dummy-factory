@@ -36,7 +36,7 @@ dependencies {
 	testImplementation 'ch.qos.logback:logback-classic:1.4.14'
 	testImplementation 'commons-net:commons-net:3.10.0'
 	testImplementation 'org.jacoco:org.jacoco.core:0.8.14'
-	testImplementation 'org.jacoco:org.jacoco.agent:0.8.14:runtime'
+	testImplementation 'org.jacoco:org.jacoco.agent:0.8.15:runtime'
 }
 
 // ----- License resolution: env var -> configs/local/deploy/activation-key.xml -----
