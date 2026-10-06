@@ -10,7 +10,7 @@ dependencies {
 
 	// DXP release.dxp.api does not bundle log4j; provide it for the test JVM
 	// so Liferay's Log4jLogFactoryImpl static init can resolve LogManager.
-	testRuntimeOnly group: "org.apache.logging.log4j", name: "log4j-core", version: "2.24.3"
+	testRuntimeOnly group: "org.apache.logging.log4j", name: "log4j-core", version: "2.26.1"
 }
 
 java {
