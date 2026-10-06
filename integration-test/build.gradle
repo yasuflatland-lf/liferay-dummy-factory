@@ -33,9 +33,9 @@ dependencies {
 	testImplementation "org.apache.groovy:groovy-json:${groovyVersion}"
 	testImplementation "org.spockframework:spock-core:${spockVersion}"
 	testImplementation "com.microsoft.playwright:playwright:${playwrightVersion}"
-	testImplementation 'ch.qos.logback:logback-classic:1.4.14'
+	testImplementation 'ch.qos.logback:logback-classic:1.6.4'
 	testImplementation 'commons-net:commons-net:3.10.0'
-	testImplementation 'org.jacoco:org.jacoco.core:0.8.14'
+	testImplementation 'org.jacoco:org.jacoco.core:0.8.15'
 	testImplementation 'org.jacoco:org.jacoco.agent:0.8.15:runtime'
 }
 
