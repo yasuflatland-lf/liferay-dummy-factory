@@ -82,10 +82,11 @@ abstract class BaseLiferaySpec extends Specification {
 
 		while (System.nanoTime() < restartDeadline) {
 			def lines = liferay.logsSince(deployStartedAt).readLines()
-			int stoppedIndex = lines.findIndexOf { it.contains('STOPPED liferay.dummy.factory_') }
+			// A fresh container installs the bundle (STARTED only); a reused one updates it (STOPPED → STARTED).
+			int stoppedIndex = lines.findLastIndexOf { it.contains('STOPPED liferay.dummy.factory_') }
 			int startedIndex = lines.findLastIndexOf { it.contains('STARTED liferay.dummy.factory_') }
 			boolean stopped = stoppedIndex >= 0
-			boolean started = stopped && startedIndex > stoppedIndex
+			boolean started = startedIndex > stoppedIndex
 			log.info('Waiting for redeploy restart, attempt {}: stopped={}, started={}',
 				++attempt, stopped, started)
 
@@ -100,8 +101,8 @@ abstract class BaseLiferaySpec extends Specification {
 		if (!restarted) {
 			String tail = liferay.logsSince(deployStartedAt).readLines().takeRight(30).join('\n')
 			throw new IllegalStateException(
-				'Bundle liferay.dummy.factory did not complete the STOPPED → STARTED ' +
-					"redeploy cycle within 180 seconds. Last 30 container log lines:\n${tail}")
+				'Bundle liferay.dummy.factory did not reach STARTED after the deploy ' +
+					"within 180 seconds. Last 30 container log lines:\n${tail}")
 		}
 
 		boolean active = false
