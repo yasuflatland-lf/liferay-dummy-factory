@@ -1,6 +1,6 @@
 # liferay-dummy-factory
 
-Liferay DXP 2026.Q3.6 Workspace: MVCPortlet + React portlet + Spock integration tests against `liferay/dxp:2026.q3.6`.
+Liferay DXP 2025.Q1.14 LTS Workspace: MVCPortlet + React portlet + Spock integration tests against `liferay/dxp:2025.q1.14-lts`.
 
 ## Routing — read the matching L2 file for the task you're starting
 
@@ -18,7 +18,7 @@ Liferay DXP 2026.Q3.6 Workspace: MVCPortlet + React portlet + Spock integration 
 2. **Single source of truth** — every fact, rule, or contract lives in exactly one file. Other files link to it.
 3. **Creator + batch response contract** — `*Creator` classes wrap per-entity work in `TransactionInvokerUtil.invoke` + `throws Throwable` and return `{success, count, requested, skipped, error?, items}` with strict `success := created == requested`; `error` MUST be set whenever `success == false`. Detail in `.claude/rules/writing-code.md`.
 4. **JSONWS-first verification** — test post-conditions through `/api/jsonws/...`, not Playwright UI navigation. Detail in `.claude/rules/testing.md`.
-5. **`jakarta.portlet` 4.0** — DXP 2026.Q3.6 uses `jakarta.portlet.*` imports and `jakarta.portlet.version=4.0` component properties. JSP taglib URI stays `http://xmlns.jcp.org/portlet_3_0` (JCP namespace). See `docs/ADR/adr-0008-dxp-2026-migration.md`.
+5. **`javax.portlet` 3.0** — DXP 2025.Q1.14 LTS uses `javax.portlet.*` imports and `javax.portlet.version=3.0` component properties. JSP taglib URI stays `http://xmlns.jcp.org/portlet_3_0` (JCP namespace). See `docs/ADR/adr-0010-dxp-2025-q1-14-lts-backport.md`.
 6. **`data-testid` is mechanically named** — `${entityKey}-${kebab(field)}-${typeSuffix}`. Do not invent ids; follow the contract in `.claude/rules/writing-code.md`.
 7. **One package manager per repo** — `yarn.lock` only. Never coexist with `package-lock.json`.
 
@@ -27,8 +27,8 @@ Liferay DXP 2026.Q3.6 Workspace: MVCPortlet + React portlet + Spock integration 
 ```bash
 ./gradlew :modules:liferay-dummy-factory:jar              # Build the bundle JAR
 ./gradlew :modules:liferay-dummy-factory:test             # Host-JVM unit tests + JaCoCo
-./gradlew :integration-test:integrationTest               # Spock + Workspace-native Docker (DXP 2026)
-./gradlew startDockerContainer                            # Start DXP 2026 container (for local dev loops)
+./gradlew :integration-test:integrationTest               # Spock + Workspace-native Docker (DXP 2025.Q1.14 LTS)
+./gradlew startDockerContainer                            # Start DXP 2025.Q1.14 LTS container (for local dev loops)
 ./gradlew stopDockerContainer                             # Stop the container (keeps volume; reuse next run)
 ./gradlew removeDockerContainer                           # Hard clean (force volume recreation)
 ./gradlew :modules:liferay-dummy-factory:copyJarToLatest  # Release only — publish JAR to latest/; see docs/details/testing-gradle.md

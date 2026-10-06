@@ -2,11 +2,11 @@
 
 L3 detail. Source of truth for Gradle task wiring, deploy verification, the incremental build trap, and JaCoCo coverage. Read on demand from `.claude/rules/testing.md` or `.claude/rules/debugging.md`.
 
-This file reflects the DXP 2026.Q3.6 workspace-native Docker flow. The Testcontainers-based approach used for CE 7.4 GA132 has been removed. See `docs/ADR/adr-0008-dxp-2026-migration.md` for the migration decisions.
+On branch `2025.Q1.14-LTS`, this file describes the DXP 2025.Q1.14 LTS workspace-native Docker flow; the filename is retained to keep links stable. See `docs/ADR/adr-0010-dxp-2025-q1-14-lts-backport.md` for the backport decision. The Testcontainers-based approach used for CE 7.4 GA132 has been removed. See `docs/ADR/adr-0008-dxp-2026-migration.md` for the migration decisions.
 
-## License requirement (DXP 2026)
+## License requirement (DXP 2025.Q1.14 LTS)
 
-DXP 2026 requires a valid activation key before the container can serve requests. Set one of these environment variables before running any Gradle integration test task:
+DXP 2025.Q1.14 LTS requires a valid activation key before the container can serve requests. Set one of these environment variables before running any Gradle integration test task:
 
 ```bash
 # Local development (file path):
@@ -24,7 +24,7 @@ The `resolveLicenseFile` Gradle task reads these variables and writes the key to
 # Build the module JAR first (required by integration tests)
 ./gradlew :modules:liferay-dummy-factory:jar
 
-# Run integration tests (starts DXP 2026 container, runs Spock specs, stops container)
+# Run integration tests (starts DXP 2025.Q1.14 LTS container, runs Spock specs, stops container)
 ./gradlew :integration-test:integrationTest
 
 # Single spec (image must already be running from a prior startDockerContainer)
@@ -32,7 +32,7 @@ The `resolveLicenseFile` Gradle task reads these variables and writes the key to
     --tests "com.liferay.support.tools.it.spec.DeploymentSpec"
 ```
 
-- The module build depends on `release.dxp.api` (DXP 2026 BOM). Do not mix individual API artifacts alongside this dependency — version skew causes runtime failures.
+- The module build depends on `release.dxp.api` (target-platform-managed BOM; see `docs/details/api-liferay-dxp2026.md` §1). Do not mix individual API artifacts alongside this dependency — version skew causes runtime failures.
 - The default `test` task is **disabled** (`enabled = false`). All integration tests run exclusively via the `integrationTest` task.
 - The `integrationTest` task automatically depends on `:modules:liferay-dummy-factory:jar`, so a standalone `./gradlew :integration-test:integrationTest` will build the JAR first.
 - JVM args: `-Xms4g -Xmx4g`.
@@ -178,7 +178,7 @@ Report locations:
 
 **Spock `cleanupSpec()` inheritance in Spock 2.x.** A `cleanupSpec()` defined in an abstract base spec IS invoked even when the concrete subclass defines its own `cleanupSpec()`. Spock's `PlatformSpecRunner.doRunCleanupSpec` chains the hierarchy. `BaseLiferaySpec.cleanupSpec()` is therefore guaranteed to dump JaCoCo coverage at the end of every spec, regardless of whether the subclass also defines `cleanupSpec()`. No explicit `super.cleanupSpec()` call is needed in subclasses.
 
-**`LIFERAY_JVM_OPTS` is the correct env var for JVM option injection.** The DXP 2026 Docker image's `setenv.sh` appends `$LIFERAY_JVM_OPTS` to the JVM startup command. `CATALINA_OPTS` would replace Liferay's built-in JVM options rather than supplement them. The JaCoCo agent is injected via `createDockerContainer { withEnvVar('LIFERAY_JVM_OPTS', '-javaagent:/opt/liferay/jacocoagent.jar=...') }`.
+**`LIFERAY_JVM_OPTS` is the correct env var for JVM option injection.** The Docker image's `setenv.sh` appends `$LIFERAY_JVM_OPTS` to the JVM startup command. `CATALINA_OPTS` would replace Liferay's built-in JVM options rather than supplement them. The JaCoCo agent is injected via `createDockerContainer { withEnvVar('LIFERAY_JVM_OPTS', '-javaagent:/opt/liferay/jacocoagent.jar=...') }`.
 
 **bmuschko `DockerCreateContainer.hostConfig.binds` is `@Input @Optional` — MUST be set at configuration time.** The bmuschko Docker plugin annotates `hostConfig.binds` (a `MapProperty<String, String>`) as `@Input`, so Gradle finalizes the property before task actions run. Calling `hostConfig.binds.put(...)` inside a `doFirst` block fails at runtime with `"The value for property 'binds' is final and cannot be changed any further."` The bind mount for the JaCoCo agent JAR must be set inside the `createDockerContainer { ... }` configure block (configuration time), not deferred to `doFirst`.
 

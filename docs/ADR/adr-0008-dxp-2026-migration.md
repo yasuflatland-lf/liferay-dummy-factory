@@ -1,5 +1,7 @@
 # ADR-0008: Migrate to Liferay DXP 2026.Q1.3-LTS
 
+Superseded on branch `2025.Q1.14-LTS` by [ADR-0010](adr-0010-dxp-2025-q1-14-lts-backport.md) for the portlet/servlet namespace and signatures.
+
 ## Status: Accepted (2026-04-18)
 
 ## Context

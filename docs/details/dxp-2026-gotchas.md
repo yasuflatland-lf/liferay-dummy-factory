@@ -1,6 +1,6 @@
-# DXP 2026.Q3.6 — Runtime and Environment Gotchas
+# DXP 2025.Q1.14 LTS — Runtime and Environment Gotchas
 
-L3 detail. Concrete pitfalls discovered during DXP 2026 migration. Read on demand from `.claude/rules/debugging.md`.
+L3 detail. On branch `2025.Q1.14-LTS`, this file describes the DXP 2025.Q1.14 LTS backport; the filename is retained to keep links stable. The runtime observations below were discovered during the DXP 2026 migration; the harness that works around them passes unchanged on DXP 2025.Q1.14 LTS (see ADR-0010), but each individual root cause has not been re-confirmed on this runtime. Read on demand from `.claude/rules/debugging.md`.
 
 ## 1. `portal-liferay-online-config.properties` baked into the DXP base image
 

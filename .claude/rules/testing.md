@@ -13,7 +13,7 @@ L2 layer for test design, execution strategy, and verification. Read this when w
 
 ## Container setup
 
-- Docker image: `liferay/dxp:2026.q3.6`.
+- Docker image: `liferay/dxp:2025.q1.14-lts`.
 - Singleton pattern: `LiferayContainer.getInstance()` provides configuration constants shared across all specs. Container lifecycle is managed by workspace Gradle tasks, not by `LiferayContainer`.
 - Startup timeout: **8 minutes** (`awaitLiferayReady` Gradle task polls `http://localhost:8080/c/portal/login`).
 - Fixed ports: **8080** (HTTP), **11311** (GoGo Shell), **8000** (JPDA). Access via system properties `liferay.http.port` / `liferay.gogo.port` set by `integrationTest` task.
@@ -27,14 +27,14 @@ L2 layer for test design, execution strategy, and verification. Read this when w
 - Use Playwright when the assertion is about DOM/rendering, client-side validation, or navigation flows. For database-state assertions ("did the entity actually get created / updated / deleted?"), query JSONWS.
 - Authenticate JSONWS calls with Basic Auth using the default admin credentials (`test@liferay.com` / `test`).
 
-**JSONWS base path in DXP 2026 is `/api/jsonws/`** — unchanged from earlier releases. `BaseLiferaySpec.jsonwsGet/Post` centralizes this; individual specs pass only the path suffix (e.g. `'user/get-current-user'`). Never hard-code the full base path in a spec.
+**JSONWS base path is `/api/jsonws/`** — unchanged from earlier releases. `BaseLiferaySpec.jsonwsGet/Post` centralizes this; individual specs pass only the path suffix (e.g. `'user/get-current-user'`). Never hard-code the full base path in a spec.
 - See `BaseLiferaySpec` for `jsonwsGet` / `jsonwsPost` helpers and any `*FunctionalSpec` under `integration-test/.../spec/` for usage.
 
 ### JSON-WS exposure: only remote `*Service`, minus blacklist
 
 - Liferay exposes remote `*Service` classes via `/api/jsonws/`, NOT `*LocalService`. If a method only exists on `*LocalService`, it cannot be called from a test.
 - Some remote services are blacklisted via `portal.properties` `json.service.invalid.class.names`. `CompanyServiceUtil` is one such entry — every JSON-WS path under `/api/jsonws/company/*` returns HTTP 404 regardless of method or parameter format.
-- Before writing cleanup or verification code for a new entity type, check both: (a) is there a remote `*Service` class with the method I need, and (b) is that class blacklisted? Catalogue of DXP 2026 API constraints: `docs/details/api-liferay-dxp2026.md`.
+- Before writing cleanup or verification code for a new entity type, check both: (a) is there a remote `*Service` class with the method I need, and (b) is that class blacklisted? Catalogue of DXP 2025.Q1.14 LTS API constraints: `docs/details/api-liferay-dxp2026.md`.
 - **`assetentry/get-entry` omits `tagNames`** — the JSONWS projection of `AssetEntry` does not include derived collection fields. Tests verifying tag attachment must make a secondary call to `assettag/get-tags?classNameId=<id>&classPK=<pk>`. Resolve `classNameId` via `classname/fetch-class-name-id`. See `docs/details/api-liferay-dxp2026.md` §23.
 
 ## Deploy verification

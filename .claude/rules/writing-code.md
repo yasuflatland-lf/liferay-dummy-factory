@@ -12,23 +12,19 @@ liferay-dummy-factory/
   integration-test/                 # Spock + Testcontainers (repo root, NOT under modules/)
 ```
 
-Detailed DXP 2026 API constraints: `docs/details/api-liferay-dxp2026.md`. Workspace frontend traps: `docs/details/workspace-frontend-traps.md`. Read on demand.
+Detailed DXP 2025.Q1.14 LTS API constraints: `docs/details/api-liferay-dxp2026.md`. Workspace frontend traps: `docs/details/workspace-frontend-traps.md`. Read on demand.
 
 ## Portlet Module
 
 - **Single-JAR design** — MVCPortlet, MVCResourceCommand, and React frontend ship together in one bundle (`liferay.dummy.factory`).
-- **MVCPortlet + PanelApp** — Registered in Control Panel > Configuration. Uses `jakarta.portlet` namespace (Portlet API 4.0). DXP 2026 requires `jakarta.portlet.*` imports (see `docs/ADR/adr-0008-dxp-2026-migration.md`).
+- **MVCPortlet + PanelApp** — Registered in Control Panel > Configuration. Uses `javax.portlet` namespace (Portlet API 3.0). See `docs/ADR/adr-0010-dxp-2025-q1-14-lts-backport.md` for the backport decision.
 - **`LDFPortletKeys.DOCUMENT_TEMP_FOLDER_NAME`** — the temp-folder name used by `DocumentUploadResourceCommand` (add/delete temp) and `DocumentCreator` (_loadTempFiles). **Never reference `DocumentUploadResourceCommand` from the service layer**; always use the constant from `constants/LDFPortletKeys`.
 - **MVCResourceCommands** — Per-entity resource commands handle creation: `/ldf/blog`, `/ldf/company`, `/ldf/org`, `/ldf/user`, `/ldf/role`, `/ldf/site`, `/ldf/page`, `/ldf/wcm`, `/ldf/doc` (+ `/ldf/doc/upload`), `/ldf/vocabulary`, `/ldf/category`, `/ldf/mb-category`, `/ldf/mb-thread`, `/ldf/mb-reply`. `/ldf/data` (`DataListResourceCommand`) serves dropdown data; `/ldf/progress` (`ProgressResourceCommand`) reports batch progress.
 - **Value Objects** — `BatchSpec` (Java record) encapsulates `count + baseName` with constructor validation. `EmailDomain` (Java record) wraps a domain string, rejects blanks and `@`-containing inputs, and defaults to `"liferay.com"` via `EmailDomain.of(raw)`. `RoleType` and `SiteMembershipType` are type-safe enums mapping frontend strings to Liferay constants. `BatchResult<T>` (generic record) is the **unified Creator return type** — see the "Creator return type is always `BatchResult<T>`" section below. Resource commands construct value objects from JSON before passing to Creators.
 - **DataListProvider SPI** — Dropdown sources are `DataListProvider` implementations discovered via OSGi `@Reference(cardinality=MULTIPLE, policy=DYNAMIC)`. Add a new type by creating `@Component(service=DataListProvider.class)` under `service/datalist/` — no changes to `DataListResourceCommand` needed.
-- **`bnd.bnd` must exclude `javax.servlet`**: DXP 2026 does not export `javax.servlet` or
-  `javax.servlet.http` from the OSGi runtime. Always include this line in
-  `modules/liferay-dummy-factory/bnd.bnd`:
-  ```
-  Import-Package: !javax.servlet,!javax.servlet.http,*
-  ```
-  Without it, the bundle will show as UNSATISFIED at activation time.
+- **`bnd.bnd` must NOT exclude `javax.servlet` or `javax.servlet.http`** — use
+  `Import-Package: *`. DXP 2025.Q1.14 LTS exports both packages; excluding them
+  prevents the bundle from loading servlet classes. See `docs/details/api-liferay-dxp2026.md` §13.
 
 ## Java Conventions
 
@@ -36,16 +32,15 @@ Detailed DXP 2026 API constraints: `docs/details/api-liferay-dxp2026.md`. Worksp
 - Prefer `@Reference` injection over `*Util` static classes (`TransactionInvoker` over `TransactionInvokerUtil`, `RoleLocalService` over `RoleLocalServiceUtil`) for testability.
 - Private fields/methods get an underscore prefix: `_privateField`, `_doSomething(...)`.
 - `@Component` annotations use array-style `property = { ... }` with one quoted string per line. The `service` attribute lives on its own line after the closing brace.
-- Use `jakarta.portlet` imports. DXP 2026 requires `jakarta.portlet.*` imports and
-	`jakarta.portlet.version=4.0` in `@Component` property arrays. Do NOT use `javax.portlet.*`.
-	JSP taglib URI stays `http://xmlns.jcp.org/portlet_3_0` — the JCP namespace is what
-	DXP 2026 advertises via `Provide-Capability`. Switching to `jakarta.tags.portlet` in JSPs
-	causes bundle resolution failure. See `docs/ADR/adr-0008-dxp-2026-migration.md`.
+- Use `javax.portlet`, `javax.servlet`, and `javax.ws.rs` imports for DXP 2025.Q1.14 LTS.
+	Portlet component properties use `javax.portlet.*`, including `javax.portlet.version=3.0`;
+	the language title key is `javax.portlet.title.<portletName>`.
+	See `docs/ADR/adr-0010-dxp-2025-q1-14-lts-backport.md`.
 - Import order: `com.liferay.*` → third-party → `javax.*`/`java.*` → `org.*`. Blank line between groups.
 - Multi-line method parameters use Liferay's continuation indent: second line +2 tabs, `throws` clause +1 tab.
 - `init.jsp` must include both `<liferay-theme:defineObjects />` and `<portlet:defineObjects />`.
 - **`init.jsp` taglib URI must stay JCP**: Use `http://xmlns.jcp.org/portlet_3_0` as the
-  portlet taglib URI in all JSPs. DXP 2026's `Provide-Capability` only advertises this URI.
+  portlet taglib URI in all JSPs. This URI is unchanged on the DXP 2025.Q1.14 LTS backport.
   Switching to `jakarta.tags.portlet` causes bundle resolution failure. A comment in
   `init.jsp` marks this as intentional — do not change it.
 - **OSGi DS `@Component` constructor pattern** — Adding any explicit constructor to a `@Component` class that uses `@Reference` field injection eliminates the JVM's implicit no-arg constructor. OSGi DS instantiates components via the no-arg constructor, so the component fails to activate if it is absent. Always declare **both** constructors: `public ClassName() {}` (OSGi activation) and `package-private ClassName(Dep dep, ...)` (unit-test injection). Reference: `CompanyCreateWorkflowOperationAdapter.java`.
@@ -108,21 +103,18 @@ if (!result.success()) {
 
 Use `validatePositiveId` for every `id > 0` constraint instead of a hand-written `if (id <= 0)` block — the helper keeps error messages consistent. The one exception is when `0` is a valid sentinel (e.g. `categoryId = 0` means "root MBCategory") — use `if (id < 0)` explicitly in that case.
 
-## DXP 2026 API call shapes
+## DXP 2025.Q1.14 LTS API call shapes
 
-### `GroupLocalService.addGroup` — 18-argument signature
+### `GroupLocalService.addGroup` — 15-argument signature
 
-DXP 2026 adds `externalReferenceCode` as the first argument and `typeSettings`
-before `serviceContext`. Pass `null` for both new parameters when no custom value is needed:
+DXP 2025.Q1.14 LTS has no `externalReferenceCode` or `typeSettings` argument in this overload:
 
 ```java
 _groupLocalService.addGroup(
-	null,                // externalReferenceCode (auto-generated)
 	userId, parentGroupId, className, classPK,
 	liveGroupId, nameMap, descriptionMap, type,
 	manualMembership, membershipRestriction, friendlyURL,
 	site, inheritContent, active,
-	null,                // typeSettings (defaults)
 	serviceContext);
 ```
 

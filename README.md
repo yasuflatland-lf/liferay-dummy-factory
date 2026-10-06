@@ -35,7 +35,7 @@ Ready-made samples live under `integration-test/src/test/resources/workflow-samp
 
 ## Required environment
 * Java 21 or above
-* Liferay DXP 2026.Q3.6 (this branch)
+* Liferay DXP 2025.Q1.14 LTS (this branch)
 * Liferay 7.4 (please see the 7.4.x branch)
 * Liferay 7.3 GA1 (please see the 7.3.x branch)
 * Liferay 7.2 (please see the 7.2.x branch)
@@ -49,7 +49,7 @@ Ready-made samples live under `integration-test/src/test/resources/workflow-samp
 
 | Layer | Technology |
 |-------|------------|
-| Portal | Liferay DXP 2026.Q3.6 |
+| Portal | Liferay DXP 2025.Q1.14 LTS |
 | Backend | MVCPortlet + MVCResourceCommand (layered) |
 | Frontend | React + Clay CSS |
 | Build | Gradle 8.5 + Liferay Workspace Plugin 10.1.9 |
@@ -74,7 +74,7 @@ Ready-made samples live under `integration-test/src/test/resources/workflow-samp
 
 ## Quick Start (Docker via Workspace Plugin)
 
-Provision the DXP 2026 activation key (required):
+Provision the DXP 2025.Q1.14 LTS activation key (required):
 
 ```bash
 # Local: point to your file

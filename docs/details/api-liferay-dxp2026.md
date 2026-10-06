@@ -1,45 +1,31 @@
-# Liferay DXP 2026.Q3.6 — API notes
+# Liferay DXP 2025.Q1.14 LTS backport — API notes
 
-L3 detail. Non-obvious API facts for DXP 2026.Q3.6. This file is the single source of truth for DXP 2026 API constraints. It replaces `api-liferay-ce74.md` (deleted). Read on demand from `.claude/rules/writing-code.md` or `.claude/rules/debugging.md`.
+L3 detail. On branch `2025.Q1.14-LTS`, this file describes DXP 2025.Q1.14 LTS; the filename is retained to keep links stable. This file is the single source of truth for API constraints on this branch. See `docs/ADR/adr-0010-dxp-2025-q1-14-lts-backport.md` for the backport decision. Runtime observations explicitly attributed to DXP 2026 remain historical; the integration suite passes on DXP 2025.Q1.14 LTS (see ADR-0010). It replaces `api-liferay-ce74.md` (deleted). Read on demand from `.claude/rules/writing-code.md` or `.claude/rules/debugging.md`.
 
 ## 1. `release.dxp.api` BOM replaces individual API dependencies
 
-DXP 2026 ships a managed BOM artifact. Use it as the single dependency for all Liferay APIs in `modules/liferay-dummy-factory/build.gradle`:
+DXP 2025.Q1.14 LTS ships a managed BOM artifact. Use it as the single dependency for all Liferay APIs in `modules/liferay-dummy-factory/build.gradle`:
 
 ```groovy
 compileOnly group: "com.liferay.portal", name: "release.dxp.api"
 ```
 
-**Never write `version: "default"`.** `com.liferay.gradle.plugins` (`LiferayBasePlugin`) installs a resolution rule that rewrites `default` to Gradle's dynamic version `latest.release` (`LiferayExtension.getDefaultVersion`), so it always picks the newest `release.dxp.api` published to the Liferay repository — it does NOT read `liferay.workspace.product`. In September 2026 Liferay published `2026.q3.3`, `default` silently jumped from `2026.q1.9` to `2026.q3.3` (conflict resolution beats the BOM constraint), and `compileJava` broke on `AssetCategoryLocalService.addCategory` (a new `boolean` parameter) with zero changes in this repo. Omitting the version lets `release.dxp.bom.compile.only:<liferay.workspace.target.platform.version>` (applied by the workspace target-platform plugin) pin `release.dxp.api` to the target platform version on every classpath, so the API only moves when `gradle.properties` is bumped deliberately. The `addCategory` change was absorbed in the deliberate bump to `2026.q3.6` — see §24.
+**Never write `version: "default"`.** `com.liferay.gradle.plugins` (`LiferayBasePlugin`) installs a resolution rule that rewrites `default` to Gradle's dynamic version `latest.release` (`LiferayExtension.getDefaultVersion`), so it always picks the newest `release.dxp.api` published to the Liferay repository — it does NOT read `liferay.workspace.product`. In September 2026 Liferay published `2026.q3.3`, `default` silently jumped from `2026.q1.9` to `2026.q3.3` (conflict resolution beats the BOM constraint), and `compileJava` broke on `AssetCategoryLocalService.addCategory` (a new `boolean` parameter) with zero changes in this repo. Omitting the version lets `release.dxp.bom.compile.only:<liferay.workspace.target.platform.version>` (applied by the workspace target-platform plugin) pin `release.dxp.api` to the target platform version on every classpath, so the API only moves when `gradle.properties` is bumped deliberately. On this branch, `liferay.workspace.product=dxp-2025.q1.14-lts` and `liferay.workspace.target.platform.version=2025.q1.14` select `release.dxp.api:2025.q1.14`; the category signature is documented in §24.
 
 The BOM includes journals (`com.liferay.journal.api`), DDM (`com.liferay.dynamic.data.mapping.api`), message boards (`com.liferay.message.boards.api`), blogs, vocabulary/category, and all portal-kernel artifacts at the correct version. Adding individual API dependencies alongside `release.dxp.api` causes version skew and runtime `ClassCastException` or `NoClassDefFoundError`. Do not add per-API entries.
 
-## 2. `GroupLocalService.addGroup` — new 17-argument signature
+## 2. `GroupLocalService.addGroup` — 15-argument signature
 
-DXP 2026 adds `externalReferenceCode` as the first argument and `typeSettings` after `type`:
+DXP 2025.Q1.14 LTS takes neither an `externalReferenceCode` first argument nor a `typeSettings` argument. Verified with `javap` on `release.dxp.api-2025.q1.14.jar`:
 
 ```java
-// Before (CE 7.4 GA132) — 15 args
 _groupLocalService.addGroup(
     userId, parentGroupId, className, classPK,
     liveGroupId, nameMap, descriptionMap, type,
-    manualMembership, membershipRestriction, friendlyURL,
-    site, inheritContent, active,
-    serviceContext);
-
-// After (DXP 2026) — 17 args
-_groupLocalService.addGroup(
-    externalReferenceCode,           // NEW: pass null for auto-generated ERC
-    userId, parentGroupId, className, classPK,
-    liveGroupId, nameMap, descriptionMap, type,
-    typeSettings,                    // NEW: pass null or StringPool.BLANK for defaults
     manualMembership, membershipRestriction, friendlyURL,
     site, inheritContent, active,
     serviceContext);
 ```
-
-Verify the exact signature against the source:
-`/home/yasuflatland/tmp/liferay-portal/portal-kernel/src/com/liferay/portal/kernel/service/GroupLocalService.java`
 
 Affected file: `modules/liferay-dummy-factory/src/main/java/com/liferay/support/tools/service/SiteCreator.java`.
 
@@ -88,9 +74,9 @@ The `categoryId` parameter is an exact-match filter, not a "no filter" sentinel.
 
 To list all threads regardless of category, iterate `MBCategoryLocalService.getCategories(groupId)` and union per-category results with the root-level call. No single overload returns group-wide threads in one shot.
 
-## 7. `MBCategoryLocalService.addCategory` — 5-argument overload removed in DXP 2026
+## 7. `MBCategoryLocalService.addCategory` — 6-argument overload
 
-The 5-argument overload (without `externalReferenceCode`) no longer exists in DXP 2026; use the 6-argument form for the typical case:
+Use the 6-argument form, which compiles unchanged against DXP 2025.Q1.14 LTS:
 
 ```java
 addCategory(String externalReferenceCode, long userId, long parentCategoryId,
@@ -144,7 +130,7 @@ Portal-core services use simple paths: `/api/jsonws/user/get-user-by-email-addre
 
 The module name matches the `Bundle-SymbolicName` prefix (e.g. `com.liferay.blogs.service` → `blogs`). Omitting the prefix returns HTTP 404.
 
-Note: DXP 2026.Q3.6 exposes JSONWS at `/api/jsonws/` (unchanged from earlier releases). `BaseLiferaySpec.jsonwsGet/Post` centralizes this; individual specs pass only the path suffix.
+Note: the test harness accesses JSONWS at `/api/jsonws/` (unchanged from earlier releases). `BaseLiferaySpec.jsonwsGet/Post` centralizes this; individual specs pass only the path suffix.
 
 ## 12. `PanelCategoryKeys.CONTROL_PANEL_APPS` — `MARKETPLACE` constant does not exist in CE 7.4
 
@@ -152,21 +138,19 @@ The constant `PanelCategoryKeys.CONTROL_PANEL_MARKETPLACE` (`"control_panel.mark
 
 In DXP 2026 the Marketplace category exists, but for this project the portlet is registered under `PanelCategoryKeys.CONTROL_PANEL_APPS` (`"control_panel.apps"`). Use `panel.app.order` lower than 100 to appear first in the Apps section. Do not reference `CONTROL_PANEL_MARKETPLACE`.
 
-## 13. `bnd.bnd` must exclude `javax.servlet` and `javax.servlet.http`
+## 13. `bnd.bnd` must NOT exclude `javax.servlet` or `javax.servlet.http`
 
-DXP 2026 does not export `javax.servlet` or `javax.servlet.http` from the OSGi runtime. Any bundle that tries to import these packages will fail with UNSATISFIED state at activation time.
-
-Add this to `modules/liferay-dummy-factory/bnd.bnd`:
+DXP 2025.Q1.14 LTS exports both packages, and the bundle needs them for `HttpServletRequest`. Use this in `modules/liferay-dummy-factory/bnd.bnd`:
 
 ```
-Import-Package: !javax.servlet,!javax.servlet.http,*
+Import-Package: *
 ```
 
-Without this exclusion the bundle will show as UNSATISFIED in GoGo Shell even though the code compiles successfully.
+Keeping `!javax.servlet,!javax.servlet.http` would leave the bundle unable to load servlet classes. The built JAR imports `javax.portlet`, `javax.servlet`, `javax.servlet.http`, `javax.ws.rs`, and `javax.ws.rs.core`, with no `jakarta` imports.
 
 ## 14. JSONWS base path is `/api/jsonws/`
 
-DXP 2026.Q3.6 keeps the JSONWS base path at `/api/jsonws/`. Earlier migration notes speculated the path had moved to `/portal/api/jsonws/`, but `/portal/api/jsonws/*` is not registered in this release and returns 404.
+The test harness uses the JSONWS base path `/api/jsonws/`. Earlier migration notes speculated the path had moved to `/portal/api/jsonws/`, but `/portal/api/jsonws/*` is not registered in this release and returns 404.
 
 `BaseLiferaySpec.jsonwsGet/Post` centralizes the base path. Individual specs and cleanup code must never hard-code the full path — pass only the suffix (e.g. `'user/get-current-user'`). When sweeping for old-path references, grep both dotted access and string literals:
 
@@ -264,7 +248,7 @@ The same empty-string behavior applies to other prototype-related accessors on `
 
 ## 21. `UserLocalService.addUserWithWorkflow` — new `int type` parameter at position 20
 
-DXP 2026 adds a required `int type` argument at position 20 (between `jobTitle` and `groupIds`). This parameter did not exist in CE 7.4 or earlier. **Always pass `UserConstants.TYPE_REGULAR` (value 1) for end-user accounts.**
+DXP 2025.Q1.14 LTS requires an `int type` argument at position 20 (between `jobTitle` and `groupIds`). This parameter did not exist in CE 7.4 or earlier. **Always pass `UserConstants.TYPE_REGULAR` (value 1) for end-user accounts.**
 
 Passing `0` (= `UserConstants.TYPE_GUEST`) or any value other than `TYPE_REGULAR` makes the user invisible in Control Panel > Users and Organizations because that view filters on `type == 1`. The bug is silent — the user is created, but the Control Panel will not display it.
 
@@ -281,7 +265,7 @@ addUserWithWorkflow(
     boolean male,
     int birthdayMonth, int birthdayDay, int birthdayYear,
     String jobTitle,
-    int type,                           // <-- position 20, NEW in DXP 2026: use UserConstants.TYPE_REGULAR
+    int type,                           // <-- position 20, use UserConstants.TYPE_REGULAR
     long[] groupIds, long[] organizationIds, long[] roleIds, long[] userGroupIds,
     boolean sendEmail,
     ServiceContext serviceContext)
@@ -322,16 +306,15 @@ GET /api/jsonws/assettag/get-tags?classNameId=<id>&classPK=<pk>
 
 In Spock specs, use `jsonwsGet('assettag/get-tags', [classNameId: ..., classPK: ...])` after the class-name resolution step. Do NOT read `tagNames` off `assetentry/get-entry` — the field will always be null.
 
-## 24. `AssetCategoryLocalService.addCategory` — new `boolean system` parameter (2026.Q3)
+## 24. `AssetCategoryLocalService.addCategory` — 9-argument signature
 
-From `2026.q3.x` the full-featured overload takes a `boolean system` between `vocabularyId` and `categoryProperties`. The pre-Q3 9-argument form no longer compiles:
+DXP 2025.Q1.14 LTS uses the 9-argument form. It has no `boolean system` argument; that parameter was added in 2026.Q3:
 
 ```java
 addCategory(String externalReferenceCode, long userId, long groupId,
             long parentCategoryId, Map<Locale, String> titleMap,
             Map<Locale, String> descriptionMap, long vocabularyId,
-            boolean system, String[] categoryProperties,
-            ServiceContext serviceContext)
+            String[] categoryProperties, ServiceContext serviceContext)
 ```
 
-Pass `system=false` for ordinary user-visible categories. Reference: `CategoryCreator.java`.
+Reference: `CategoryCreator.java`.
