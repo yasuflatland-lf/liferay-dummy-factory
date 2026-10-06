@@ -19,6 +19,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.nio.file.Path
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 abstract class BaseLiferaySpec extends Specification {
@@ -71,8 +72,37 @@ abstract class BaseLiferaySpec extends Specification {
 		}
 
 		log.info('Deploying JAR: {}', getModuleJarPath())
+		Instant deployStartedAt = Instant.now().minusSeconds(2)
 		liferay.deployJar(getModuleJarPath())
 		log.info('JAR copied to container. GoGo Shell at {}:{}', liferay.host, liferay.gogoPort)
+
+		boolean restarted = false
+		long restartDeadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(180_000)
+		int attempt = 0
+
+		while (System.nanoTime() < restartDeadline) {
+			def lines = liferay.logsSince(deployStartedAt).readLines()
+			int stoppedIndex = lines.findIndexOf { it.contains('STOPPED liferay.dummy.factory_') }
+			int startedIndex = lines.findLastIndexOf { it.contains('STARTED liferay.dummy.factory_') }
+			boolean stopped = stoppedIndex >= 0
+			boolean started = stopped && startedIndex > stoppedIndex
+			log.info('Waiting for redeploy restart, attempt {}: stopped={}, started={}',
+				++attempt, stopped, started)
+
+			if (started) {
+				restarted = true
+				break
+			}
+
+			TimeUnit.SECONDS.sleep(2)
+		}
+
+		if (!restarted) {
+			String tail = liferay.logsSince(deployStartedAt).readLines().takeRight(30).join('\n')
+			throw new IllegalStateException(
+				'Bundle liferay.dummy.factory did not complete the STOPPED → STARTED ' +
+					"redeploy cycle within 180 seconds. Last 30 container log lines:\n${tail}")
+		}
 
 		boolean active = false
 

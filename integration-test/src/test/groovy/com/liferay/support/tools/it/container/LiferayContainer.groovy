@@ -3,6 +3,7 @@ package com.liferay.support.tools.it.container
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.nio.file.Path
+import java.time.Instant
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -85,6 +86,10 @@ class LiferayContainer {
 			"cp ${tmpPath} ${targetPath} && " +
 				"chown liferay:liferay ${targetPath} && " +
 				"rm ${tmpPath}")
+	}
+
+	String logsSince(Instant since) {
+		return _runDocker('logs', '--since', since.toString(), containerName)
 	}
 
 	private static String _runDocker(String... args) {
