@@ -6,6 +6,16 @@
     {
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
+    },
+    {
+      "description": "Gradle 8.14.5 breaks the Liferay Gradle plugins (#117/#119); stay on 8.5 until upgraded by hand",
+      "matchManagers": ["gradle-wrapper"],
+      "allowedVersions": "<8.6",
+      "automerge": false
+    },
+    {
+      "matchPackageNames": ["com.liferay:com.liferay.gradle.plugins.workspace"],
+      "automerge": false
     }
   ]
 }
