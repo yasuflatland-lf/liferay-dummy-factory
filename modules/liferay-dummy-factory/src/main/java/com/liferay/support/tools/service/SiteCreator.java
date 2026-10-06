@@ -60,13 +60,10 @@ public class SiteCreator {
 			try {
 				Group group = BatchTransaction.run(
 					() -> {
-						// externalReferenceCode: dummy-factory sites intentionally omit ERC (no idempotency keying).
-						// typeSettings: StringPool.BLANK preserves the platform default group configuration.
 						Group newGroup = _groupLocalService.addGroup(
-							null, userId, parentGroupId, null, 0,
+							userId, parentGroupId, null, 0,
 							GroupConstants.DEFAULT_LIVE_GROUP_ID, nameMap,
-							descriptionMap, type, StringPool.BLANK,
-							manualMembership,
+							descriptionMap, type, manualMembership,
 							GroupConstants.DEFAULT_MEMBERSHIP_RESTRICTION,
 							StringPool.BLANK, true, inheritContent, active,
 							serviceContext);

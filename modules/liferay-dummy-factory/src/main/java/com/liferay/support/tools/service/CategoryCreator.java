@@ -43,8 +43,8 @@ public class CategoryCreator {
 				BatchTransaction.run(
 					() -> _assetCategoryLocalService.addCategory(
 						null, userId, groupId, 0L, titleMap,
-						Collections.emptyMap(), vocabularyId, false,
-						new String[0], serviceContext)));
+						Collections.emptyMap(), vocabularyId, new String[0],
+						serviceContext)));
 
 			progress.onProgress(i + 1, count);
 		}

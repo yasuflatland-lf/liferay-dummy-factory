@@ -3,7 +3,7 @@ package com.liferay.support.tools.portlet;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 
-import jakarta.portlet.Portlet;
+import javax.portlet.Portlet;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -13,12 +13,12 @@ import org.osgi.service.component.annotations.Component;
 		"com.liferay.portlet.css-class-wrapper=portlet-liferay-dummy-factory",
 		"com.liferay.portlet.display-category=category.hidden",
 		"com.liferay.portlet.header-portlet-css=/css/main.css",
-		"jakarta.portlet.display-name=Liferay Dummy Factory",
-		"jakarta.portlet.init-param.template-path=/",
-		"jakarta.portlet.init-param.view-template=/view.jsp",
-		"jakarta.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
-		"jakarta.portlet.resource-bundle=content.Language",
-		"jakarta.portlet.version=4.0"
+		"javax.portlet.display-name=Liferay Dummy Factory",
+		"javax.portlet.init-param.template-path=/",
+		"javax.portlet.init-param.view-template=/view.jsp",
+		"javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
+		"javax.portlet.resource-bundle=content.Language",
+		"javax.portlet.version=3.0"
 	},
 	service = Portlet.class
 )

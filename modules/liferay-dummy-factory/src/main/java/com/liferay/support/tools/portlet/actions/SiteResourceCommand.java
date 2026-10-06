@@ -15,15 +15,15 @@ import com.liferay.support.tools.service.SiteMembershipType;
 import com.liferay.support.tools.service.usecase.SiteCreateUseCase;
 import com.liferay.support.tools.service.usecase.SiteItemResult;
 
-import jakarta.portlet.ResourceRequest;
-import jakarta.portlet.ResourceResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 @Component(
 	property = {
-		"jakarta.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
+		"javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
 		"mvc.command.name=/ldf/site"
 	},
 	service = MVCResourceCommand.class

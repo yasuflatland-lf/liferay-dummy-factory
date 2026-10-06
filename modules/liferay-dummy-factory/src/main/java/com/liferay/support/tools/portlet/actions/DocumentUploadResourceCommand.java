@@ -17,15 +17,15 @@ import com.liferay.support.tools.constants.LDFPortletKeys;
 
 import java.io.InputStream;
 
-import jakarta.portlet.ResourceRequest;
-import jakarta.portlet.ResourceResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 @Component(
 	property = {
-		"jakarta.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
+		"javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
 		"mvc.command.name=/ldf/doc/upload"
 	},
 	service = MVCResourceCommand.class
