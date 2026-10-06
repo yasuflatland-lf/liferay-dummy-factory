@@ -1,6 +1,6 @@
 package com.liferay.support.tools.workflow.jaxrs;
 
-import jakarta.ws.rs.core.Application;
+import javax.ws.rs.core.Application;
 
 import org.osgi.service.component.annotations.Component;
 

@@ -9,10 +9,10 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.support.tools.utils.ProgressCallback;
 import com.liferay.support.tools.utils.ProgressManager;
 
-import jakarta.portlet.ResourceRequest;
-import jakarta.portlet.ResourceResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 class PortletJsonCommandTemplate {
 

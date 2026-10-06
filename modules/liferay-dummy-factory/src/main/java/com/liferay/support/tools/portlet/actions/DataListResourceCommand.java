@@ -16,10 +16,10 @@ import com.liferay.support.tools.service.DataListProvider;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import jakarta.portlet.ResourceRequest;
-import jakarta.portlet.ResourceResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 
 @Component(
 	property = {
-		"jakarta.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
+		"javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
 		"mvc.command.name=/ldf/data"
 	},
 	service = MVCResourceCommand.class

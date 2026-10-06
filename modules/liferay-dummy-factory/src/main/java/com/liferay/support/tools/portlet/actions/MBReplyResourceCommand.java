@@ -16,15 +16,15 @@ import com.liferay.support.tools.service.BatchSpec;
 import com.liferay.support.tools.service.MBReplyBatchSpec;
 import com.liferay.support.tools.service.MBReplyCreator;
 
-import jakarta.portlet.ResourceRequest;
-import jakarta.portlet.ResourceResponse;
+import javax.portlet.ResourceRequest;
+import javax.portlet.ResourceResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 @Component(
 	property = {
-		"jakarta.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
+		"javax.portlet.name=" + LDFPortletKeys.LIFERAY_DUMMY_FACTORY,
 		"mvc.command.name=/ldf/mb-reply"
 	},
 	service = MVCResourceCommand.class
