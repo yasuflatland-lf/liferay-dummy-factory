@@ -6,6 +6,10 @@
     {
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
+    },
+    {
+      "matchManagers": ["gradle-wrapper"],
+      "automerge": false
     }
   ]
 }
