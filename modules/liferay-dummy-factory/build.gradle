@@ -3,7 +3,7 @@ apply plugin: 'jacoco'
 dependencies {
 	compileOnly group: "com.liferay.portal", name: "release.dxp.api"
 
-	compileInclude group: "net.datafaker", name: "datafaker", version: "2.5.4"
+	compileInclude group: "net.datafaker", name: "datafaker", version: "2.7.0"
 
 	testImplementation group: "com.liferay.portal", name: "release.dxp.api"
 	testImplementation group: "org.junit.jupiter", name: "junit-jupiter", version: "5.10.2"
