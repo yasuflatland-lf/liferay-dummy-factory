@@ -32,11 +32,11 @@ docker exec liferay bash -c "(echo 'lb dummy.factory'; sleep 2) | telnet localho
 
 Look for `UNSATISFIED REFERENCE` entries. For example, if the PortletTracker isn't picking up your portlet, the corresponding PanelApp `@Reference` will stay unsatisfied.
 
-The PortletTracker / `jakarta.portlet` migration details are in `docs/details/api-liferay-dxp2026.md` (and `docs/ADR/adr-0008-dxp-2026-migration.md` records the migration decision).
+The PortletTracker / `javax.portlet` backport details are in `docs/details/api-liferay-dxp2026.md` (and `docs/ADR/adr-0010-dxp-2025-q1-11-lts-backport.md` records the backport decision).
 
 ### Check `Import-Package` with `headers <bundle-id>`
 
-Verifies which portlet API package the bundle actually imports (should be `jakarta.portlet` for DXP 2026).
+Verifies which portlet API package the bundle actually imports (should be `javax.portlet` for DXP 2025.Q1.11 LTS).
 
 ## Inspecting entity state via JSONWS
 
@@ -107,8 +107,8 @@ Silent skips and silently disabled type checking are easy to introduce. Mock typ
 - `docker logs -f <project-name>-liferay` for the container log (e.g. `docker logs -f liferay-dummy-factory-liferay`). Startup takes 5–8 minutes.
 - Test logging includes `passed`, `skipped`, `failed`, `standardOut`, `standardError`.
 
-## Known DXP 2026 API constraints
+## Known DXP 2025.Q1.11 LTS API constraints
 
-DXP 2026.Q3.6 has several non-obvious API constraints (`GroupLocalService.addGroup` new 18-arg signature,
+DXP 2025.Q1.11 LTS has several non-obvious API constraints (`GroupLocalService.addGroup` 15-arg signature,
 `CompanyService` blacklist, `MBThreadLocalService.getThreads` exact-match categoryId, `group/delete-group`
-returning 404, `bnd.bnd` javax.servlet exclusion, etc.). Full catalog in `docs/details/api-liferay-dxp2026.md`.
+returning 404, `bnd.bnd` servlet imports, etc.). Full catalog in `docs/details/api-liferay-dxp2026.md`.
