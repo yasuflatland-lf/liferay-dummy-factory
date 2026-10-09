@@ -1,4 +1,4 @@
 [tools]
 java = "temurin-21.0.10+7.0.LTS"
 node = "24.21.0"
-yarn = "1.22.22"
+yarn = "4.18.1"
