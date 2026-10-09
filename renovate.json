@@ -19,6 +19,11 @@
       "allowedVersions": "<7.0.0"
     },
     {
+      "description": "Spock 2.4-groovy-5.0 refuses to compile on Groovy 6 (#148); stay on Groovy 5.x until a matching Spock build exists",
+      "matchPackageNames": ["org.apache.groovy:groovy", "org.apache.groovy:groovy-json"],
+      "allowedVersions": "<6.0.0"
+    },
+    {
       "matchPackageNames": ["com.liferay:com.liferay.gradle.plugins.workspace"],
       "automerge": false
     }
