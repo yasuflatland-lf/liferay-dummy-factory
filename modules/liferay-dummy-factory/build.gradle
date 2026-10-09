@@ -6,7 +6,11 @@ dependencies {
 	compileInclude group: "net.datafaker", name: "datafaker", version: "2.7.0"
 
 	testImplementation group: "com.liferay.portal", name: "release.dxp.api"
-	testImplementation group: "org.junit.jupiter", name: "junit-jupiter", version: "5.10.2"
+	testImplementation platform(group: "org.junit", name: "junit-bom", version: "5.14.4")
+	testImplementation group: "org.junit.jupiter", name: "junit-jupiter"
+
+	// JUnit 5.12+ needs a launcher matching the engine; Gradle 8.5's bundled one is older.
+	testRuntimeOnly group: "org.junit.platform", name: "junit-platform-launcher"
 
 	// DXP release.dxp.api does not bundle log4j; provide it for the test JVM
 	// so Liferay's Log4jLogFactoryImpl static init can resolve LogManager.
