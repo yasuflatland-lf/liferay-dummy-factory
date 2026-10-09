@@ -6,7 +6,7 @@ dependencies {
 	compileInclude group: "net.datafaker", name: "datafaker", version: "2.7.0"
 
 	testImplementation group: "com.liferay.portal", name: "release.dxp.api"
-	testImplementation group: "org.junit.jupiter", name: "junit-jupiter", version: "5.10.2"
+	testImplementation group: "org.junit.jupiter", name: "junit-jupiter", version: "5.14.4"
 
 	// DXP release.dxp.api does not bundle log4j; provide it for the test JVM
 	// so Liferay's Log4jLogFactoryImpl static init can resolve LogManager.
