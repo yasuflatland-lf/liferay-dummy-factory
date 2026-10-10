@@ -188,15 +188,9 @@ class WebContentCreationSpec extends BaseLiferaySpec {
 		}
 	}
 
-	def 'reports per-site failure when structure id is missing'() {
-		// DDMStructureService#addStructure does not accept a raw definition
-		// JSON via JSONWS form-encoded POST on Liferay (it expects a
-		// serialized DDMForm Java object), so we cannot cheaply build a
-		// site-scoped structure for this test. Instead, we pass a
-		// deliberately nonexistent ddmStructureId; the WebContentCreator
-		// reports per-site failure for both target sites and the overall
-		// payload flags the batch as not-ok with totalCreated=0. This still
-		// exercises the per-site error pipeline end to end.
+	def 'rejects a missing structure id before creating in any site'() {
+		// CompanyScopedIds validates ddmStructureId before the first site's
+		// transaction, so the whole batch is rejected as invalid input.
 		given:
 		Map siteA = jsonws.createSite(
 			"WcmStructA-${System.nanoTime()}")
@@ -217,10 +211,10 @@ class WebContentCreationSpec extends BaseLiferaySpec {
 			folderId: 0
 		])
 
-		then: 'overall response is not ok and nothing was created'
-		response.ok == false
-		response.totalRequested == 6
-		response.totalCreated == 0
+		then: 'the batch is rejected with the missing-structure error'
+		assert response.success == false : "${response}"
+		assert (response.error as String)?.contains(
+			'ddmStructureId 999999999 does not exist') : "${response}"
 
 		and: 'JSONWS shows both sites have zero articles'
 		int countA = jsonwsGet(
@@ -232,21 +226,6 @@ class WebContentCreationSpec extends BaseLiferaySpec {
 
 		countA == 0
 		countB == 0
-
-		and: 'perSite payload reports a non-empty error for each site'
-		List perSite = response.perSite as List
-		perSite.size() == 2
-
-		Map entryA = perSite.find { (it.groupId as Long) == siteAId } as Map
-		Map entryB = perSite.find { (it.groupId as Long) == siteBId } as Map
-
-		entryA != null
-		(entryA.failed as int) == 3
-		(entryA.error as String)?.trim()
-
-		entryB != null
-		(entryB.failed as int) == 3
-		(entryB.error as String)?.trim()
 	}
 
 	private static int _countParagraphLines(String content) {
