@@ -88,7 +88,6 @@ public class WorkflowFunctionFactory {
 	}
 
 	private static long _userId(WorkflowStepExecutionRequest request) {
-
 		long userId = _runtimeUserId(request.context());
 
 		if (userId <= 0) {

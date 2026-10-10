@@ -57,10 +57,12 @@ public final class WorkflowOpenAPIDocumentBuilder {
 					"Runs the steps top to bottom and stops at the first failing step. Returns HTTP 200 even when a step fails: check execution.status (SUCCEEDED or FAILED) and errors in the response body.",
 					"Execution result", schema)));
 
-		for (WorkflowFunctionDescriptor descriptor : descriptors.stream(
+		List<WorkflowFunctionDescriptor> sortedDescriptors = descriptors.stream(
 		).sorted(
 			Comparator.comparing(WorkflowFunctionDescriptor::operation)
-		).toList()) {
+		).toList();
+
+		for (WorkflowFunctionDescriptor descriptor : sortedDescriptors) {
 			String operation = descriptor.operation();
 			String operationId = operationIdOf(operation);
 

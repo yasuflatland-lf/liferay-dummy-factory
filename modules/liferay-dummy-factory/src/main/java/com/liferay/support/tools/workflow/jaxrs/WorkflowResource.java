@@ -226,9 +226,11 @@ public class WorkflowResource {
 				_schemaDocument(),
 				_workflowFunctions().values().stream(
 				).filter(
-					workflowFunction -> workflowFunction instanceof DefaultWorkflowFunction
+					DefaultWorkflowFunction.class::isInstance
 				).map(
-					workflowFunction -> ((DefaultWorkflowFunction)workflowFunction).descriptor()
+					DefaultWorkflowFunction.class::cast
+				).map(
+					DefaultWorkflowFunction::descriptor
 				).toList())
 		).build();
 	}
