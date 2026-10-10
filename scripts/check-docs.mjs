@@ -1,10 +1,18 @@
 #!/usr/bin/env node
 // Documentation consistency check. Zero dependencies; run from anywhere:
 //   node scripts/check-docs.mjs
-// Rules enforced are described in .claude/rules/documentation.md.
+// Documentation rules: docs/AGENTS.md. Agent-instruction layout rules:
+// docs/reference/agent-instructions.md.
 
 import {execFileSync, spawnSync} from 'node:child_process';
-import {existsSync, readFileSync, statSync} from 'node:fs';
+import {
+	existsSync,
+	lstatSync,
+	readdirSync,
+	readFileSync,
+	readlinkSync,
+	statSync,
+} from 'node:fs';
 import path from 'node:path';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
@@ -22,10 +30,24 @@ const markdownFiles = tracked.filter(
 		!file.includes('node_modules/') &&
 		(!file.includes('/') ||
 			file.startsWith('docs/') ||
-			file.startsWith('.claude/'))
+			file.startsWith('.agents/') ||
+			file.startsWith('.claude/') ||
+			isAgentFile(file))
 );
 
 const isAdr = (file) => file.startsWith('docs/adr/');
+
+function isAgentFile(file) {
+	return ['AGENTS.md', 'CLAUDE.md'].includes(path.posix.basename(file));
+}
+
+// Tool-specific instruction files that only one agent would read.
+const TOOL_SPECIFIC_RULES = [
+	'.claude/rules',
+	'.cursor/rules',
+	'.cursorrules',
+	'.github/copilot-instructions.md',
+];
 
 const errors = [];
 
@@ -144,6 +166,7 @@ for (const file of markdownFiles) {
 
 // 2. Repository paths quoted in living docs exist. ADRs are historical records.
 const TOP_LEVEL = [
+	'.agents/',
 	'.claude/',
 	'.github/',
 	'configs/',
@@ -163,7 +186,9 @@ for (const file of markdownFiles.filter((file) => !isAdr(file))) {
 			if (
 				!TOP_LEVEL.some((prefix) => candidate.startsWith(prefix)) ||
 				/[<>*{}$…]/.test(candidate) ||
-				candidate.startsWith('.claude/plan')
+				candidate.startsWith('.claude/plan') ||
+				candidate.startsWith('.agents/plan') ||
+				TOOL_SPECIFIC_RULES.some((rule) => candidate.startsWith(rule))
 			) {
 				continue;
 			}
@@ -179,54 +204,147 @@ for (const file of markdownFiles.filter((file) => !isAdr(file))) {
 	}
 }
 
-// 3. Every `paths:` glob of a path-scoped rule matches at least one file.
-function globToRegExp(glob) {
-	let source = '';
+// 3. Agent instructions: AGENTS.md is the single source, CLAUDE.md files are
+// one-line imports, every scoped AGENTS.md is indexed from the root, the
+// chain Codex concatenates fits its default budget, and skills are valid
+// Agent Skills exposed to Claude Code through per-skill symlinks.
+const CLAUDE_SHIM = '@AGENTS.md';
+const CODEX_CHAIN_BUDGET = 32 * 1024;
 
-	for (let i = 0; i < glob.length; i++) {
-		const char = glob[i];
+const agentsFiles = tracked.filter(
+	(file) => path.posix.basename(file) === 'AGENTS.md'
+);
+const rootAgents = readIfExists('AGENTS.md');
 
-		if (char === '*' && glob[i + 1] === '*') {
-			source += glob[i + 2] === '/' ? '(?:.*/)?' : '.*';
-			i += glob[i + 2] === '/' ? 2 : 1;
-		}
-		else if (char === '*') {
-			source += '[^/]*';
-		}
-		else if (char === '{') {
-			const end = glob.indexOf('}', i);
+if (!rootAgents) {
+	report('AGENTS.md', 0, 'root AGENTS.md is missing');
+}
 
-			source += `(?:${glob
-				.slice(i + 1, end)
-				.split(',')
-				.map((part) => part.replace(/[.+?^$()|[\]\\]/g, '\\$&'))
-				.join('|')})`;
-			i = end;
+for (const file of agentsFiles) {
+	const dir = path.posix.dirname(file);
+	const shim = dir === '.' ? 'CLAUDE.md' : `${dir}/CLAUDE.md`;
+
+	if (!existsSync(path.join(ROOT, shim))) {
+		report(file, 0, `missing sibling ${shim} containing "${CLAUDE_SHIM}"`);
+	}
+
+	if (dir !== '.' && !rootAgents.includes(`](${file})`)) {
+		report('AGENTS.md', 0, `scoped instructions not indexed: ${file}`);
+	}
+
+	let chainBytes = 0;
+
+	for (
+		let ancestor = dir;
+		;
+		ancestor = path.posix.dirname(ancestor)
+	) {
+		const candidate =
+			ancestor === '.' ? 'AGENTS.md' : `${ancestor}/AGENTS.md`;
+
+		if (existsSync(path.join(ROOT, candidate))) {
+			chainBytes += statSync(path.join(ROOT, candidate)).size;
 		}
-		else {
-			source += char.replace(/[.+?^$()|[\]\\]/g, '\\$&');
+
+		if (ancestor === '.') {
+			break;
 		}
 	}
 
-	return new RegExp(`^${source}$`);
+	if (chainBytes > CODEX_CHAIN_BUDGET) {
+		report(
+			file,
+			0,
+			`AGENTS.md chain is ${chainBytes} bytes; Codex truncates after ${CODEX_CHAIN_BUDGET}`
+		);
+	}
 }
 
-for (const file of markdownFiles.filter((file) =>
-	file.startsWith('.claude/rules/')
+for (const file of tracked.filter(
+	(file) => path.posix.basename(file) === 'CLAUDE.md'
 )) {
-	const content = readFileSync(path.join(ROOT, file), 'utf8');
-	const frontMatter = /^---\n([\s\S]*?)\n---/.exec(content);
+	const dir = path.posix.dirname(file);
+	const sibling = dir === '.' ? 'AGENTS.md' : `${dir}/AGENTS.md`;
+
+	if (!existsSync(path.join(ROOT, sibling))) {
+		report(file, 0, `CLAUDE.md without sibling ${sibling}`);
+	}
+
+	if (readIfExists(file).trim() !== CLAUDE_SHIM) {
+		report(
+			file,
+			0,
+			`must contain only "${CLAUDE_SHIM}"; put instructions in ${sibling}`
+		);
+	}
+}
+
+for (const rule of TOOL_SPECIFIC_RULES) {
+	if (tracked.some((file) => file === rule || file.startsWith(`${rule}/`))) {
+		report(rule, 0, 'tool-specific instructions; move them into an AGENTS.md');
+	}
+}
+
+const SKILLS_DIR = '.agents/skills';
+const CLAUDE_SKILLS_DIR = '.claude/skills';
+
+const listDir = (dir) =>
+	existsSync(path.join(ROOT, dir)) ? readdirSync(path.join(ROOT, dir)) : [];
+
+const skills = listDir(SKILLS_DIR);
+
+for (const name of skills) {
+	const skillFile = `${SKILLS_DIR}/${name}/SKILL.md`;
+	const frontMatter = /^---\n([\s\S]*?)\n---/.exec(readIfExists(skillFile));
 
 	if (!frontMatter) {
+		report(skillFile, 0, 'missing SKILL.md with YAML front matter');
+
 		continue;
 	}
 
-	for (const match of frontMatter[1].matchAll(/^\s*-\s*["']?([^"'\n]+)["']?\s*$/gm)) {
-		const regExp = globToRegExp(match[1].trim());
+	const field = (key) =>
+		new RegExp(`^${key}:\\s*(.*)$`, 'm').exec(frontMatter[1])?.[1].trim();
+	const declaredName = field('name');
+	const description = field('description');
 
-		if (!tracked.some((trackedFile) => regExp.test(trackedFile))) {
-			report(file, 0, `paths glob matches no file: ${match[1]}`);
-		}
+	if (declaredName !== name) {
+		report(skillFile, 0, `name "${declaredName}" must equal directory "${name}"`);
+	}
+
+	if (!/^(?!.*--)[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/.test(name)) {
+		report(skillFile, 0, `invalid skill name "${name}" (Agent Skills spec)`);
+	}
+
+	if (!description || description.length > 1024) {
+		report(skillFile, 0, 'description must be 1-1024 characters');
+	}
+
+	if (!rootAgents.includes(`](${skillFile})`)) {
+		report('AGENTS.md', 0, `skill not listed: ${skillFile}`);
+	}
+
+	const link = `${CLAUDE_SKILLS_DIR}/${name}`;
+	const expectedTarget = `../../${SKILLS_DIR}/${name}`;
+	const linkStat = existsSync(path.join(ROOT, link))
+		? lstatSync(path.join(ROOT, link))
+		: null;
+
+	if (
+		!linkStat?.isSymbolicLink() ||
+		readlinkSync(path.join(ROOT, link)) !== expectedTarget
+	) {
+		report(link, 0, `must be a symlink to ${expectedTarget}`);
+	}
+}
+
+for (const name of listDir(CLAUDE_SKILLS_DIR)) {
+	if (!skills.includes(name)) {
+		report(
+			`${CLAUDE_SKILLS_DIR}/${name}`,
+			0,
+			`no matching ${SKILLS_DIR}/${name}; skills live in ${SKILLS_DIR}`
+		);
 	}
 }
 
