@@ -23,6 +23,12 @@ public class OrganizationCreator {
 			ProgressCallback progress)
 		throws Throwable {
 
+		if (parentOrganizationId != 0) {
+			_companyScopedIds.organization(
+				_companyScopedIds.companyId(userId), "parentOrganizationId",
+				parentOrganizationId);
+		}
+
 		int count = batchSpec.count();
 		String baseName = batchSpec.baseName();
 
@@ -81,6 +87,9 @@ public class OrganizationCreator {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		OrganizationCreator.class);
+
+	@Reference
+	private CompanyScopedIds _companyScopedIds;
 
 	@Reference
 	private OrganizationLocalService _organizationLocalService;

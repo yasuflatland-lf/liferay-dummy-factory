@@ -35,6 +35,42 @@ public class UserCreator {
 			ProgressCallback progress)
 		throws Throwable {
 
+		for (long id : spec.organizationIds()) {
+			_companyScopedIds.organization(companyId, "organizationIds", id);
+		}
+
+		for (long id : spec.roleIds()) {
+			_companyScopedIds.role(companyId, "roleIds", id);
+		}
+
+		for (long id : spec.siteRoleIds()) {
+			_companyScopedIds.role(companyId, "siteRoleIds", id);
+		}
+
+		for (long id : spec.orgRoleIds()) {
+			_companyScopedIds.role(companyId, "orgRoleIds", id);
+		}
+
+		for (long id : spec.userGroupIds()) {
+			_companyScopedIds.userGroup(companyId, "userGroupIds", id);
+		}
+
+		for (long id : spec.groupIds()) {
+			_companyScopedIds.group(companyId, "groupIds", id);
+		}
+
+		if (spec.publicLayoutSetPrototypeId() != 0) {
+			_companyScopedIds.layoutSetPrototype(
+				companyId, "publicLayoutSetPrototypeId",
+				spec.publicLayoutSetPrototypeId());
+		}
+
+		if (spec.privateLayoutSetPrototypeId() != 0) {
+			_companyScopedIds.layoutSetPrototype(
+				companyId, "privateLayoutSetPrototypeId",
+				spec.privateLayoutSetPrototypeId());
+		}
+
 		BatchSpec batchSpec = spec.batch();
 		int count = batchSpec.count();
 		String baseName = batchSpec.baseName();
@@ -149,10 +185,8 @@ public class UserCreator {
 
 						if ((groupIds != null) && (groupIds.length > 0)) {
 							for (long groupId : groupIds) {
-								if (groupId > 0) {
-									_groupLocalService.addUserGroup(
-										u.getUserId(), groupId);
-								}
+								_groupLocalService.addUserGroup(
+									u.getUserId(), groupId);
 							}
 						}
 
@@ -160,16 +194,14 @@ public class UserCreator {
 							(groupIds != null) && (groupIds.length > 0)) {
 
 							for (long groupId : groupIds) {
-								if (groupId > 0) {
-									Group group =
-										_groupLocalService.fetchGroup(groupId);
+								Group group =
+									_groupLocalService.fetchGroup(groupId);
 
-									if ((group != null) && group.isSite()) {
-										_userGroupRoleLocalService.
-											addUserGroupRoles(
-												u.getUserId(), groupId,
-												siteRoleIds);
-									}
+								if ((group != null) && group.isSite()) {
+									_userGroupRoleLocalService.
+										addUserGroupRoles(
+											u.getUserId(), groupId,
+											siteRoleIds);
 								}
 							}
 						}
@@ -251,6 +283,9 @@ public class UserCreator {
 
 	@Reference
 	private CommonUtil _commonUtil;
+
+	@Reference
+	private CompanyScopedIds _companyScopedIds;
 
 	@Reference
 	private GroupLocalService _groupLocalService;

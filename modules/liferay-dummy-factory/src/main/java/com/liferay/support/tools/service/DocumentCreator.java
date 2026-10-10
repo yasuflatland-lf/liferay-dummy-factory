@@ -34,6 +34,14 @@ public class DocumentCreator {
 		String[] uploadedFiles = spec.uploadedFiles();
 		AssetTagNames tags = spec.tags();
 
+		long companyId = _companyScopedIds.companyId(userId);
+
+		_companyScopedIds.group(companyId, "groupId", groupId);
+
+		if (folderId != 0) {
+			_companyScopedIds.dlFolder(companyId, "folderId", folderId);
+		}
+
 		int count = spec.batch().count();
 		String baseName = spec.batch().baseName();
 
@@ -202,6 +210,9 @@ public class DocumentCreator {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DocumentCreator.class);
+
+	@Reference
+	private CompanyScopedIds _companyScopedIds;
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;
