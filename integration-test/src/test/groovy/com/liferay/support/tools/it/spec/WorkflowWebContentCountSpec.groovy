@@ -64,9 +64,7 @@ class WorkflowWebContentCountSpec extends BaseLiferaySpec {
 		]
 
 		when:
-		Map response = _rawRequest(
-			'POST', '/o/ldf-workflow/execute', basicAuthHeader(),
-			JsonOutput.toJson(request))
+		Map response = _postJson('/o/ldf-workflow/execute', request)
 
 		then:
 		assert response.status == 200 : "${response}"
@@ -88,31 +86,10 @@ class WorkflowWebContentCountSpec extends BaseLiferaySpec {
 
 		then:
 		assert groupId > 0 : "${payload}"
-		assert result != null : "${payload}"
-		assert ['success', 'requested', 'count', 'skipped', 'items', 'error'].every {
-			result.containsKey(it)
-		} : "${payload}"
-		assert result.success instanceof Boolean : "${payload}"
-		assert ['requested', 'count', 'skipped'].every {
-			result[it] instanceof Number
-		} : "${payload}"
-		assert result.items instanceof List : "${payload}"
-		assert result.success == true : "${payload}"
-		assert result.requested == 3 : "${payload}"
-		assert result.count == 3 : "${payload}"
-		assert result.skipped == 0 : "${payload}"
-		assert result.containsKey('error') && result.error == null : "${payload}"
-		assert result.items.size() == 1 : "${payload}"
-		assert result.items[0].groupId == groupId : "${payload}"
-		assert result.items[0].created == 3 : "${payload}"
-		assert result.items[0].failed == 0 : "${payload}"
-		assert result.items[0].containsKey('siteName') : "${payload}"
-		assert result.items[0].siteName instanceof String : "${payload}"
-		assert !result.items[0].containsKey('error') : "${payload}"
+		_assertOnePerSiteItemSuccess(payload, result, 3)
 
 		when:
-		int articleCount = jsonwsGet(
-			"journal.journalarticle/get-articles-count/group-id/${groupId}/folder-id/0") as int
+		int articleCount = _articleCount()
 
 		then:
 		assert articleCount == 3 : "article count ${articleCount}; ${payload}"
@@ -129,9 +106,8 @@ class WorkflowWebContentCountSpec extends BaseLiferaySpec {
 		]
 
 		when:
-		Map response = _rawRequest(
-			'POST', '/o/ldf-workflow/operations/webContent.create', basicAuthHeader(),
-			JsonOutput.toJson(parameters))
+		Map response = _postJson(
+			'/o/ldf-workflow/operations/webContent.create', parameters)
 
 		then:
 		assert response.status == 200 : "${response}"
@@ -142,31 +118,10 @@ class WorkflowWebContentCountSpec extends BaseLiferaySpec {
 
 		then:
 		assert payload.status == 'SUCCEEDED' : "${payload}"
-		assert result != null : "${payload}"
-		assert ['success', 'requested', 'count', 'skipped', 'items', 'error'].every {
-			result.containsKey(it)
-		} : "${payload}"
-		assert result.success instanceof Boolean : "${payload}"
-		assert ['requested', 'count', 'skipped'].every {
-			result[it] instanceof Number
-		} : "${payload}"
-		assert result.items instanceof List : "${payload}"
-		assert result.success == true : "${payload}"
-		assert result.requested == 2 : "${payload}"
-		assert result.count == 2 : "${payload}"
-		assert result.skipped == 0 : "${payload}"
-		assert result.containsKey('error') && result.error == null : "${payload}"
-		assert result.items.size() == 1 : "${payload}"
-		assert result.items[0].groupId == groupId : "${payload}"
-		assert result.items[0].created == 2 : "${payload}"
-		assert result.items[0].failed == 0 : "${payload}"
-		assert result.items[0].containsKey('siteName') : "${payload}"
-		assert result.items[0].siteName instanceof String : "${payload}"
-		assert !result.items[0].containsKey('error') : "${payload}"
+		_assertOnePerSiteItemSuccess(payload, result, 2)
 
 		when:
-		int articleCount = jsonwsGet(
-			"journal.journalarticle/get-articles-count/group-id/${groupId}/folder-id/0") as int
+		int articleCount = _articleCount()
 
 		then:
 		assert articleCount == 5 : "article count ${articleCount}; ${payload}"
@@ -184,9 +139,8 @@ class WorkflowWebContentCountSpec extends BaseLiferaySpec {
 		]
 
 		when:
-		Map response = _rawRequest(
-			'POST', '/o/ldf-workflow/operations/webContent.create', basicAuthHeader(),
-			JsonOutput.toJson(parameters))
+		Map response = _postJson(
+			'/o/ldf-workflow/operations/webContent.create', parameters)
 
 		then:
 		assert response.status == 422 : "${response}"
@@ -218,45 +172,64 @@ class WorkflowWebContentCountSpec extends BaseLiferaySpec {
 		assert payload.error?.message == result.error : "${payload}"
 
 		when:
-		int articleCount = jsonwsGet(
-			"journal.journalarticle/get-articles-count/group-id/${groupId}/folder-id/0") as int
+		int articleCount = _articleCount()
 
 		then:
 		assert articleCount == 5 : "article count ${articleCount}; ${payload}"
 	}
 
-	private Map _rawRequest(
-		String method, String path, String authorization, String jsonBody) {
+	private void _assertOnePerSiteItemSuccess(Map payload, Map result, int count) {
 
+		assert result != null : "${payload}"
+		assert ['success', 'requested', 'count', 'skipped', 'items', 'error'].every {
+			result.containsKey(it)
+		} : "${payload}"
+		assert result.success instanceof Boolean : "${payload}"
+		assert ['requested', 'count', 'skipped'].every {
+			result[it] instanceof Number
+		} : "${payload}"
+		assert result.items instanceof List : "${payload}"
+		assert result.success == true : "${payload}"
+		assert result.requested == count : "${payload}"
+		assert result.count == count : "${payload}"
+		assert result.skipped == 0 : "${payload}"
+		assert result.error == null : "${payload}"
+		assert result.items.size() == 1 : "${payload}"
+		assert result.items[0].groupId == groupId : "${payload}"
+		assert result.items[0].created == count : "${payload}"
+		assert result.items[0].failed == 0 : "${payload}"
+		assert result.items[0].siteName instanceof String : "${payload}"
+		assert !result.items[0].containsKey('error') : "${payload}"
+	}
+
+	private int _articleCount() {
+		return jsonwsGet(
+			"journal.journalarticle/get-articles-count/group-id/${groupId}/folder-id/0") as int
+	}
+
+	private Map _postJson(String path, Map body) {
 		def conn = new URL(absoluteUrl(path)).openConnection() as HttpURLConnection
 
 		try {
-			conn.requestMethod = method
+			conn.requestMethod = 'POST'
 			conn.instanceFollowRedirects = false
-
-			if (authorization != null) {
-				conn.setRequestProperty('Authorization', authorization)
-			}
-
+			conn.setRequestProperty('Authorization', basicAuthHeader())
 			conn.setRequestProperty('Accept', 'application/json')
 			conn.setRequestProperty('Accept-Encoding', 'identity')
+			conn.setRequestProperty('Content-Type', 'application/json')
 			conn.connectTimeout = 10_000
 			conn.readTimeout = 60_000
-
-			if (jsonBody != null) {
-				conn.setRequestProperty('Content-Type', 'application/json')
-				conn.doOutput = true
-				conn.outputStream.withWriter('UTF-8') { writer ->
-					writer.write(jsonBody)
-				}
+			conn.doOutput = true
+			conn.outputStream.withWriter('UTF-8') { writer ->
+				writer.write(JsonOutput.toJson(body))
 			}
 
 			int status = conn.responseCode
-			String body = (status < 400)
+			String responseBody = (status < 400)
 				? (conn.inputStream?.getText('UTF-8') ?: '')
 				: (conn.errorStream?.getText('UTF-8') ?: '')
 
-			return [status: status, body: body]
+			return [status: status, body: responseBody]
 		}
 		finally {
 			conn.disconnect()
