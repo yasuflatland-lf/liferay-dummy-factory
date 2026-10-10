@@ -64,7 +64,7 @@ curl -u test@liferay.com:Test12345 \
 | Basic Auth works on `/o/*` but JSONWS runs as Guest | JSONWS servlet has its own verifier | [Step 2](../reference/dxp-runtime-config.md#2-register-basic-auth-on-the-jsonws-servlet-filter) |
 | POST 403 `MustHaveSessionCSRFToken` | JSONWS CSRF check | [Step 3](../reference/dxp-runtime-config.md#3-exempt-jsonws-from-the-csrf-check) |
 | Only Country/Region services callable | Basic Auth login support disabled or SAP not widened | [Step 4](../reference/dxp-runtime-config.md#4-enable-basic-auth-login-support-at-runtime), [SAP](../reference/dxp-runtime-config.md#service-access-policies-sap) |
-| 401 (or Guest data) with the default password | Admin password changed by the first-login form | [Step 5](../reference/dxp-runtime-config.md#5-use-the-current-admin-password) |
+| 401 with the default password | Admin password changed by the first-login form | [Step 5](../reference/dxp-runtime-config.md#5-use-the-current-admin-password) |
 | `/api/jsonws/company/*` 404 | `CompanyService` is blacklisted | Read `companyId` from `user/get-current-user` |
 | Module service path 404 | Missing context prefix | e.g. `blogs.blogsentry/...` ([table](../reference/liferay-dxp-api.md#what-is-exposed)) |
 | Garbled JSON / parse errors in helpers | gzip response | Send `Accept-Encoding: identity` (the harness does) |

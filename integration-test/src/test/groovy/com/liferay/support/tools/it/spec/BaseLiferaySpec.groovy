@@ -402,11 +402,10 @@ abstract class BaseLiferaySpec extends Specification {
 	 * every spec that exercises JSONWS first goes through either
 	 * {@code loginAsAdmin} or {@code LdfResourceClient.login}, both of which
 	 * submit the {@code update_password} form with {@link #NEW_ADMIN_PASSWORD}.
-	 * Using the post-reset value here avoids the silent-Guest fallback that
-	 * happens when {@code BasicAuthHeaderAutoLoginSupport.doLogin} authenticates
-	 * with the wrong password and {@code BasicAuthHeaderAuthVerifier} returns an
-	 * empty {@code AuthVerifierResult} (no challenge issued because
-	 * {@code forceBasicAuth} is unset on {@code BasicAuthHeaderAuthVerifierConfiguration}).
+	 * Using the post-reset value avoids an HTTP 401: with Basic Auth login
+	 * support enabled, a wrong password is answered with a challenge whatever
+	 * {@code forceBasicAuth} is set to. See
+	 * {@code docs/reference/dxp-runtime-config.md#when-basic-auth-falls-through-to-guest}.
 	 */
 	protected String basicAuthHeader() {
 		String credentials =
