@@ -7,6 +7,7 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.support.tools.workflow.adapter.TestModelProxyUtil;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.Map;
@@ -69,7 +70,7 @@ public class CompanyScopedIdsTest {
 
 			assertDoesNotThrow(() -> method.invoke(ids, 10L, method.getName(), 20L));
 			var error = assertThrows(
-				java.lang.reflect.InvocationTargetException.class,
+				InvocationTargetException.class,
 				() -> method.invoke(ids, 11L, method.getName(), 20L));
 
 			assertInstanceOf(IllegalArgumentException.class, error.getCause());
@@ -80,7 +81,7 @@ public class CompanyScopedIdsTest {
 			}
 
 			var missing = assertThrows(
-				java.lang.reflect.InvocationTargetException.class,
+				InvocationTargetException.class,
 				() -> method.invoke(ids, 10L, method.getName(), 20L));
 
 			assertInstanceOf(IllegalArgumentException.class, missing.getCause());
@@ -91,11 +92,8 @@ public class CompanyScopedIdsTest {
 	@Test
 	public void companyIsDerivedFromCreatorUser() throws Exception {
 		CompanyScopedIds ids = new CompanyScopedIds();
-		Field field = CompanyScopedIds.class.getDeclaredField("_userLocalService");
-		field.setAccessible(true);
-		field.set(ids, TestModelProxyUtil.proxy(
-			UserLocalService.class, Map.of("fetchUser",
-				TestModelProxyUtil.proxy(User.class, Map.of("getCompanyId", 10L)))));
+
+		_setUserCompany(ids, 10L);
 
 		assertEquals(10L, ids.companyId(30L));
 	}
@@ -108,22 +106,20 @@ public class CompanyScopedIdsTest {
 	@Test
 	public void webContentRejectsForeignSiteBeforeCreatingInFirstSite() throws Exception {
 		CompanyScopedIds ids = validator(null);
-		Field users = CompanyScopedIds.class.getDeclaredField("_userLocalService");
-		users.setAccessible(true);
-		users.set(ids, TestModelProxyUtil.proxy(
-			UserLocalService.class, Map.of("fetchUser",
-				TestModelProxyUtil.proxy(User.class, Map.of("getCompanyId", 10L)))));
-		Field groups = CompanyScopedIds.class.getDeclaredField("_groupLocalService");
-		groups.setAccessible(true);
-		groups.set(ids, Proxy.newProxyInstance(
-			GroupLocalService.class.getClassLoader(), new Class<?>[] {GroupLocalService.class},
-			(proxy, method, args) -> TestModelProxyUtil.proxy(
-				Group.class, Map.of("getCompanyId", (long)args[0] == 20L ? 10L : 11L))));
+
+		_setUserCompany(ids, 10L);
+		_setField(
+			ids, "_groupLocalService",
+			Proxy.newProxyInstance(
+				GroupLocalService.class.getClassLoader(),
+				new Class<?>[] {GroupLocalService.class},
+				(proxy, method, args) -> TestModelProxyUtil.proxy(
+					Group.class,
+					Map.of("getCompanyId", (long)args[0] == 20L ? 10L : 11L))));
 
 		WebContentCreator creator = new WebContentCreator();
-		Field validator = WebContentCreator.class.getDeclaredField("_companyScopedIds");
-		validator.setAccessible(true);
-		validator.set(creator, ids);
+
+		_setField(creator, "_companyScopedIds", ids);
 		WebContentBatchSpec spec = new WebContentBatchSpec(
 			new BatchSpec(1, "article"), new long[] {20L, 21L}, 0L,
 			new String[0], true, true, 0, "body", 0, 0, 0, "", 0L, 0L,
@@ -136,16 +132,40 @@ public class CompanyScopedIdsTest {
 		assertEquals("groupIds 21 does not belong to the caller's company", error.getMessage());
 	}
 
+	private static void _setField(Object target, String name, Object value)
+		throws ReflectiveOperationException {
+
+		Field field = target.getClass().getDeclaredField(name);
+
+		field.setAccessible(true);
+		field.set(target, value);
+	}
+
+	private static void _setUserCompany(CompanyScopedIds ids, long companyId)
+		throws ReflectiveOperationException {
+
+		_setField(
+			ids, "_userLocalService",
+			TestModelProxyUtil.proxy(
+				UserLocalService.class,
+				Map.of(
+					"fetchUser",
+					TestModelProxyUtil.proxy(
+						User.class, Map.of("getCompanyId", companyId)))));
+	}
+
 	private CompanyScopedIds validator(Group group) {
 		try {
 			CompanyScopedIds ids = new CompanyScopedIds();
-			Field groups = CompanyScopedIds.class.getDeclaredField("_groupLocalService");
-			groups.setAccessible(true);
-			groups.set(ids, TestModelProxyUtil.proxy(
-				GroupLocalService.class, group == null ? Map.of() : Map.of("fetchGroup", group)));
-			Field users = CompanyScopedIds.class.getDeclaredField("_userLocalService");
-			users.setAccessible(true);
-			users.set(ids, TestModelProxyUtil.proxy(UserLocalService.class, Map.of()));
+
+			_setField(
+				ids, "_groupLocalService",
+				TestModelProxyUtil.proxy(
+					GroupLocalService.class,
+					(group == null) ? Map.of() : Map.of("fetchGroup", group)));
+			_setField(
+				ids, "_userLocalService",
+				TestModelProxyUtil.proxy(UserLocalService.class, Map.of()));
 
 			return ids;
 		}

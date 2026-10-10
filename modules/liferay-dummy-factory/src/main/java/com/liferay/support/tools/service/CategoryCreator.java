@@ -25,6 +25,7 @@ public class CategoryCreator {
 		throws Throwable {
 
 		long companyId = _companyScopedIds.companyId(userId);
+
 		_companyScopedIds.group(companyId, "groupId", groupId);
 		_companyScopedIds.vocabulary(companyId, "vocabularyId", vocabularyId);
 

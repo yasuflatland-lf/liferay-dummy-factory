@@ -21,18 +21,19 @@ public class MBThreadCreator {
 			long userId, MBThreadBatchSpec spec, ProgressCallback progress)
 		throws Throwable {
 
-		long companyId = _companyScopedIds.companyId(userId);
-		_companyScopedIds.group(companyId, "groupId", spec.groupId());
-
-		if (spec.categoryId() != 0) {
-			_companyScopedIds.mbCategory(companyId, "categoryId", spec.categoryId());
-		}
-
 		long groupId = spec.groupId();
 		long categoryId = spec.categoryId();
 		String body = spec.body();
 		String format = spec.format();
 		BatchSpec batchSpec = spec.batch();
+
+		long companyId = _companyScopedIds.companyId(userId);
+
+		_companyScopedIds.group(companyId, "groupId", groupId);
+
+		if (categoryId != 0) {
+			_companyScopedIds.mbCategory(companyId, "categoryId", categoryId);
+		}
 
 		int count = batchSpec.count();
 

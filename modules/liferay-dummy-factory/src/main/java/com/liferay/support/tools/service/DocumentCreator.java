@@ -28,18 +28,19 @@ public class DocumentCreator {
 			long userId, DocumentBatchSpec spec, ProgressCallback progress)
 		throws Throwable {
 
-		long companyId = _companyScopedIds.companyId(userId);
-		_companyScopedIds.group(companyId, "groupId", spec.groupId());
-
-		if (spec.folderId() != 0) {
-			_companyScopedIds.dlFolder(companyId, "folderId", spec.folderId());
-		}
-
 		long groupId = spec.groupId();
 		long folderId = spec.folderId();
 		String description = spec.description();
 		String[] uploadedFiles = spec.uploadedFiles();
 		AssetTagNames tags = spec.tags();
+
+		long companyId = _companyScopedIds.companyId(userId);
+
+		_companyScopedIds.group(companyId, "groupId", groupId);
+
+		if (folderId != 0) {
+			_companyScopedIds.dlFolder(companyId, "folderId", folderId);
+		}
 
 		int count = spec.batch().count();
 		String baseName = spec.batch().baseName();

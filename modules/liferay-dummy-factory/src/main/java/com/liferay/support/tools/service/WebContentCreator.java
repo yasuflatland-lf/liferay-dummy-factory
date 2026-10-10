@@ -46,26 +46,6 @@ public class WebContentCreator {
 			long userId, WebContentBatchSpec spec, ProgressCallback progress)
 		throws Throwable {
 
-		long companyId = _companyScopedIds.companyId(userId);
-
-		for (long groupId : spec.groupIds()) {
-			_companyScopedIds.group(companyId, "groupIds", groupId);
-		}
-
-		if (spec.folderId() != 0) {
-			_companyScopedIds.journalFolder(companyId, "folderId", spec.folderId());
-		}
-
-		if (spec.ddmStructureId() != 0) {
-			_companyScopedIds.ddmStructure(
-				companyId, "ddmStructureId", spec.ddmStructureId());
-		}
-
-		if (spec.ddmTemplateId() != 0) {
-			_companyScopedIds.ddmTemplate(
-				companyId, "ddmTemplateId", spec.ddmTemplateId());
-		}
-
 		BatchSpec batch = spec.batch();
 		long[] groupIds = spec.groupIds();
 		long folderId = spec.folderId();
@@ -81,6 +61,26 @@ public class WebContentCreator {
 		long ddmStructureId = spec.ddmStructureId();
 		long ddmTemplateId = spec.ddmTemplateId();
 		AssetTagNames tags = spec.tags();
+
+		long companyId = _companyScopedIds.companyId(userId);
+
+		for (long groupId : groupIds) {
+			_companyScopedIds.group(companyId, "groupIds", groupId);
+		}
+
+		if (folderId != 0) {
+			_companyScopedIds.journalFolder(companyId, "folderId", folderId);
+		}
+
+		if (ddmStructureId != 0) {
+			_companyScopedIds.ddmStructure(
+				companyId, "ddmStructureId", ddmStructureId);
+		}
+
+		if (ddmTemplateId != 0) {
+			_companyScopedIds.ddmTemplate(
+				companyId, "ddmTemplateId", ddmTemplateId);
+		}
 
 		int count = batch.count();
 		String baseName = batch.baseName();

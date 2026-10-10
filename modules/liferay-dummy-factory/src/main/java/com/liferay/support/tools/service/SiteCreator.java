@@ -46,7 +46,8 @@ public class SiteCreator {
 
 		if (publicLayoutSetPrototypeId != 0) {
 			_companyScopedIds.layoutSetPrototype(
-				companyId, "publicLayoutSetPrototypeId", publicLayoutSetPrototypeId);
+				companyId, "publicLayoutSetPrototypeId",
+				publicLayoutSetPrototypeId);
 		}
 
 		if (privateLayoutSetPrototypeId != 0) {

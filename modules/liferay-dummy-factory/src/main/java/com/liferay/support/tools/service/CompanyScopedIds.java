@@ -33,8 +33,44 @@ public class CompanyScopedIds {
 		return user.getCompanyId();
 	}
 
+	public void ddmStructure(long companyId, String parameter, long id) {
+		_requireCompany(
+			companyId, parameter, id,
+			_ddmStructureLocalService.fetchDDMStructure(id));
+	}
+
+	public void ddmTemplate(long companyId, String parameter, long id) {
+		_requireCompany(
+			companyId, parameter, id,
+			_ddmTemplateLocalService.fetchDDMTemplate(id));
+	}
+
+	public void dlFolder(long companyId, String parameter, long id) {
+		_requireCompany(
+			companyId, parameter, id, _dlFolderLocalService.fetchDLFolder(id));
+	}
+
 	public void group(long companyId, String parameter, long id) {
-		_requireCompany(companyId, parameter, id, _groupLocalService.fetchGroup(id));
+		_requireCompany(
+			companyId, parameter, id, _groupLocalService.fetchGroup(id));
+	}
+
+	public void journalFolder(long companyId, String parameter, long id) {
+		_requireCompany(
+			companyId, parameter, id,
+			_journalFolderLocalService.fetchJournalFolder(id));
+	}
+
+	public void layoutSetPrototype(long companyId, String parameter, long id) {
+		_requireCompany(
+			companyId, parameter, id,
+			_layoutSetPrototypeLocalService.fetchLayoutSetPrototype(id));
+	}
+
+	public void mbCategory(long companyId, String parameter, long id) {
+		_requireCompany(
+			companyId, parameter, id,
+			_mbCategoryLocalService.fetchMBCategory(id));
 	}
 
 	public void organization(long companyId, String parameter, long id) {
@@ -44,57 +80,25 @@ public class CompanyScopedIds {
 	}
 
 	public void role(long companyId, String parameter, long id) {
-		_requireCompany(companyId, parameter, id, _roleLocalService.fetchRole(id));
+		_requireCompany(
+			companyId, parameter, id, _roleLocalService.fetchRole(id));
+	}
+
+	public void thread(long companyId, String parameter, long id) {
+		_requireCompany(
+			companyId, parameter, id, _mbThreadLocalService.fetchMBThread(id));
 	}
 
 	public void userGroup(long companyId, String parameter, long id) {
 		_requireCompany(
-			companyId, parameter, id, _userGroupLocalService.fetchUserGroup(id));
-	}
-
-	public void layoutSetPrototype(long companyId, String parameter, long id) {
-		_requireCompany(
 			companyId, parameter, id,
-			_layoutSetPrototypeLocalService.fetchLayoutSetPrototype(id));
+			_userGroupLocalService.fetchUserGroup(id));
 	}
 
 	public void vocabulary(long companyId, String parameter, long id) {
 		_requireCompany(
 			companyId, parameter, id,
 			_assetVocabularyLocalService.fetchAssetVocabulary(id));
-	}
-
-	public void mbCategory(long companyId, String parameter, long id) {
-		_requireCompany(
-			companyId, parameter, id, _mbCategoryLocalService.fetchMBCategory(id));
-	}
-
-	public void thread(long companyId, String parameter, long id) {
-		_requireCompany(
-			companyId, parameter, id,
-			_mbThreadLocalService.fetchMBThread(id));
-	}
-
-	public void dlFolder(long companyId, String parameter, long id) {
-		_requireCompany(
-			companyId, parameter, id, _dlFolderLocalService.fetchDLFolder(id));
-	}
-
-	public void journalFolder(long companyId, String parameter, long id) {
-		_requireCompany(
-			companyId, parameter, id,
-			_journalFolderLocalService.fetchJournalFolder(id));
-	}
-
-	public void ddmStructure(long companyId, String parameter, long id) {
-		_requireCompany(
-			companyId, parameter, id,
-			_ddmStructureLocalService.fetchDDMStructure(id));
-	}
-
-	public void ddmTemplate(long companyId, String parameter, long id) {
-		_requireCompany(
-			companyId, parameter, id, _ddmTemplateLocalService.fetchDDMTemplate(id));
 	}
 
 	private static void _requireCompany(
@@ -107,7 +111,8 @@ public class CompanyScopedIds {
 
 		if (entity.getCompanyId() != companyId) {
 			throw new IllegalArgumentException(
-				parameter + " " + id + " does not belong to the caller's company");
+				parameter + " " + id +
+					" does not belong to the caller's company");
 		}
 	}
 
