@@ -3,6 +3,7 @@ package com.liferay.support.tools.workflow;
 import com.liferay.support.tools.service.BatchSpec;
 
 import java.lang.reflect.Array;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -24,7 +25,7 @@ public class WorkflowParameterValues {
 		}
 
 		if (value instanceof Number number) {
-			return number.intValue();
+			return _asInt(name, number);
 		}
 
 		if (value instanceof String string) {
@@ -187,6 +188,15 @@ public class WorkflowParameterValues {
 		}
 
 		return value;
+	}
+
+	private int _asInt(String name, Number number) {
+		try {
+			return new BigDecimal(number.toString()).intValueExact();
+		}
+		catch (ArithmeticException | NumberFormatException exception) {
+			throw _invalid(name, "an integer");
+		}
 	}
 
 	private List<Object> _flattenValues(Object value) {

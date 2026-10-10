@@ -49,9 +49,10 @@ class BatchCountCapSpec extends BaseLiferaySpec {
 
 		then:
 		assert response.success == false : "expected rejection: ${response}"
-		assert (response.error as String).contains('1000')
+		assert (response.error as String).contains('1000') : "unexpected error: ${response}"
 
 		and:
+		_assertTestUserExists()
 		assert _capUserDoesNotExist() : "unexpected capuser1 after request: ${response}"
 	}
 
@@ -113,9 +114,10 @@ class BatchCountCapSpec extends BaseLiferaySpec {
 		} as Map
 		assert failedStep?.status == 'FAILED' : "expected failed user step: ${response}"
 		assert failedStep.error?.message != null : "expected step error: ${response}"
-		assert (failedStep.error.message as String).contains('1000')
+		assert (failedStep.error.message as String).contains('1000') : "unexpected step error: ${response}"
 
 		and:
+		_assertTestUserExists()
 		assert _capUserDoesNotExist() : "unexpected capuser1 after workflow: ${response}"
 	}
 
@@ -124,15 +126,29 @@ class BatchCountCapSpec extends BaseLiferaySpec {
 			"journal.journalarticle/get-articles-count/group-id/${groupId}/folder-id/0") as int
 	}
 
+	private void _assertTestUserExists() {
+		Object user = jsonwsGet(
+			"user/get-user-by-screen-name?companyId=${companyId}&screenName=test")
+
+		assert (user instanceof Map) && !user.containsKey('exception') : "test user lookup failed: ${user}"
+		assert user.screenName == 'test' : "unexpected test user: ${user}"
+	}
+
 	private boolean _capUserDoesNotExist() {
 		try {
-			Object user = jsonwsGet(
+			jsonwsGet(
 				"user/get-user-by-screen-name?companyId=${companyId}&screenName=capuser1")
 
-			return (user instanceof Map) && user.containsKey('exception')
+			return false
 		}
 		catch (IllegalStateException exception) {
-			return true
+			if (exception.message.contains('HTTP 404') &&
+				exception.message.contains('NoSuchUserException')) {
+
+				return true
+			}
+
+			throw exception
 		}
 	}
 

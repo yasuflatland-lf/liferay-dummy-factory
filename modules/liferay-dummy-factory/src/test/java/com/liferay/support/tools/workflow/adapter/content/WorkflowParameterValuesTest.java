@@ -13,6 +13,38 @@ import org.junit.jupiter.api.Test;
 class WorkflowParameterValuesTest {
 
 	@Test
+	void optionalIntRejectsOutOfIntRangeCount() {
+		WorkflowParameterValues values =
+			new WorkflowParameterValues(Map.of("count", 4294968296L));
+
+		IllegalArgumentException exception = assertThrows(
+			IllegalArgumentException.class,
+			() -> values.optionalInt("count", 0));
+
+		assertEquals("count must be an integer", exception.getMessage());
+	}
+
+	@Test
+	void optionalIntRejectsFractionalCount() {
+		WorkflowParameterValues values =
+			new WorkflowParameterValues(Map.of("count", 1000.9));
+
+		IllegalArgumentException exception = assertThrows(
+			IllegalArgumentException.class,
+			() -> values.optionalInt("count", 0));
+
+		assertEquals("count must be an integer", exception.getMessage());
+	}
+
+	@Test
+	void optionalIntAcceptsLongCount() {
+		WorkflowParameterValues values =
+			new WorkflowParameterValues(Map.of("count", 5L));
+
+		assertEquals(5, values.optionalInt("count", 0));
+	}
+
+	@Test
 	void optionalBooleanAcceptsBooleansAndExactBooleanStrings() {
 		WorkflowParameterValues workflowParameterValues =
 			new WorkflowParameterValues(
