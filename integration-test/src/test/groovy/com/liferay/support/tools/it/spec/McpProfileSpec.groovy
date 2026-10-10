@@ -32,10 +32,10 @@ class McpProfileSpec extends BaseLiferaySpec {
 
 	def cleanupSpec() {
 		pw?.close()
-		// The ldf profile and created site are not deleted because the container is disposable (.claude/rules/testing.md "Cleanup").
+		// The ldf profile is kept because the next run re-provisions it idempotently; the site has no JSONWS delete path.
 	}
 
-	def 'provisioning creates an active ldf profile exposing every ldf-workflow tool'() {
+	def 'provisioning creates an ldf profile exposing every ldf-workflow tool'() {
 		when:
 		List<String> tools = provisioner.provision()
 

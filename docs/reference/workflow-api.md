@@ -195,7 +195,7 @@ The dedicated profile `ldf` at `/o/mcp/ldf` is provisioned by `McpProfileProvisi
 
 - **Profile storage on the pinned DXP image (measured)**: `/o/mcp/server-profiles` has only `name`, `description` and a required `tools` text field with one `<toolSetName> <toolName>` line per pinned tool. There is no `profileStatus` picklist, no `instructions` field, and no `/o/mcp/server-profile-tools` object (HTTP 404); those exist only in later liferay-portal `master`. So instead of the create-inactive, upsert-tools, activate sequence planned in ADR-0010, the provisioner upserts the whole profile in one `PUT /o/mcp/server-profiles/by-external-reference-code/LDF_MCP_PROFILE`. Unknown fields in that body are silently ignored.
 - **Verification**: Liferay accepts a `tools` line naming a tool that does not exist without error, so the provisioner checks `tools/list` on `/o/mcp/ldf` against the discovered tool set.
-- **No restart needed**: a profile update is visible on the next `tools/list`.
+- **No restart needed for a profile update**: it is visible on the next `tools/list`. After a redeploy that adds or renames tools, restart the container before re-running `setupMcpProfile`, because the provisioner discovers tools through the cached tool set ([Stale definitions after a redeploy](#mcp-tool-set)).
 - **Regression guard**: `McpProfileSpec`.
 
 ## Limitations
