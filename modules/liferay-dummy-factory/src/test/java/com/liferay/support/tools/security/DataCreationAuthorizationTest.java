@@ -20,14 +20,16 @@ class DataCreationAuthorizationTest {
 	void nonAdminIsForbidden() {
 		assertEquals(
 			"Executing a workflow requires a company administrator.",
-			DataCreationAuthorization.forbiddenReason(false, false, List.of("role.create")));
+			DataCreationAuthorization.forbiddenReason(
+				false, false, List.of("role.create")));
 	}
 
 	@Test
 	void omniadminWithoutCompanyAdminIsForbidden() {
 		assertEquals(
 			"Executing a workflow requires a company administrator.",
-			DataCreationAuthorization.forbiddenReason(false, true, List.of("role.create")));
+			DataCreationAuthorization.forbiddenReason(
+				false, true, List.of("role.create")));
 	}
 
 	@Test
@@ -40,7 +42,8 @@ class DataCreationAuthorizationTest {
 	void companyAdminCannotCreateCompanies() {
 		assertEquals(
 			"company.create requires an omniadmin.",
-			DataCreationAuthorization.forbiddenReason(true, false, List.of("company.create")));
+			DataCreationAuthorization.forbiddenReason(
+				true, false, List.of("company.create")));
 	}
 
 	@Test

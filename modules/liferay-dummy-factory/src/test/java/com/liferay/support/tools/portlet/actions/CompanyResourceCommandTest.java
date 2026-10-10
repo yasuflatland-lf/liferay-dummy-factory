@@ -19,7 +19,8 @@ class CompanyResourceCommandTest {
 
 		assertThrows(
 			PrincipalException.MustBeOmniadmin.class,
-			() -> DataCreationAuthorization.requirePermission(permissionChecker, "/ldf/company"));
+			() -> DataCreationAuthorization.requirePermission(
+				permissionChecker, "/ldf/company"));
 	}
 
 	@Test
@@ -27,7 +28,8 @@ class CompanyResourceCommandTest {
 		PermissionChecker permissionChecker = _permissionChecker(true);
 
 		assertDoesNotThrow(
-			() -> DataCreationAuthorization.requirePermission(permissionChecker, "/ldf/company"));
+			() -> DataCreationAuthorization.requirePermission(
+				permissionChecker, "/ldf/company"));
 	}
 
 	private PermissionChecker _permissionChecker(boolean omniadmin) {

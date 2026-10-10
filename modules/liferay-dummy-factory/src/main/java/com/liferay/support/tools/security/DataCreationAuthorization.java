@@ -4,7 +4,6 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 
 import java.util.Collection;
-import java.util.List;
 
 public final class DataCreationAuthorization {
 
@@ -15,7 +14,7 @@ public final class DataCreationAuthorization {
 			return "Executing a workflow requires a company administrator.";
 		}
 
-		if (!omniadmin && operations.contains("company.create")) {
+		if (!omniadmin && operations.contains(_COMPANY_CREATE_OPERATION)) {
 			return "company.create requires an omniadmin.";
 		}
 
@@ -26,22 +25,22 @@ public final class DataCreationAuthorization {
 			PermissionChecker permissionChecker, String command)
 		throws PrincipalException {
 
-		String reason = forbiddenReason(
-			permissionChecker.isCompanyAdmin(), permissionChecker.isOmniadmin(),
-			List.of("/ldf/company".equals(command) ? "company.create" : command));
-
-		if (reason == null) {
-			return;
+		if (!permissionChecker.isCompanyAdmin()) {
+			throw new PrincipalException.MustBeCompanyAdmin(permissionChecker);
 		}
 
-		if (permissionChecker.isCompanyAdmin()) {
+		if (!permissionChecker.isOmniadmin() &&
+			_COMPANY_CREATE_COMMAND.equals(command)) {
+
 			throw new PrincipalException.MustBeOmniadmin(permissionChecker);
 		}
-
-		throw new PrincipalException.MustBeCompanyAdmin(permissionChecker);
 	}
 
 	private DataCreationAuthorization() {
 	}
+
+	private static final String _COMPANY_CREATE_COMMAND = "/ldf/company";
+
+	private static final String _COMPANY_CREATE_OPERATION = "company.create";
 
 }
