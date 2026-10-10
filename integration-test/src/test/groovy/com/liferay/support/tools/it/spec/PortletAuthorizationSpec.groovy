@@ -43,8 +43,8 @@ class PortletAuthorizationSpec extends BaseLiferaySpec {
 		delegateRoleId = role.roleId as Long
 		assert delegateRoleId > 0
 
-		// ResourcePermissionService.addResourcePermission supports company scope (1),
-		// whose primKey is the companyId. Control Panel portlet access uses groupId 0.
+		// Company scope (1) with primKey = companyId makes the grant company-wide;
+		// groupId only scopes the caller's own permission check on the role.
 		jsonwsPost('resourcepermission/add-resource-permission', [
 			groupId: 0, companyId: companyId, name: PORTLET_ID, scope: 1,
 			primKey: companyId.toString(), roleId: delegateRoleId,
@@ -52,8 +52,9 @@ class PortletAuthorizationSpec extends BaseLiferaySpec {
 		])
 
 		// Reaching /group/control_panel at all also needs the portal-level
-		// VIEW_CONTROL_PANEL ("90" is PortletKeys.PORTAL), as DXP grants it
-		// alongside ACCESS_IN_CONTROL_PANEL in RoleLocalServiceImpl.
+		// VIEW_CONTROL_PANEL ("90" is PortletKeys.PORTAL), which DXP's Roles Admin
+		// app grants alongside ACCESS_IN_CONTROL_PANEL
+		// (RolesAdminPortlet._updateViewControlPanelPermission).
 		jsonwsPost('resourcepermission/add-resource-permission', [
 			groupId: 0, companyId: companyId, name: '90', scope: 1,
 			primKey: companyId.toString(), roleId: delegateRoleId,

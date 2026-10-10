@@ -71,17 +71,50 @@ class DataCreationAuthorizationTest {
 		assertThrows(
 			PrincipalException.MustBeCompanyAdmin.class,
 			() -> DataCreationAuthorization.requirePermission(
-				_permissionChecker(false), "/ldf/user"));
+				_permissionChecker(false, false), false));
+	}
+
+	@Test
+	void portletNonAdminCreatingCompaniesNeedsCompanyAdminFirst() {
+		assertThrows(
+			PrincipalException.MustBeCompanyAdmin.class,
+			() -> DataCreationAuthorization.requirePermission(
+				_permissionChecker(false, false), true));
+	}
+
+	@Test
+	void portletOmniadminWithoutCompanyAdminIsRejected() {
+		assertThrows(
+			PrincipalException.MustBeCompanyAdmin.class,
+			() -> DataCreationAuthorization.requirePermission(
+				_permissionChecker(false, true), false));
 	}
 
 	@Test
 	void portletCompanyAdminCanCreateData() {
 		assertDoesNotThrow(
 			() -> DataCreationAuthorization.requirePermission(
-				_permissionChecker(true), "/ldf/user"));
+				_permissionChecker(true, false), false));
 	}
 
-	private PermissionChecker _permissionChecker(boolean companyAdmin) {
+	@Test
+	void portletCompanyAdminCannotCreateCompanies() {
+		assertThrows(
+			PrincipalException.MustBeOmniadmin.class,
+			() -> DataCreationAuthorization.requirePermission(
+				_permissionChecker(true, false), true));
+	}
+
+	@Test
+	void portletOmniadminCanCreateCompanies() {
+		assertDoesNotThrow(
+			() -> DataCreationAuthorization.requirePermission(
+				_permissionChecker(true, true), true));
+	}
+
+	private PermissionChecker _permissionChecker(
+		boolean companyAdmin, boolean omniadmin) {
+
 		return (PermissionChecker)Proxy.newProxyInstance(
 			PermissionChecker.class.getClassLoader(),
 			new Class<?>[] {PermissionChecker.class},
@@ -90,7 +123,11 @@ class DataCreationAuthorizationTest {
 					return 42L;
 				}
 
-				return method.getName().equals("isCompanyAdmin") && companyAdmin;
+				if (method.getName().equals("isCompanyAdmin")) {
+					return companyAdmin;
+				}
+
+				return method.getName().equals("isOmniadmin") && omniadmin;
 			});
 	}
 

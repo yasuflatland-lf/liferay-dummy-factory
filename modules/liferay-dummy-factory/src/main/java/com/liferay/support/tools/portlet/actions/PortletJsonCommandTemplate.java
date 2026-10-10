@@ -29,6 +29,17 @@ class PortletJsonCommandTemplate {
 			JsonCommandHandler jsonCommandHandler)
 		throws Exception {
 
+		serveJsonWithProgress(
+			resourceRequest, resourceResponse, portal, log, errorLogMessage,
+			false, jsonCommandHandler);
+	}
+
+	static void serveJsonWithProgress(
+			ResourceRequest resourceRequest, ResourceResponse resourceResponse,
+			Portal portal, Log log, String errorLogMessage,
+			boolean createsCompany, JsonCommandHandler jsonCommandHandler)
+		throws Exception {
+
 		HttpServletRequest httpServletRequest =
 			portal.getOriginalServletRequest(
 				portal.getHttpServletRequest(resourceRequest));
@@ -42,7 +53,7 @@ class PortletJsonCommandTemplate {
 		boolean progressStarted = false;
 
 		try {
-			requirePermission(resourceRequest);
+			requirePermission(resourceRequest, createsCompany);
 			progressManager.start(resourceRequest);
 			progressStarted = true;
 
@@ -97,14 +108,15 @@ class PortletJsonCommandTemplate {
 		ResourceCommandUtil.setErrorResponse(responseJson, throwable);
 	}
 
-	static void requirePermission(ResourceRequest resourceRequest)
+	static void requirePermission(
+			ResourceRequest resourceRequest, boolean createsCompany)
 		throws PrincipalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		DataCreationAuthorization.requirePermission(
-			themeDisplay.getPermissionChecker(), resourceRequest.getResourceID());
+			themeDisplay.getPermissionChecker(), createsCompany);
 	}
 
 	static void permissionDenied(

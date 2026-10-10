@@ -257,8 +257,8 @@ class LdfResourceClient implements Closeable {
 			_username, _authToken ? 'present' : 'missing')
 	}
 
-	// Liferay forces a password change on first login for a user whose
-	// password has never been changed, even when
+	// DXP redirects to /c/portal/update_password while User.passwordReset is
+	// set, which still happens here despite
 	// passwords.default.policy.change.required=false. The default admin hits it
 	// on "/", a freshly created user on its first Control Panel request. Fill the
 	// form with a stable value so subsequent navigations reach the portlet.

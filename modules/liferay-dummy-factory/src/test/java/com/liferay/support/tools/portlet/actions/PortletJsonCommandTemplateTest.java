@@ -1,7 +1,9 @@
 package com.liferay.support.tools.portlet.actions;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.liferay.portal.kernel.json.JSONObject;
@@ -10,6 +12,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -35,6 +38,34 @@ class PortletJsonCommandTemplateTest {
 		_assertDenial(
 			new PrincipalException.MustBeCompanyAdmin(42L), "/ldf/user",
 			"Creating data requires a company administrator.");
+	}
+
+	@Test
+	void companyCreationFlagIgnoresTheResourceId() {
+
+		// MVCPortlet runs every command named in a comma-separated resource ID,
+		// so the omniadmin requirement must come from the command, not the ID.
+
+		ResourceRequest resourceRequest = _resourceRequest(
+			_permissionChecker(true, false), "/ldf/company,");
+
+		assertThrows(
+			PrincipalException.MustBeOmniadmin.class,
+			() -> PortletJsonCommandTemplate.requirePermission(
+				resourceRequest, true));
+		assertDoesNotThrow(
+			() -> PortletJsonCommandTemplate.requirePermission(
+				_resourceRequest(_permissionChecker(true, false), "/ldf/company"),
+				false));
+	}
+
+	@Test
+	void nonAdminIsRejectedWhateverTheCommand() {
+		assertThrows(
+			PrincipalException.MustBeCompanyAdmin.class,
+			() -> PortletJsonCommandTemplate.requirePermission(
+				_resourceRequest(_permissionChecker(false, false), "/ldf/user"),
+				false));
 	}
 
 	@Test
@@ -186,6 +217,42 @@ class PortletJsonCommandTemplateTest {
 		}
 
 		return response;
+	}
+
+	private static PermissionChecker _permissionChecker(
+		boolean companyAdmin, boolean omniadmin) {
+
+		return _proxy(
+			PermissionChecker.class,
+			(proxy, method, args) -> {
+				if (method.getReturnType() == long.class) {
+					return 42L;
+				}
+
+				if (method.getName().equals("isCompanyAdmin")) {
+					return companyAdmin;
+				}
+
+				return method.getName().equals("isOmniadmin") && omniadmin;
+			});
+	}
+
+	private static ResourceRequest _resourceRequest(
+		PermissionChecker permissionChecker, String resourceId) {
+
+		ThemeDisplay themeDisplay = new ThemeDisplay();
+
+		themeDisplay.setPermissionChecker(permissionChecker);
+
+		return _proxy(
+			ResourceRequest.class,
+			(proxy, method, args) -> {
+				if (method.getName().equals("getAttribute")) {
+					return themeDisplay;
+				}
+
+				return resourceId;
+			});
 	}
 
 	private static <T> T _proxy(Class<T> type, InvocationHandler handler) {

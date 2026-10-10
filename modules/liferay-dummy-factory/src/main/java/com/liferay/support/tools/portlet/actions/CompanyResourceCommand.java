@@ -35,7 +35,7 @@ public class CompanyResourceCommand extends BaseMVCResourceCommand {
 
 		PortletJsonCommandTemplate.serveJsonWithProgress(
 			resourceRequest, resourceResponse, _portal, _log,
-			"Failed to create companies",
+			"Failed to create companies", true,
 			(context, data, responseJson) -> {
 				int count = GetterUtil.getInteger(data.getString("count"));
 				String webId = GetterUtil.getString(data.getString("webId"));

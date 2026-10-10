@@ -37,15 +37,20 @@ public class DocumentUploadResourceCommand extends BaseMVCResourceCommand {
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
-		UploadPortletRequest uploadPortletRequest =
-			_portal.getUploadPortletRequest(resourceRequest);
-
-		String cmd = ParamUtil.getString(uploadPortletRequest, "cmd");
-
 		JSONObject responseJson = JSONFactoryUtil.createJSONObject();
 
+		String cmd = null;
+
 		try {
-			PortletJsonCommandTemplate.requirePermission(resourceRequest);
+
+			// Check before parsing the multipart body
+
+			PortletJsonCommandTemplate.requirePermission(resourceRequest, false);
+
+			UploadPortletRequest uploadPortletRequest =
+				_portal.getUploadPortletRequest(resourceRequest);
+
+			cmd = ParamUtil.getString(uploadPortletRequest, "cmd");
 
 			if ("add_temp".equals(cmd)) {
 				String sourceFileName = uploadPortletRequest.getFileName(
