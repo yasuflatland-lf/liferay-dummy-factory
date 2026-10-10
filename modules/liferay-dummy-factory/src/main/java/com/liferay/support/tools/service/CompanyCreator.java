@@ -2,6 +2,8 @@ package com.liferay.support.tools.service;
 
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.service.CompanyLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.support.tools.utils.BatchTransaction;
 import com.liferay.support.tools.utils.ProgressCallback;
 
@@ -14,6 +16,13 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = CompanyCreator.class)
 public class CompanyCreator {
 
+	public CompanyCreator() {
+	}
+
+	CompanyCreator(CompanyLocalService companyLocalService) {
+		_companyLocalService = companyLocalService;
+	}
+
 	public BatchResult<Company> create(
 			int count, String webId, String virtualHostname, String mx,
 			int maxUsers, boolean active, ProgressCallback progress)
@@ -24,12 +33,22 @@ public class CompanyCreator {
 		for (int i = 0; i < count; i++) {
 			String prefix = (count > 1) ? String.valueOf(i + 1) : "";
 
-			companies.add(
-				BatchTransaction.run(
-					() -> _companyLocalService.addCompany(
-						null, prefix + webId, prefix + virtualHostname,
-						prefix + mx, maxUsers, active, false, null, null, null,
-						null, null, null)));
+			// Layout indexing during addCompany renders pages with the thread's
+			// ServiceContext response, which a CMS fragment redirects. An empty
+			// context makes Liferay use a dummy response.
+			ServiceContextThreadLocal.pushServiceContext(new ServiceContext());
+
+			try {
+				companies.add(
+					BatchTransaction.run(
+						() -> _companyLocalService.addCompany(
+							null, prefix + webId, prefix + virtualHostname,
+							prefix + mx, maxUsers, active, false, null, null,
+							null, null, null, null)));
+			}
+			finally {
+				ServiceContextThreadLocal.popServiceContext();
+			}
 
 			progress.onProgress(i + 1, count);
 		}

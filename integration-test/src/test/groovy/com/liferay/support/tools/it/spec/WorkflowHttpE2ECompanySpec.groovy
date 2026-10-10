@@ -3,7 +3,6 @@ package com.liferay.support.tools.it.spec
 import com.liferay.support.tools.it.util.PlaywrightLifecycle
 import com.liferay.support.tools.it.util.WorkflowHttpClient
 
-import spock.lang.IgnoreIf
 import spock.lang.Shared
 import spock.lang.Stepwise
 
@@ -106,11 +105,6 @@ class WorkflowHttpE2ECompanySpec extends BaseLiferaySpec {
 		]
 	}
 
-	// Skipped in CI: Liferay company creation triggers site initializer, page-template
-	// generation, and batch-engine imports that exceed the 60 s Playwright HTTP timeout
-	// on shared runners. The plan test above already verifies that company.create is
-	// registered as a workflow operation. Run locally to exercise the full execution path.
-	@IgnoreIf({ System.getenv('CI') == 'true' })
 	def 'execute creates a company, user, and organization via HTTP JSON'() {
 		when:
 		Map response = workflowHttpClient.execute(_companyWorkflowRequest())

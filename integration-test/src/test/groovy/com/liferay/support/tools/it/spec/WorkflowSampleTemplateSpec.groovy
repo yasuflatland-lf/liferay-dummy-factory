@@ -5,7 +5,6 @@ import com.liferay.support.tools.it.util.WorkflowHttpClient
 
 import groovy.json.JsonSlurper
 
-import spock.lang.IgnoreIf
 import spock.lang.Shared
 
 import org.slf4j.Logger
@@ -576,11 +575,6 @@ class WorkflowSampleTemplateSpec extends BaseLiferaySpec {
 		mbThreads.any { (it.id as Long) == mbThreadId }
 	}
 
-	// Skipped in CI: company creation triggers site initializer, page-template
-	// generation, and batch-engine imports that exceed the 60 s Playwright HTTP
-	// timeout on shared runners. WorkflowHttpE2ECompanySpec.plan verifies that
-	// company.create is registered. Run locally to exercise the full path.
-	@IgnoreIf({ System.getenv('CI') == 'true' })
 	def 'sample company-user-organization template executes end-to-end'() {
 		given:
 		Map fixture = _loadFixture('company-user-organization.json')
