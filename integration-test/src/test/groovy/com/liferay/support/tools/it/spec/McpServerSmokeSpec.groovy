@@ -119,20 +119,18 @@ class McpServerSmokeSpec extends BaseLiferaySpec {
 			}
 
 			int status = conn.responseCode
-			String body = (status < 400)
-				? (conn.inputStream?.getText('UTF-8') ?: '')
-				: (conn.errorStream?.getText('UTF-8') ?: '')
 
 			if (status >= 400) {
+				String errorBody = conn.errorStream?.getText('UTF-8') ?: ''
+
 				throw new IllegalStateException(
-					"POST ${path} returned HTTP ${status}: ${body}")
+					"POST ${path} returned HTTP ${status}: ${errorBody}")
 			}
 
+			String body = conn.inputStream?.getText('UTF-8') ?: ''
+
 			if (conn.contentType?.startsWith('text/event-stream')) {
-				body = body.split(/\r?\n\r?\n/).collect { event ->
-					event.readLines().findAll { it.startsWith('data:') }
-						.collect { it.substring(5).replaceFirst(/^ /, '') }.join('\n')
-				}.findAll { it }.last()
+				body = _lastEventData(body)
 			}
 
 			return new JsonSlurper().parseText(body) as Map
@@ -140,6 +138,17 @@ class McpServerSmokeSpec extends BaseLiferaySpec {
 		finally {
 			conn.disconnect()
 		}
+	}
+
+	private String _lastEventData(String eventStream) {
+		List<String> eventData = eventStream.split(/\r?\n\r?\n/).collect { event ->
+			event.readLines()
+				.findAll { it.startsWith('data:') }
+				.collect { it.substring(5).replaceFirst(/^ /, '') }
+				.join('\n')
+		}
+
+		return eventData.findAll { it }.last()
 	}
 
 }
