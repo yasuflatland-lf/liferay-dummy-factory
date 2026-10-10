@@ -127,7 +127,7 @@ class WorkflowWebContentCountSpec extends BaseLiferaySpec {
 		assert articleCount == 5 : "article count ${articleCount}; ${payload}"
 	}
 
-	def 'operations endpoint reports the per-site error when web content creation fails'() {
+	def 'operations endpoint rejects missing template input before web content creation'() {
 		given:
 		assert groupId != null && groupId > 0 :
 			'prior feature method did not populate groupId; @Stepwise ordering broken'
@@ -147,29 +147,11 @@ class WorkflowWebContentCountSpec extends BaseLiferaySpec {
 
 		when:
 		Map payload = new JsonSlurper().parseText(response.body as String) as Map
-		Map result = payload.result as Map
 
 		then:
 		assert payload.status == 'FAILED' : "${payload}"
-		assert result != null : "${payload}"
-		assert ['success', 'requested', 'count', 'skipped', 'items', 'error'].every {
-			result.containsKey(it)
-		} : "${payload}"
-		assert result.success == false : "${payload}"
-		assert result.requested == 2 : "${payload}"
-		assert result.count == 0 : "${payload}"
-		assert result.skipped == 2 : "${payload}"
-		assert result.items instanceof List : "${payload}"
-		assert result.items.size() == 1 : "${payload}"
-		assert result.items[0].groupId == groupId : "${payload}"
-		assert result.items[0].created == 0 : "${payload}"
-		assert result.items[0].failed == 2 : "${payload}"
-		assert (result.items[0].error as String)?.trim() : "${payload}"
-		assert result.error == result.items[0].error : "${payload}"
-		assert !(result.error as String).contains('count must match items size') :
+		assert payload.error?.message?.contains('ddmStructureId 999999999 does not exist') :
 			"${payload}"
-		assert payload.error?.code == 'STEP_REPORTED_FAILURE' : "${payload}"
-		assert payload.error?.message == result.error : "${payload}"
 
 		when:
 		int articleCount = _articleCount()

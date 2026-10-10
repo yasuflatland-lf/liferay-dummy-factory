@@ -23,6 +23,9 @@ public class BlogsCreator {
 			long userId, BlogsBatchSpec spec, ProgressCallback progress)
 		throws Throwable {
 
+		long companyId = _companyScopedIds.companyId(userId);
+		_companyScopedIds.group(companyId, "groupId", spec.groupId());
+
 		BatchSpec batch = spec.batch();
 		int count = batch.count();
 
@@ -88,5 +91,8 @@ public class BlogsCreator {
 
 	@Reference
 	private BlogsEntryLocalService _blogsEntryLocalService;
+
+	@Reference
+	private CompanyScopedIds _companyScopedIds;
 
 }

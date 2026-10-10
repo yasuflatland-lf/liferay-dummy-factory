@@ -21,6 +21,13 @@ public class MBThreadCreator {
 			long userId, MBThreadBatchSpec spec, ProgressCallback progress)
 		throws Throwable {
 
+		long companyId = _companyScopedIds.companyId(userId);
+		_companyScopedIds.group(companyId, "groupId", spec.groupId());
+
+		if (spec.categoryId() != 0) {
+			_companyScopedIds.mbCategory(companyId, "categoryId", spec.categoryId());
+		}
+
 		long groupId = spec.groupId();
 		long categoryId = spec.categoryId();
 		String body = spec.body();
@@ -58,6 +65,9 @@ public class MBThreadCreator {
 
 		return BatchResult.success(count, messages, 0);
 	}
+
+	@Reference
+	private CompanyScopedIds _companyScopedIds;
 
 	@Reference
 	private MBMessageLocalService _mbMessageLocalService;

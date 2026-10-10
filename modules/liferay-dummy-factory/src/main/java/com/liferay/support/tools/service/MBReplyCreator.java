@@ -24,6 +24,9 @@ public class MBReplyCreator {
 			long userId, MBReplyBatchSpec spec, ProgressCallback progress)
 		throws Throwable {
 
+		_companyScopedIds.thread(
+			_companyScopedIds.companyId(userId), "threadId", spec.threadId());
+
 		BatchSpec batchSpec = spec.batch();
 		int count = batchSpec.count();
 
@@ -70,6 +73,9 @@ public class MBReplyCreator {
 
 		return BatchResult.success(count, replies, 0);
 	}
+
+	@Reference
+	private CompanyScopedIds _companyScopedIds;
 
 	@Reference
 	private MBMessageLocalService _mbMessageLocalService;

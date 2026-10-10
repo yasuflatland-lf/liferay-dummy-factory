@@ -20,6 +20,9 @@ public class VocabularyCreator {
 			ProgressCallback progress)
 		throws Throwable {
 
+		_companyScopedIds.group(
+			_companyScopedIds.companyId(userId), "groupId", groupId);
+
 		int count = batchSpec.count();
 
 		ServiceContext serviceContext = new ServiceContext();
@@ -45,5 +48,8 @@ public class VocabularyCreator {
 
 	@Reference
 	private AssetVocabularyLocalService _assetVocabularyLocalService;
+
+	@Reference
+	private CompanyScopedIds _companyScopedIds;
 
 }

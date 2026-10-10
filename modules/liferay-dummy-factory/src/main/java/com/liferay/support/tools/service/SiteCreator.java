@@ -35,6 +35,26 @@ public class SiteCreator {
 			ProgressCallback progress)
 		throws Throwable {
 
+		if (parentGroupId != 0) {
+			_companyScopedIds.group(companyId, "parentGroupId", parentGroupId);
+		}
+
+		if (siteTemplateId != 0) {
+			_companyScopedIds.layoutSetPrototype(
+				companyId, "siteTemplateId", siteTemplateId);
+		}
+
+		if (publicLayoutSetPrototypeId != 0) {
+			_companyScopedIds.layoutSetPrototype(
+				companyId, "publicLayoutSetPrototypeId", publicLayoutSetPrototypeId);
+		}
+
+		if (privateLayoutSetPrototypeId != 0) {
+			_companyScopedIds.layoutSetPrototype(
+				companyId, "privateLayoutSetPrototypeId",
+				privateLayoutSetPrototypeId);
+		}
+
 		int count = batchSpec.count();
 		String baseName = batchSpec.baseName();
 
@@ -138,6 +158,9 @@ public class SiteCreator {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		SiteCreator.class);
+
+	@Reference
+	private CompanyScopedIds _companyScopedIds;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
