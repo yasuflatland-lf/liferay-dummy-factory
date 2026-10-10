@@ -31,6 +31,9 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
+      - name: Check documentation consistency
+        run: node scripts/check-docs.mjs
+
       - name: Run unit tests
         run: ./gradlew :modules:liferay-dummy-factory:test --no-daemon
 
