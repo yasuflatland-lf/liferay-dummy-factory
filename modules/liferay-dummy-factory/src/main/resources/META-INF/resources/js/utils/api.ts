@@ -8,9 +8,40 @@ function toErrorResponse<T>(error: unknown): ApiResponse<T> {
 	};
 }
 
+function isNonBlankString(value: unknown): value is string {
+	return typeof value === 'string' && value.trim().length > 0;
+}
+
+async function readErrorMessage(
+	response: Response
+): Promise<string | undefined> {
+	let data;
+
+	try {
+		data = await response.json();
+	}
+	catch {
+		return undefined; // Empty or non-JSON body: caller falls back to the HTTP status.
+	}
+
+	if (!Array.isArray(data?.errors)) {
+		return undefined;
+	}
+
+	const messages = data.errors
+		.map((error: {message?: unknown} | null) => error?.message)
+		.filter(isNonBlankString);
+
+	return messages.length ? messages.join('\n') : undefined;
+}
+
 async function parseResponse<T>(response: Response): Promise<ApiResponse<T>> {
 	if (!response.ok) {
-		return {error: `Server error: ${response.status}`, success: false};
+		const error =
+			(await readErrorMessage(response)) ??
+			`Server error: ${response.status}`;
+
+		return {error, success: false};
 	}
 
 	const data = await response.json();
@@ -44,7 +75,7 @@ export async function fetchResource<T>(
 			method: 'GET',
 		});
 
-		return parseResponse<T>(response);
+		return await parseResponse<T>(response);
 	}
 	catch (error) {
 		return toErrorResponse<T>(error);
@@ -70,7 +101,7 @@ export async function postResource<T>(
 			method: 'POST',
 		});
 
-		return parseResponse<T>(response);
+		return await parseResponse<T>(response);
 	}
 	catch (error) {
 		return toErrorResponse<T>(error);
@@ -92,7 +123,7 @@ export async function postJsonResource<T>(
 			method: 'POST',
 		});
 
-		return parseResponse<T>(response);
+		return await parseResponse<T>(response);
 	}
 	catch (error) {
 		return toErrorResponse<T>(error);
