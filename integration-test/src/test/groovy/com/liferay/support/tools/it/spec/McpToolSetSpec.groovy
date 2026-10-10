@@ -118,6 +118,88 @@ class McpToolSetSpec extends BaseLiferaySpec {
 			"unexpected paths: ${(document.paths as Map).keySet()}"
 	}
 
+	def 'execute rejects a request without credentials and creates nothing'() {
+		given:
+		String roleName = "mcp-guest-role-${System.currentTimeMillis()}"
+		Map request = [
+			schemaVersion: '1.0',
+			steps: [[
+				id: 'createRole', operation: 'role.create',
+				idempotencyKey: 'mcp-guest-1',
+				params: [
+					[name: 'count', value: 1],
+					[name: 'baseName', value: roleName],
+					[name: 'roleType', value: 'regular']
+				]
+			]]
+		]
+
+		when:
+		Map response = _rawRequest(
+			'POST', '/o/ldf-workflow/execute', null, JsonOutput.toJson(request))
+
+		then:
+		assert response.status == 401 : "unauthenticated execute was not rejected: ${response}"
+
+		when:
+		List roleNames = (jsonwsGet(
+			"role/get-roles/company-id/${companyId}/types/1") as List)*.name
+
+		then:
+		assert roleNames.contains('Administrator') :
+			"role listing did not return regular roles: ${roleNames}"
+		assert !roleNames.contains(roleName) : "guest execute created role ${roleName}"
+	}
+
+	def 'a wrong password on ldf-workflow is answered with HTTP 401'() {
+		when:
+		Map response = _rawRequest(
+			'GET', '/o/ldf-workflow/functions',
+			'Basic ' + 'test@liferay.com:wrong-password'.bytes.encodeBase64().toString(),
+			null)
+
+		then:
+		assert response.status == 401 : "wrong password was not rejected: ${response}"
+	}
+
+	private Map _rawRequest(
+		String method, String path, String authorization, String jsonBody) {
+
+		def conn = new URL(absoluteUrl(path)).openConnection() as HttpURLConnection
+
+		try {
+			conn.requestMethod = method
+			conn.instanceFollowRedirects = false
+
+			if (authorization != null) {
+				conn.setRequestProperty('Authorization', authorization)
+			}
+
+			conn.setRequestProperty('Accept', 'application/json')
+			conn.setRequestProperty('Accept-Encoding', 'identity')
+			conn.connectTimeout = 10_000
+			conn.readTimeout = 60_000
+
+			if (jsonBody != null) {
+				conn.setRequestProperty('Content-Type', 'application/json')
+				conn.doOutput = true
+				conn.outputStream.withWriter('UTF-8') { writer ->
+					writer.write(jsonBody)
+				}
+			}
+
+			int status = conn.responseCode
+			String body = (status < 400)
+				? (conn.inputStream?.getText('UTF-8') ?: '')
+				: (conn.errorStream?.getText('UTF-8') ?: '')
+
+			return [status: status, body: body]
+		}
+		finally {
+			conn.disconnect()
+		}
+	}
+
 	private Map _callTool(String name, Map<String, Object> arguments) {
 		Map response = _mcpPost('/o/mcp', [
 			jsonrpc: '2.0', id: 1, method: 'tools/call',

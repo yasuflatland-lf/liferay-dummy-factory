@@ -1,5 +1,7 @@
 package com.liferay.support.tools.workflow.jaxrs;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.support.tools.workflow.DefaultWorkflowFunction;
 import com.liferay.support.tools.workflow.MapWorkflowFunctionRegistry;
@@ -40,6 +42,7 @@ import java.util.regex.Pattern;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -68,6 +71,9 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 @Produces(MediaType.APPLICATION_JSON)
 public class WorkflowResource {
 
+	private static final String _BASIC_CHALLENGE =
+		"Basic realm=\"PortalRealm\"";
+
 	private static final Pattern _STEP_ID_PATTERN = Pattern.compile(
 		"[A-Za-z0-9_-]+");
 
@@ -77,6 +83,8 @@ public class WorkflowResource {
 		@Context HttpServletRequest httpServletRequest,
 		WorkflowRequestDto workflowRequestDto) {
 
+		User user = _signedInUser(httpServletRequest);
+
 		ValidationResult validationResult = _validatedPlan(workflowRequestDto);
 
 		if (!validationResult.errors().isEmpty()) {
@@ -85,8 +93,7 @@ public class WorkflowResource {
 
 		return new WorkflowExecuteResponseDto(
 			_workflowEngine().execute(
-				validationResult.plan(), _currentUserId(httpServletRequest),
-				_currentCompanyId(httpServletRequest)),
+				validationResult.plan(), user.getUserId(), user.getCompanyId()),
 			List.of());
 	}
 
@@ -164,22 +171,6 @@ public class WorkflowResource {
 			workflowOperationAdapter) {
 
 		_spiWorkflowOperationAdapters.remove(workflowOperationAdapter.operationName());
-	}
-
-	private long _currentCompanyId(HttpServletRequest httpServletRequest) {
-		if ((_portal == null) || (httpServletRequest == null)) {
-			return 0L;
-		}
-
-		return _portal.getCompanyId(httpServletRequest);
-	}
-
-	private long _currentUserId(HttpServletRequest httpServletRequest) {
-		if ((_portal == null) || (httpServletRequest == null)) {
-			return 0L;
-		}
-
-		return _portal.getUserId(httpServletRequest);
 	}
 
 	private Map<String, Object> _functionDocument(WorkflowFunction workflowFunction) {
@@ -352,6 +343,26 @@ public class WorkflowResource {
 			(map, entry) -> map.put(entry.getKey(), entry.getValue()),
 			Map::putAll
 		);
+	}
+
+	private User _signedInUser(HttpServletRequest httpServletRequest) {
+		User user = null;
+
+		try {
+			user = _portal.getUser(httpServletRequest);
+		}
+		catch (PortalException portalException) {
+			throw new NotAuthorizedException(
+				portalException.getMessage(), _BASIC_CHALLENGE);
+		}
+
+		if ((user == null) || user.isGuestUser()) {
+			throw new NotAuthorizedException(
+				"Executing a workflow requires a signed-in user.",
+				_BASIC_CHALLENGE);
+		}
+
+		return user;
 	}
 
 	private void _addFallbackWorkflowFunction(

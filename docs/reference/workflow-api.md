@@ -14,7 +14,11 @@ The JAX-RS application at `/o/ldf-workflow` that runs multi-step workflows. This
 
 Registration uses the OSGi JAX-RS whiteboard: `osgi.jaxrs.application.base=/o/ldf-workflow`, `osgi.jaxrs.name=ldf-workflow`, and `osgi.jaxrs.application.select=(osgi.jaxrs.name=ldf-workflow)` on the resource.
 
+### Authentication
+
 Browser callers must send the session cookie **and** a CSRF token ([why](../architecture/frontend.md#server-communication)). Scripts authenticate with Basic Auth.
+
+`execute` rejects a Guest (or unresolvable) user with HTTP 401 and a `Basic realm="PortalRealm"` challenge before it validates or runs anything, and runs the steps as the signed-in user and that user's company. The guard lives in `WorkflowResource`, not in the application or a Basic Auth config, so `functions`, `schema`, `plan` and `openapi.json` stay anonymous. Liferay MCP fetches `openapi.json` without credentials ([Liferay MCP Server](dxp-runtime-config.md#liferay-mcp-server)), and `plan` only validates. An MCP invocation still passes the guard: the internal forward carries the MCP user as the `USER_ID` request attribute. `McpToolSetSpec` locks the 401.
 
 ## Request
 
