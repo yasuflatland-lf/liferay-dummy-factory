@@ -48,10 +48,7 @@ public class CompanyResourceCommand extends BaseMVCResourceCommand {
 				PermissionChecker permissionChecker =
 					themeDisplay.getPermissionChecker();
 
-				if (!permissionChecker.isOmniadmin()) {
-					throw new PrincipalException.MustBeOmniadmin(
-						permissionChecker);
-				}
+				requireOmniadmin(permissionChecker);
 
 				int count = GetterUtil.getInteger(data.getString("count"));
 				String webId = GetterUtil.getString(data.getString("webId"));
@@ -84,6 +81,14 @@ public class CompanyResourceCommand extends BaseMVCResourceCommand {
 						return json;
 					});
 			});
+	}
+
+	static void requireOmniadmin(PermissionChecker permissionChecker)
+		throws PrincipalException {
+
+		if (!permissionChecker.isOmniadmin()) {
+			throw new PrincipalException.MustBeOmniadmin(permissionChecker);
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

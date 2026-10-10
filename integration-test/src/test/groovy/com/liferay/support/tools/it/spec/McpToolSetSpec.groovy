@@ -27,9 +27,10 @@ class McpToolSetSpec extends BaseLiferaySpec {
 		loginAsAdmin(pw)
 
 		String baseName = "nonadmin${System.currentTimeMillis()}"
+		String password = 'test'
 		Map response = _rawRequest(
 			'POST', '/o/ldf-workflow/operations/user.create', basicAuthHeader(),
-			JsonOutput.toJson([count: 1, baseName: baseName]))
+			JsonOutput.toJson([count: 1, baseName: baseName, password: password]))
 		assert response.status == 200 : "non-admin setup failed: ${response}"
 
 		Map step = new JsonSlurper().parseText(response.body as String) as Map
@@ -43,7 +44,7 @@ class McpToolSetSpec extends BaseLiferaySpec {
 		assert (user.emailAddress as String)?.equalsIgnoreCase("${baseName}1@liferay.com") :
 			"JSONWS returned a different setup user: ${user}"
 		assert (user.userId as Long) == nonAdminUserId
-		nonAdminAuthorization = 'Basic ' + "${email}:test".getBytes('UTF-8').encodeBase64().toString()
+		nonAdminAuthorization = 'Basic ' + "${email}:${password}".getBytes('UTF-8').encodeBase64().toString()
 	}
 
 	def cleanupSpec() {
@@ -225,8 +226,16 @@ class McpToolSetSpec extends BaseLiferaySpec {
 
 		then:
 		assert response.status == 403 : "non-admin request was not rejected: ${response}"
-		assert (response.body as String).contains('FORBIDDEN') :
-			"authorization error missing: ${response}"
+
+		when:
+		Map body = new JsonSlurper().parseText(response.body as String) as Map
+
+		then:
+		assert body.errors[0].code == 'FORBIDDEN' :
+			"unexpected authorization error code: ${body}"
+		assert body.errors[0].message ==
+			'Executing a workflow requires a company administrator.' :
+			"unexpected authorization error message: ${body}"
 
 		when:
 		List roleNames = _regularRoleNames()
@@ -346,8 +355,16 @@ class McpToolSetSpec extends BaseLiferaySpec {
 
 		then:
 		assert response.status == 403 : "non-admin request was not rejected: ${response}"
-		assert (response.body as String).contains('FORBIDDEN') :
-			"authorization error missing: ${response}"
+
+		when:
+		Map body = new JsonSlurper().parseText(response.body as String) as Map
+
+		then:
+		assert body.errors[0].code == 'FORBIDDEN' :
+			"unexpected authorization error code: ${body}"
+		assert body.errors[0].message ==
+			'Executing a workflow requires a company administrator.' :
+			"unexpected authorization error message: ${body}"
 
 		when:
 		List roleNames = _regularRoleNames()
