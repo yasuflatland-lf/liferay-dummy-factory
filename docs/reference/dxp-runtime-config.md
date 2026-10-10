@@ -73,7 +73,7 @@ The OSGi-side file:
 ```
 enabled=B"true"
 urlsIncludes="/api/*,/o/*,/xmlrpc/*"
-urlsExcludes="/o/mcp-server/v1.0/openapi.json"
+urlsExcludes="/o/mcp-server/v1.0/openapi.json,/o/headless-admin-site/v1.0/openapi.json,/o/headless-admin-taxonomy/v1.0/openapi.json,/o/headless-admin-user/v1.0/openapi.json"
 forceBasicAuth=B"true"
 ```
 
@@ -166,8 +166,9 @@ The design is [ADR-0010](../adr/0010-mcp-via-liferay-mcp-server.md); `McpServerS
 - **Per-instance switch**: OSGi PID `com.liferay.mcp.server.rest.internal.configuration.MCPServerConfiguration`, boolean `enabled` (default `false`, COMPANY scope). The system-level file `configs/common/osgi/configs/com.liferay.mcp.server.rest.internal.configuration.MCPServerConfiguration.config` (`enabled=B"true"`) is enough; a `configuration.override.` entry in `portal-ext.properties` is not needed.
 - **Disabled state**: when the flag or `enabled` is off, `MCPServerAuthVerifierFilter` answers HTTP 404 on `/o/mcp`.
 - **Requests**: `/o/mcp` accepts Basic auth. Send `Content-Type: application/json` and `Accept: application/json, text/event-stream`.
-- **`forceBasicAuth` empties the tool list**: to build a profile's tools, `MCPServerServlet` fetches the tool set's OpenAPI document (`/mcp-server/v1.0/openapi.json` for the `default` profile) through an internal request that carries no `Authorization` header. With `forceBasicAuth=B"true"` ([step 2](#2-register-basic-auth-on-the-jsonws-servlet-filter)) that request gets HTTP 401, the log shows `Skipping MCP tool "getToolSetsPage" from tool set "mcp-server-v1.0" ... HTTP 401 for /mcp-server/v1.0/openapi.json`, and `tools/list` returns `{"tools":[]}` while `initialize` still succeeds. The fix is an `urlsExcludes` entry on the Basic Auth verifier for that document. `urlsExcludes` takes exact paths or trailing-`*` prefixes, so each tool set whose OpenAPI document must be read needs its own entry.
-- **Caching**: the servlet caches the built tool list, so a config change needs a fresh container (`./gradlew removeDockerContainer`).
+- **`forceBasicAuth` empties the tool list**: to build a profile's tools, `MCPServerServlet` fetches the tool set's OpenAPI document (`/mcp-server/v1.0/openapi.json` for the `default` profile) through an internal request that carries no `Authorization` header. With `forceBasicAuth=B"true"` ([step 2](#2-register-basic-auth-on-the-jsonws-servlet-filter)) that request gets HTTP 401, the log shows `Skipping MCP tool "getToolSetsPage" from tool set "mcp-server-v1.0" ... HTTP 401 for /mcp-server/v1.0/openapi.json`, and `tools/list` returns `{"tools":[]}` while `initialize` still succeeds. The fix is an `urlsExcludes` entry on the Basic Auth verifier for that document.
+- **The meta tools read each tool set's OpenAPI document the same way**: `getToolSetToolSetNameToolSummariesPage`, `getToolSetToolSetNameTool` and `postToolSetToolSetNameToolInvoke` go through `ToolSetUtil._getOpenAPIJSONObject`, which fetches `/o/<tool set path>/openapi.json` without credentials. A tool set whose document is not excluded fails with `Unable to read the OpenAPI document of the "<tool set>" tool set`, although `getToolSetsPage` still lists it. `urlsExcludes` takes exact paths or trailing-`*` prefixes only, so each tool set gets its own entry. The current list covers `mcp-server`, `headless-admin-site`, `headless-admin-taxonomy` and `headless-admin-user` (the lookup tool sets ADR-0010 relies on); add the entry when the MCP surface needs another tool set. (liferay-portal master reads the document in-process; the HTTP fetch and its 401 were observed on the pinned DXP image for `mcp-server-v1.0`, and `McpServerSmokeSpec` locks the `headless-admin-user-v1.0` case.)
+- **Caching**: the servlet caches the built tool list, and `ToolSetUtil` caches each OpenAPI document per company, so a config change needs a fresh container (`./gradlew removeDockerContainer`).
 
 ## Other runtime behaviour
 

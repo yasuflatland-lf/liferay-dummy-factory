@@ -75,6 +75,33 @@ class McpServerSmokeSpec extends BaseLiferaySpec {
 		} : "no headless-admin-user tool set: ${response.items*.name}"
 	}
 
+	def 'meta tool reads the headless-admin-user tool set OpenAPI document'() {
+		given:
+		Map request = [
+			jsonrpc: '2.0', id: 3, method: 'tools/call',
+			params: [
+				name: 'getToolSetToolSetNameToolSummariesPage',
+				arguments: [toolSetName: 'headless-admin-user-v1.0']
+			]
+		]
+
+		when:
+		Map response = _mcpPost('/o/mcp', request)
+
+		then:
+		assert response.error == null : "tools/call failed: ${response}"
+		assert response.result.isError == false : "tool returned an error: ${response}"
+
+		when:
+		Map page = new JsonSlurper().parseText(
+			response.result.content[0].text as String) as Map
+
+		then:
+		assert (page.items as List).size() > 0 : "no tool summaries: ${page}"
+		assert (page.items*.name).contains('getMyUserAccount') :
+			"getMyUserAccount missing from tool summaries: ${page.items*.name}"
+	}
+
 	private Map _mcpPost(String path, Map<String, Object> jsonRpcBody) {
 		def conn = new URL(absoluteUrl(path)).openConnection() as HttpURLConnection
 
