@@ -1,6 +1,6 @@
 # ADR-0008: Migrate to Liferay DXP 2026.Q1.3-LTS
 
-## Status: Accepted (2026-04-18)
+## Status: Accepted (2026-04-18); the wrong-password → Guest claims below are corrected in [When Basic Auth falls through to Guest](../reference/dxp-runtime-config.md#when-basic-auth-falls-through-to-guest)
 
 ## Context
 

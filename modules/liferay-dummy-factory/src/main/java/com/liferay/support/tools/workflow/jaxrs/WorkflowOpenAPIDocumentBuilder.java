@@ -1,5 +1,7 @@
 package com.liferay.support.tools.workflow.jaxrs;
 
+import com.liferay.support.tools.service.BatchSpec;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -102,6 +104,6 @@ public final class WorkflowOpenAPIDocumentBuilder {
 			"content", _content(_map("type", "object")));
 	}
 
-	private static final String _INFO_DESCRIPTION = "Creates dummy data (sites, users, organizations, roles, web content, documents, blogs, pages, vocabularies, categories, message boards) in this Liferay instance. Workflow: call getWorkflowFunctions to learn operations, compose a request, validate it with planWorkflow, then run executeWorkflow. Inside a workflow, a step parameter is either {\"name\", \"value\"} or {\"name\", \"from\"}; \"from\" reads input.<field> or an earlier result such as steps.<stepId>.items[0].groupId. Site-scoped operations need groupId > 0: create or look up the site first and pass its groupId. count is limited to 1000 per step.";
+	private static final String _INFO_DESCRIPTION = "Creates dummy data (sites, users, organizations, roles, web content, documents, blogs, pages, vocabularies, categories, message boards) in this Liferay instance. Workflow: call getWorkflowFunctions to learn operations, compose a request, validate it with planWorkflow, then run executeWorkflow. Inside a workflow, a step parameter is either {\"name\", \"value\"} or {\"name\", \"from\"}; \"from\" reads input.<field> or an earlier result such as steps.<stepId>.items[0].groupId. Site-scoped operations need groupId > 0: create or look up the site first and pass its groupId. count is limited to " + BatchSpec.MAX_COUNT + " per step; for webContent.create the limit applies to count × groupIds.";
 
 }
