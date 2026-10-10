@@ -23,6 +23,12 @@ public record WebContentBatchSpec(
 		baseArticle = (baseArticle == null) ? "" : baseArticle;
 		linkLists = (linkLists == null) ? "" : linkLists;
 		tags = (tags == null) ? AssetTagNames.EMPTY : tags;
+
+		if ((long)batch.count() * groupIds.length > BatchSpec.MAX_COUNT) {
+			throw new IllegalArgumentException(
+				"count multiplied by the number of groupIds must be less " +
+					"than or equal to " + BatchSpec.MAX_COUNT);
+		}
 	}
 
 }

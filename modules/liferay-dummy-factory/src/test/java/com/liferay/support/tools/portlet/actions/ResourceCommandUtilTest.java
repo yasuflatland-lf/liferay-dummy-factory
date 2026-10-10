@@ -1,6 +1,7 @@
 package com.liferay.support.tools.portlet.actions;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,21 @@ class ResourceCommandUtilTest {
 		assertThrows(
 			IllegalArgumentException.class,
 			() -> ResourceCommandUtil.validatePositiveId(-1L, "id"));
+	}
+
+	@Test
+	void validateCountRejectsAboveMax() {
+		IllegalArgumentException exception = assertThrows(
+			IllegalArgumentException.class,
+			() -> ResourceCommandUtil.validateCount(1001));
+
+		assertEquals(
+			"count must be less than or equal to 1000", exception.getMessage());
+	}
+
+	@Test
+	void validateCountAcceptsMax() {
+		assertDoesNotThrow(() -> ResourceCommandUtil.validateCount(1000));
 	}
 
 }
