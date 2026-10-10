@@ -346,7 +346,7 @@ public class WorkflowResource {
 	}
 
 	private User _signedInUser(HttpServletRequest httpServletRequest) {
-		User user = null;
+		User user;
 
 		try {
 			user = _portal.getUser(httpServletRequest);

@@ -27,8 +27,6 @@ class WorkflowOpenAPIDocumentBuilderTest {
 			WorkflowOpenAPIDocumentBuilder.build(_schema()), "paths");
 
 		assertEquals(
-			Set.of("/functions", "/schema", "/plan", "/execute"), paths.keySet());
-		assertEquals(
 			List.of("/functions", "/schema", "/plan", "/execute"),
 			new ArrayList<>(paths.keySet()));
 	}
@@ -70,7 +68,6 @@ class WorkflowOpenAPIDocumentBuilderTest {
 
 			assertFalse(schema.containsKey("$schema"));
 			assertFalse(schema.containsKey("$id"));
-			assertTrue(schema.containsKey("required"));
 			assertEquals(input.get("required"), schema.get("required"));
 			assertEquals(input.get("properties"), schema.get("properties"));
 		}
