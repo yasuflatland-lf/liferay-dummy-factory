@@ -41,7 +41,13 @@ class PortletJsonCommandTemplateTest {
 	void omniadminDenialIsLocalizedAndLoggedWithoutStackTrace() {
 		PermissionChecker permissionChecker = _proxy(
 			PermissionChecker.class,
-			(proxy, method, args) -> method.getReturnType() == long.class ? 42L : false);
+			(proxy, method, args) -> {
+				if (method.getReturnType() == long.class) {
+					return 42L;
+				}
+
+				return false;
+			});
 
 		_assertDenial(
 			new PrincipalException.MustBeOmniadmin(permissionChecker),
@@ -49,16 +55,20 @@ class PortletJsonCommandTemplateTest {
 	}
 
 	private void _assertDenial(
-		PrincipalException exception, String command, String expectedMessage) {
+		PrincipalException principalException, String command,
+		String expectedMessage) {
 
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
 		themeDisplay.setUser(_proxy(User.class, (proxy, method, args) -> 42L));
 
-		ResourceBundle bundle = ResourceBundle.getBundle("content.Language", Locale.US);
+		ResourceBundle resourceBundle = ResourceBundle.getBundle(
+			"content.Language", Locale.US);
+
 		PortletConfig portletConfig = _proxy(
-			PortletConfig.class, (proxy, method, args) -> bundle);
-		ResourceRequest request = _proxy(
+			PortletConfig.class, (proxy, method, args) -> resourceBundle);
+
+		ResourceRequest resourceRequest = _proxy(
 			ResourceRequest.class,
 			(proxy, method, args) -> {
 				if (method.getName().equals("getAttribute")) {
@@ -71,46 +81,65 @@ class PortletJsonCommandTemplateTest {
 					return portletConfig;
 				}
 
-				return method.getName().equals("getLocale") ? Locale.US : command;
+				if (method.getName().equals("getLocale")) {
+					return Locale.US;
+				}
+
+				return command;
 			});
+
 		Map<String, Object> response = new HashMap<>();
-		JSONObject json = _proxy(
+
+		JSONObject responseJson = _proxy(
 			JSONObject.class,
 			(proxy, method, args) -> {
 				response.put((String)args[0], args[1]);
+
 				return proxy;
 			});
+
 		List<String> warnings = new ArrayList<>();
+
 		Log log = _proxy(
 			Log.class,
 			(proxy, method, args) -> {
 				assertEquals("warn", method.getName());
 				assertEquals(1, args.length);
+
 				warnings.add((String)args[0]);
+
 				return null;
 			});
+
+		LanguageUtil languageUtil = new LanguageUtil();
+
 		Language originalLanguage = LanguageUtil.getLanguage();
 
 		try {
-			new LanguageUtil().setLanguage(_proxy(
-				Language.class,
-				(proxy, method, args) -> ((ResourceBundle)args[0]).getString((String)args[1])));
+			languageUtil.setLanguage(
+				_proxy(
+					Language.class,
+					(proxy, method, args) -> ((ResourceBundle)args[0]).getString(
+						(String)args[1])));
 
-			PortletJsonCommandTemplate.permissionDenied(request, json, log, exception);
+			PortletJsonCommandTemplate.permissionDenied(
+				resourceRequest, responseJson, log, principalException);
 		}
 		finally {
-			new LanguageUtil().setLanguage(originalLanguage);
+			languageUtil.setLanguage(originalLanguage);
 		}
 
-		assertEquals(Map.of("success", false, "error", expectedMessage), response);
+		assertEquals(
+			Map.of("success", false, "error", expectedMessage), response);
 		assertEquals(1, warnings.size());
 		assertTrue(warnings.get(0).contains("userId=42"));
 		assertTrue(warnings.get(0).contains("command=" + command));
 	}
 
 	private static <T> T _proxy(Class<T> type, InvocationHandler handler) {
-		return type.cast(Proxy.newProxyInstance(
-			type.getClassLoader(), new Class<?>[] {type}, handler));
+		return type.cast(
+			Proxy.newProxyInstance(
+				type.getClassLoader(), new Class<?>[] {type}, handler));
 	}
 
 }

@@ -90,15 +90,22 @@ class PortletJsonCommandTemplate {
 				", command=" + resourceRequest.getResourceID() + ", reason=" +
 				principalException.getMessage());
 
+		PortletConfig portletConfig =
+			(PortletConfig)resourceRequest.getAttribute(
+				JavaConstants.JAKARTA_PORTLET_CONFIG);
+
+		String languageKey = "ldf-company-admin-required";
+
+		if (principalException instanceof PrincipalException.MustBeOmniadmin) {
+			languageKey = "ldf-omniadmin-required";
+		}
+
 		responseJson.put("success", false);
 		responseJson.put(
 			"error",
 			LanguageUtil.get(
-				((PortletConfig)resourceRequest.getAttribute(
-					JavaConstants.JAKARTA_PORTLET_CONFIG)).getResourceBundle(
-					resourceRequest.getLocale()),
-				(principalException instanceof PrincipalException.MustBeOmniadmin) ?
-					"ldf-omniadmin-required" : "ldf-company-admin-required"));
+				portletConfig.getResourceBundle(resourceRequest.getLocale()),
+				languageKey));
 	}
 
 	@FunctionalInterface

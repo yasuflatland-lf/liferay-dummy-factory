@@ -86,10 +86,11 @@ public class WorkflowResource {
 
 	private static final String _COMPANY_CREATE = "company.create";
 
-	private static final Log _log = LogFactoryUtil.getLog(WorkflowResource.class);
-
 	private static final Pattern _STEP_ID_PATTERN = Pattern.compile(
 		"[A-Za-z0-9_-]+");
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		WorkflowResource.class);
 
 	@POST
 	@Path("execute")
