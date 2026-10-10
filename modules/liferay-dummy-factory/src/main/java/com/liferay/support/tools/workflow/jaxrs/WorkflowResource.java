@@ -43,8 +43,11 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -53,6 +56,8 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 
 @Component(
 	property = {
+		"openapi.resource=true",
+		"openapi.resource.path=/ldf-workflow",
 		"osgi.jaxrs.application.select=(osgi.jaxrs.name=ldf-workflow)",
 		"osgi.jaxrs.resource=true"
 	},
@@ -101,6 +106,17 @@ public class WorkflowResource {
 		document.put("referenceSyntax", _referenceSyntax());
 
 		return Map.copyOf(document);
+	}
+
+	@GET
+	@Path("openapi.json")
+	public Response getOpenAPI(
+		@Context HttpServletRequest httpServletRequest,
+		@QueryParam("type") String type, @Context UriInfo uriInfo) {
+
+		return Response.ok(
+			WorkflowOpenAPIDocumentBuilder.build(_schemaDocument())
+		).build();
 	}
 
 	@POST

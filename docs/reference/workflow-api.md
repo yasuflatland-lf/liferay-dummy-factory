@@ -10,6 +10,7 @@ The JAX-RS application at `/o/ldf-workflow` that runs multi-step workflows. This
 | `GET /o/ldf-workflow/schema` | JSON Schema of the request; includes the current `operation` enum and the `from` syntax |
 | `POST /o/ldf-workflow/plan` | Validate a workflow without running it |
 | `POST /o/ldf-workflow/execute` | Validate, then run the steps |
+| `GET /o/ldf-workflow/openapi.json` | OpenAPI 3.1.0 document, JSON only — see [MCP tool set](#mcp-tool-set) |
 
 Registration uses the OSGi JAX-RS whiteboard: `osgi.jaxrs.application.base=/o/ldf-workflow`, `osgi.jaxrs.name=ldf-workflow`, and `osgi.jaxrs.application.select=(osgi.jaxrs.name=ldf-workflow)` on the resource.
 
@@ -134,6 +135,18 @@ Each sample is one JSON file under `integration-test/src/test/resources/workflow
 | `message-boards` | `site.create`, `mbCategory.create`, `mbThread.create`, `mbReply.create` | Longest chain: category → thread → reply |
 
 Adding a sample: create the fixture first, then the TS copy, then extend the parity test.
+
+## MCP tool set
+
+`GET /openapi.json` turns this application into a Liferay MCP Server tool set (design: [ADR-0010](../adr/0010-mcp-via-liferay-mcp-server.md); container setup: [Liferay MCP Server](dxp-runtime-config.md#liferay-mcp-server)).
+
+- **Publication**: `WorkflowResource` carries `openapi.resource=true` and `openapi.resource.path=/ldf-workflow` and exposes `getOpenAPI(HttpServletRequest, String, UriInfo)`, which Liferay looks up by reflection. Keep that exact signature. The document is built by `WorkflowOpenAPIDocumentBuilder` from the same request schema `/schema` returns, with `$schema` and `$id` removed. There is no `api.version` property and no version path segment.
+- **Tool set name**: `ldf-workflow`.
+- **Tools** (`operationId`s): `getWorkflowFunctions` (`GET /functions`), `getWorkflowSchema` (`GET /schema`), `planWorkflow` (`POST /plan`), `executeWorkflow` (`POST /execute`). **The operationIds are public API: do not rename them.** A rename breaks every MCP profile that pinned the tool. `WorkflowOpenAPIDocumentBuilderTest.operationIdsAreStable` locks them.
+- **Invocation through the `default` profile** uses the meta tool `postToolSetToolSetNameToolInvoke`. A tool with a JSON request body takes the workflow request nested twice under `body`: `{"toolSetName": "ldf-workflow", "toolName": "planWorkflow", "body": {"body": <workflow request>}}`. The outer `body` is the meta tool's payload. The inner `body` is how Liferay maps an operation's request body into tool input. Tools without a request body take `"body": {}`.
+- **Error mapping**: Liferay reports `isError=true` only for HTTP status >= 300. `/plan` and `/execute` return 200 even on validation errors or a failed step, so an MCP caller must read `errors` and `execution.status` in the body.
+- **Stale definitions after a redeploy (measured on the pinned DXP image)**: after changing a `summary` in the builder and redeploying the JAR into a running container, `/o/ldf-workflow/openapi.json` served the new text right away, but `getToolSetToolSetNameToolSummariesPage` and `getToolSetToolSetNameTool` kept the old text until the container was restarted. Liferay caches each tool set's OpenAPI document per company in memory. **Workaround: restart the container** (`docker restart <container>`; verified) after a redeploy that changes the OpenAPI document.
+- **Regression guard**: `McpToolSetSpec`.
 
 ## Limitations
 

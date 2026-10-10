@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed — becomes Accepted once the Phase 0 spike (below) confirms the discovery behavior on `liferay/dxp:2026.q3.6`.
+Accepted. The Phase 0 spike confirmed the discovery behavior on `liferay/dxp:2026.q3.6`; see [Phase 0 results (2026.q3.6)](#phase-0-results-2026q36).
 
 ## Date
 
@@ -57,6 +57,15 @@ The following was read from `liferay/liferay-portal` `master` (`modules/apps/mcp
 - **Lookup tools (sites, vocabularies, …) are not built by us.** Liferay's own headless applications (e.g. headless-admin-site, headless-admin-taxonomy) are discovered as tool sets by the same mechanism. A dedicated lookup operation is added only if a concrete gap is found.
 - **No cleanup tool.** Out of scope by product decision.
 - **The OpenAPI document is served as JSON only**, at `GET /openapi.json`. Liferay reads tool sets through `OpenAPIDocument.Type.JSON` only, so a YAML variant would have no consumer. The resource keeps the `getOpenAPI(HttpServletRequest, String, UriInfo)` signature that Liferay invokes by reflection.
+
+### Phase 0 results (2026.q3.6)
+
+Measured with `McpToolSetSpec` and by hand on the pinned image. Operational detail lives in [Workflow API → MCP tool set](../reference/workflow-api.md#mcp-tool-set) and [DXP runtime configuration → Liferay MCP Server](../reference/dxp-runtime-config.md#liferay-mcp-server).
+
+- **Discovery works for a custom JAX-RS application.** With `openapi.resource=true`, `openapi.resource.path=/ldf-workflow` and a public `getOpenAPI(HttpServletRequest, String, UriInfo)` behind `GET /openapi.json`, `/o/mcp-server/v1.0/tool-sets` lists `ldf-workflow`. `getToolSetToolSetNameToolSummariesPage` returns exactly the four coarse tools, each with `summary + ". " + description` as its description. Option C stands; options A/B are not needed.
+- **Invocation works through the `default` profile.** `postToolSetToolSetNameToolInvoke` ran `getWorkflowFunctions` with `body: {}`, and ran `planWorkflow` with the request nested as `body: {body: <request>}`, as predicted. No other nesting was needed.
+- **On 2026.q3.6 Liferay reads each tool set's OpenAPI document over an unauthenticated HTTP request, and runs a tool through an internal forward with no `Authorization` header.** The repository's `forceBasicAuth` test setup blocks both, so the dev container needs BasicAuth verifier changes for `/o/ldf-workflow` ([Liferay MCP Server](../reference/dxp-runtime-config.md#liferay-mcp-server)). A stock DXP does not need them. One side effect showed up: with no credentials, `/o/ldf-workflow/plan` and `/execute` run as Guest and can create data. That is a gap the bundle already has on a stock DXP. It needs its own fix, outside this ADR.
+- **The OpenAPI cache is stale after a redeploy.** After changing a `summary` and redeploying the JAR into a running container, `/o/ldf-workflow/openapi.json` served the new text right away. The MCP meta tools kept the old text for the whole time we watched (about 50 seconds, four checks). After `docker restart`, they showed the new text. The fallback in "Costs and risks" is confirmed: **restart the container after a redeploy that changes the OpenAPI document.**
 
 ### Batch size cap (all entry points)
 
