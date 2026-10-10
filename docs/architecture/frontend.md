@@ -36,7 +36,7 @@ Consequences: no content-hashed filenames, no watch mode / HMR (rebuild the JAR 
 
 - Entity forms post to the resource URLs that `view.jsp` passes in `actionResourceURLs`, with `credentials: 'include'`. GET sends parameters in the query string; POST sends `application/x-www-form-urlencoded` with the JSON payload in a `data` parameter.
 - Workflow actions post JSON to `/o/ldf-workflow/*`. Every `fetch` to a Liferay `/o/<app>/…` JAX-RS path must send **both** `credentials: 'include'` and `headers: {'x-csrf-token': Liferay.authToken}` (or `?p_auth=`). With the session cookie alone, PortalRealm answers 401 — the on-mount schema fetch then fails silently and every workflow button stays disabled. `test/js/utils/workflowJsonSchema.test.ts` locks both options.
-- `parseResponse` treats a response as failed when `data.success === false || data.error` — both checks, because the two fields are independent. A failure passes the full payload through (`ApiResponse<T>` failure carries `data?: T`) so partial batches can be rendered without another request.
+- For non-2xx responses, `parseResponse` returns nonblank string messages from `errors[].message`, joined by newlines, or `Server error: <status>` if the body is empty, non-JSON or has no usable messages. For successful HTTP responses, it treats the payload as failed when `data.success === false || data.error` — both checks, because the two fields are independent. A payload failure passes the full payload through (`ApiResponse<T>` failure carries `data?: T`) so partial batches can be rendered without another request.
 
 ### Form field dependencies
 
