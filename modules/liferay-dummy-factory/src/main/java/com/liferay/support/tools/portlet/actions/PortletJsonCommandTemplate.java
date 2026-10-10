@@ -2,13 +2,19 @@ package com.liferay.support.tools.portlet.actions;
 
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.support.tools.utils.ProgressCallback;
 import com.liferay.support.tools.utils.ProgressManager;
 
+import jakarta.portlet.PortletConfig;
 import jakarta.portlet.ResourceRequest;
 import jakarta.portlet.ResourceResponse;
 
@@ -53,6 +59,10 @@ class PortletJsonCommandTemplate {
 			ResourceCommandUtil.setErrorResponse(
 				responseJson, illegalArgumentException);
 		}
+		catch (PrincipalException principalException) {
+			permissionDenied(
+				resourceRequest, responseJson, log, principalException);
+		}
 		catch (Throwable throwable) {
 			log.error(errorLogMessage, throwable);
 
@@ -66,6 +76,29 @@ class PortletJsonCommandTemplate {
 
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse, responseJson);
+	}
+
+	static void permissionDenied(
+		ResourceRequest resourceRequest, JSONObject responseJson, Log log,
+		PrincipalException principalException) {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		log.warn(
+			"Portlet permission denied: userId=" + themeDisplay.getUserId() +
+				", command=" + resourceRequest.getResourceID() + ", reason=" +
+				principalException.getMessage());
+
+		responseJson.put("success", false);
+		responseJson.put(
+			"error",
+			LanguageUtil.get(
+				((PortletConfig)resourceRequest.getAttribute(
+					JavaConstants.JAKARTA_PORTLET_CONFIG)).getResourceBundle(
+					resourceRequest.getLocale()),
+				(principalException instanceof PrincipalException.MustBeOmniadmin) ?
+					"ldf-omniadmin-required" : "ldf-company-admin-required"));
 	}
 
 	@FunctionalInterface

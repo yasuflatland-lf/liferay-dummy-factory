@@ -1,6 +1,8 @@
 package com.liferay.support.tools.workflow.jaxrs;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
@@ -83,6 +85,8 @@ public class WorkflowResource {
 		"Basic realm=\"PortalRealm\"";
 
 	private static final String _COMPANY_CREATE = "company.create";
+
+	private static final Log _log = LogFactoryUtil.getLog(WorkflowResource.class);
 
 	private static final Pattern _STEP_ID_PATTERN = Pattern.compile(
 		"[A-Za-z0-9_-]+");
@@ -507,6 +511,10 @@ public class WorkflowResource {
 		if (reason == null) {
 			return;
 		}
+
+		_log.warn(
+			"Workflow permission denied: userId=" + user.getUserId() +
+				", operations=" + operations + ", reason=" + reason);
 
 		throw new ForbiddenException(
 			Response.status(

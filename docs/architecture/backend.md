@@ -85,7 +85,7 @@ Each `*Creator` wraps the per-entity work in `BatchTransaction.run(() -> { … }
 
 ## Resource commands
 
-The portlet's Control Panel permission governs access to its resource commands. `/ldf/company` additionally requires the request's permission checker to be an omniadmin, matching DXP's Virtual Instances app: a company administrator of a secondary instance must not create virtual instances. `CompanyResourceCommandTest` covers the check. A denial returns the template's usual `{success:false, error}` JSON with HTTP 200, unlike the REST path's HTTP 403. REST and MCP authorization is defined in [Workflow API authentication](../reference/workflow-api.md#authentication).
+The portlet's Control Panel permission governs access to its resource commands. `/ldf/company` additionally requires the request's permission checker to be an omniadmin, matching DXP's Virtual Instances app: a company administrator of a secondary instance must not create virtual instances. `CompanyResourceCommandTest` covers the check. A denial returns `{success:false, error}` with HTTP 200, unlike the REST path's HTTP 403, and a localized message from the portlet resource bundle. The template catches `PrincipalException` before its generic handler, so a denial is logged at WARN with userId, command and reason, without a stack trace. REST and MCP authorization is defined in [Workflow API authentication](../reference/workflow-api.md#authentication).
 
 Every resource command except `DocumentUploadResourceCommand` (multipart upload) delegates to the template:
 
