@@ -3,6 +3,7 @@ package com.liferay.support.tools.workflow.jaxrs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.liferay.support.tools.workflow.WorkflowStepExecutionResult;
@@ -16,6 +17,7 @@ import com.liferay.support.tools.workflow.spi.WorkflowExecutionContext;
 import com.liferay.support.tools.workflow.spi.WorkflowOperationAdapter;
 import com.liferay.support.tools.workflow.spi.WorkflowStepResult;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,53 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 
 class WorkflowResourceTest {
+
+	@Test
+	void nonAdminIsForbidden() {
+		assertEquals(
+			"Executing a workflow requires a company administrator.",
+			WorkflowResource.forbiddenReason(false, false, List.of("role.create")));
+	}
+
+	@Test
+	void omniadminWithoutCompanyAdminIsForbidden() {
+		assertEquals(
+			"Executing a workflow requires a company administrator.",
+			WorkflowResource.forbiddenReason(false, true, List.of("role.create")));
+	}
+
+	@Test
+	void companyAdminCanCreateRoles() {
+		assertNull(WorkflowResource.forbiddenReason(
+			true, false, List.of("role.create")));
+	}
+
+	@Test
+	void companyAdminCannotCreateCompanies() {
+		assertEquals(
+			"company.create requires an omniadmin.",
+			WorkflowResource.forbiddenReason(true, false, List.of("company.create")));
+	}
+
+	@Test
+	void companyAdminCannotCreateCompaniesInLaterSteps() {
+		assertEquals(
+			"company.create requires an omniadmin.",
+			WorkflowResource.forbiddenReason(
+				true, false, List.of("role.create", "company.create")));
+	}
+
+	@Test
+	void omniadminCanCreateCompanies() {
+		assertNull(WorkflowResource.forbiddenReason(
+			true, true, List.of("role.create", "company.create")));
+	}
+
+	@Test
+	void companyAdminAllowsMissingOperationsUntilValidation() {
+		assertNull(WorkflowResource.forbiddenReason(
+			true, false, Arrays.asList(null, "role.create")));
+	}
 
 	@Test
 	void planRejectsUnsupportedSchemaVersion() {
