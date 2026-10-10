@@ -12,6 +12,12 @@ class McpToolSetSpec extends BaseLiferaySpec {
 	@Shared
 	PlaywrightLifecycle pw
 
+	@Shared
+	Long nonAdminUserId
+
+	@Shared
+	String nonAdminAuthorization
+
 	def setupSpec() {
 		ensureBundleActive()
 
@@ -19,10 +25,36 @@ class McpToolSetSpec extends BaseLiferaySpec {
 
 		// Prime admin password via Playwright login so Basic Auth calls use the active credentials.
 		loginAsAdmin(pw)
+
+		String baseName = "nonadmin${System.currentTimeMillis()}"
+		Map response = _rawRequest(
+			'POST', '/o/ldf-workflow/operations/user.create', basicAuthHeader(),
+			JsonOutput.toJson([count: 1, baseName: baseName]))
+		assert response.status == 200 : "non-admin setup failed: ${response}"
+
+		Map step = new JsonSlurper().parseText(response.body as String) as Map
+		nonAdminUserId = step.result?.items?.getAt(0)?.userId as Long
+		assert nonAdminUserId > 0 : "setup user ID missing: ${step}"
+		assert step.result.success == true : "setup batch failed: ${step}"
+
+		String email = step.result.items[0].emailAddress as String
+		Map user = jsonwsGet(
+			"user/get-user-by-email-address?companyId=${companyId}&emailAddress=${email}") as Map
+		assert (user.emailAddress as String)?.equalsIgnoreCase("${baseName}1@liferay.com") :
+			"JSONWS returned a different setup user: ${user}"
+		assert (user.userId as Long) == nonAdminUserId
+		nonAdminAuthorization = 'Basic ' + "${email}:test".getBytes('UTF-8').encodeBase64().toString()
 	}
 
 	def cleanupSpec() {
-		pw?.close()
+		try {
+			if (nonAdminUserId != null) {
+				jsonwsPost('user/delete-user', [userId: nonAdminUserId])
+			}
+		}
+		finally {
+			pw?.close()
+		}
 	}
 
 	def 'ldf-workflow is listed as an MCP tool set'() {
@@ -169,6 +201,43 @@ class McpToolSetSpec extends BaseLiferaySpec {
 		assert !roleNames.contains(roleName) : "guest execute created role ${roleName}"
 	}
 
+	def 'execute rejects a non-admin user with 403 and creates nothing'() {
+		given:
+		assert nonAdminAuthorization : 'non-admin setup did not complete'
+		String roleName = "mcp-nonadmin-execute-${System.currentTimeMillis()}"
+		Map request = [
+			schemaVersion: '1.0',
+			steps: [[
+				id: 'createRole', operation: 'role.create',
+				idempotencyKey: "nonadmin-${System.nanoTime()}",
+				params: [
+					[name: 'count', value: 1],
+					[name: 'baseName', value: roleName],
+					[name: 'roleType', value: 'regular']
+				]
+			]]
+		]
+
+		when:
+		Map response = _rawRequest(
+			'POST', '/o/ldf-workflow/execute', nonAdminAuthorization,
+			JsonOutput.toJson(request))
+
+		then:
+		assert response.status == 403 : "non-admin request was not rejected: ${response}"
+		assert (response.body as String).contains('FORBIDDEN') :
+			"authorization error missing: ${response}"
+
+		when:
+		List roleNames = (jsonwsGet(
+			"role/get-roles/company-id/${companyId}/types/1") as List)*.name
+
+		then:
+		assert roleNames.contains('Administrator') :
+			"role listing did not return regular roles: ${roleNames}"
+		assert !roleNames.contains(roleName) : "non-admin request created role ${roleName}"
+	}
+
 	def 'createUsers creates users through MCP'() {
 		when:
 		Map result = _callTool(
@@ -264,6 +333,31 @@ class McpToolSetSpec extends BaseLiferaySpec {
 		assert roleNames.contains('Administrator') :
 			"role listing did not return regular roles: ${roleNames}"
 		assert !roleNames.contains(roleName) : "guest operation created role ${roleName}"
+	}
+
+	def 'operations endpoint rejects a non-admin user with 403 and creates nothing'() {
+		given:
+		assert nonAdminAuthorization : 'non-admin setup did not complete'
+		String roleName = "mcp-nonadmin-operation-${System.currentTimeMillis()}"
+
+		when:
+		Map response = _rawRequest(
+			'POST', '/o/ldf-workflow/operations/role.create', nonAdminAuthorization,
+			JsonOutput.toJson([count: 1, baseName: roleName, roleType: 'regular']))
+
+		then:
+		assert response.status == 403 : "non-admin request was not rejected: ${response}"
+		assert (response.body as String).contains('FORBIDDEN') :
+			"authorization error missing: ${response}"
+
+		when:
+		List roleNames = (jsonwsGet(
+			"role/get-roles/company-id/${companyId}/types/1") as List)*.name
+
+		then:
+		assert roleNames.contains('Administrator') :
+			"role listing did not return regular roles: ${roleNames}"
+		assert !roleNames.contains(roleName) : "non-admin request created role ${roleName}"
 	}
 
 	def 'operations endpoint answers 404 for an unknown operation'() {

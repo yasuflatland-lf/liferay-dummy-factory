@@ -2,6 +2,8 @@ package com.liferay.support.tools.workflow.jaxrs;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.support.tools.service.CategoryCreator;
 import com.liferay.support.tools.service.VocabularyCreator;
@@ -33,6 +35,7 @@ import com.liferay.support.tools.workflow.dto.WorkflowStepDto;
 import com.liferay.support.tools.workflow.dto.WorkflowValidationErrorDto;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -44,6 +47,7 @@ import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.POST;
@@ -78,6 +82,8 @@ public class WorkflowResource {
 	private static final String _BASIC_CHALLENGE =
 		"Basic realm=\"PortalRealm\"";
 
+	private static final String _COMPANY_CREATE = "company.create";
+
 	private static final Pattern _STEP_ID_PATTERN = Pattern.compile(
 		"[A-Za-z0-9_-]+");
 
@@ -88,6 +94,19 @@ public class WorkflowResource {
 		WorkflowRequestDto workflowRequestDto) {
 
 		User user = _signedInUser(httpServletRequest);
+		List<String> operations = new ArrayList<>();
+
+		if ((workflowRequestDto != null) &&
+			(workflowRequestDto.steps() != null)) {
+
+			for (WorkflowStepDto step : workflowRequestDto.steps()) {
+				if (step != null) {
+					operations.add(step.operation());
+				}
+			}
+		}
+
+		_requirePermission(user, operations);
 
 		ValidationResult validationResult = _validatedPlan(workflowRequestDto);
 
@@ -110,6 +129,8 @@ public class WorkflowResource {
 
 		User user = _signedInUser(httpServletRequest);
 
+		_requirePermission(user, Collections.singletonList(operation));
+
 		OperationOutcome outcome = executeOperation(
 			user.getUserId(), user.getCompanyId(), operation, parameters);
 
@@ -120,6 +141,20 @@ public class WorkflowResource {
 		).type(
 			MediaType.APPLICATION_JSON
 		).build();
+	}
+
+	static String forbiddenReason(
+		boolean companyAdmin, boolean omniadmin, Collection<String> operations) {
+
+		if (!companyAdmin) {
+			return "Executing a workflow requires a company administrator.";
+		}
+
+		if (!omniadmin && operations.contains(_COMPANY_CREATE)) {
+			return "company.create requires an omniadmin.";
+		}
+
+		return null;
 	}
 
 	OperationOutcome executeOperation(
@@ -454,6 +489,28 @@ public class WorkflowResource {
 		);
 	}
 
+	private void _requirePermission(User user, Collection<String> operations) {
+		PermissionChecker permissionChecker = _permissionCheckerFactory.create(
+			user);
+		String reason = forbiddenReason(
+			permissionChecker.isCompanyAdmin(), permissionChecker.isOmniadmin(),
+			operations);
+
+		if (reason != null) {
+			throw new ForbiddenException(
+				Response.status(
+					Response.Status.FORBIDDEN
+				).type(
+					MediaType.APPLICATION_JSON
+				).entity(
+					Map.of(
+						"errors",
+						List.of(
+							new WorkflowValidationErrorDto("FORBIDDEN", "/", reason)))
+				).build());
+		}
+	}
+
 	private User _signedInUser(HttpServletRequest httpServletRequest) {
 		User user;
 
@@ -706,6 +763,9 @@ public class WorkflowResource {
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private PermissionCheckerFactory _permissionCheckerFactory;
 
 	@Reference
 	private CategoryCreator _categoryCreator;

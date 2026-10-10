@@ -7,8 +7,11 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.support.tools.constants.LDFPortletKeys;
 import com.liferay.support.tools.service.BatchResult;
 import com.liferay.support.tools.service.CompanyCreator;
@@ -37,6 +40,14 @@ public class CompanyResourceCommand extends BaseMVCResourceCommand {
 			resourceRequest, resourceResponse, _portal, _log,
 			"Failed to create companies",
 			(context, data, responseJson) -> {
+				ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
+				if (!themeDisplay.getPermissionChecker().isOmniadmin()) {
+					throw new PrincipalException.MustBeOmniadmin(
+						themeDisplay.getPermissionChecker());
+				}
+
 				int count = GetterUtil.getInteger(data.getString("count"));
 				String webId = GetterUtil.getString(data.getString("webId"));
 				String virtualHostname = GetterUtil.getString(
