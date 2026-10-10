@@ -11,6 +11,7 @@ If JSONWS calls fail with 401/403 or come back as the Guest user, start at [Basi
 | `portal-ext.properties` | Disables setup wizard / terms / reminder queries / password-change prompts; opens JSONWS; registers Basic Auth on the JSONWS servlet; exempts JSONWS from CSRF; widens the default SAP |
 | `portal-liferay-online-config.properties` | **Intentionally empty** — shadows the image's file that blocks JSONWS |
 | `osgi/configs/…BasicAuthHeaderAuthVerifierConfiguration-default.config` | Enables Basic Auth on the OSGi verifier pipeline (`/o/*`, `/api/*`) |
+| `osgi/configs/com.liferay.mcp.server.rest.internal.configuration.MCPServerConfiguration.config` | Switches the Liferay MCP Server on — see [Liferay MCP Server](#liferay-mcp-server) |
 | `osgi/configs/…SAPConfiguration.config` | SAP defaults for a fresh database |
 | `osgi/configs/com.liferay.support.tools.basicauth.BasicAuthTestSetup.config` | Activates `BasicAuthTestSetup` |
 | `osgi/configs/com.liferay.support.tools.sap.SAPTestSetup.config` | Activates `SAPTestSetup` |
@@ -72,10 +73,11 @@ The OSGi-side file:
 ```
 enabled=B"true"
 urlsIncludes="/api/*,/o/*,/xmlrpc/*"
+urlsExcludes="/o/mcp-server/v1.0/openapi.json"
 forceBasicAuth=B"true"
 ```
 
-`forceBasicAuth` turns a wrong password into an HTTP 401 instead of a silent Guest request (Liferay translates it to the `basic_auth` filter property, which is why grepping for `basic_auth=true` finds nothing in the OCD). `urlsIncludes` is a **comma-separated String** — see [`.config` syntax](#config-file-syntax).
+`forceBasicAuth` turns a wrong password into an HTTP 401 instead of a silent Guest request (Liferay translates it to the `basic_auth` filter property, which is why grepping for `basic_auth=true` finds nothing in the OCD). `urlsIncludes` is a **comma-separated String** — see [`.config` syntax](#config-file-syntax). `urlsExcludes` exists only for the Liferay MCP Server — see [Liferay MCP Server](#liferay-mcp-server).
 
 ### 3. Exempt JSONWS from the CSRF check
 
@@ -155,6 +157,17 @@ Felix TypedProperties format:
 - More than one comment line makes DXP 2026 reject the whole file ("Multiple comment lines found"). Keep `.config` files comment-free and document them in Java or here.
 - Arrays are valid only for `String[]` attributes. `urlsIncludes` / `urlsExcludes` in every `BaseAuthVerifierConfiguration` are `String`: an array literal is stored as `[Ljava.lang.String;@<hash>`, matches no URL, and the verifier is skipped without any log line.
 - `<pid>~<name>.config` is a factory instance; `-` works in place of `~` for legacy reasons (hence `…Configuration-default.config`).
+
+## Liferay MCP Server
+
+The design is [ADR-0010](../adr/0010-mcp-via-liferay-mcp-server.md); `McpServerSmokeSpec` is the regression guard.
+
+- **Feature flag**: `feature.flag.LPD-63311=true` in `configs/common/portal-ext.properties`.
+- **Per-instance switch**: OSGi PID `com.liferay.mcp.server.rest.internal.configuration.MCPServerConfiguration`, boolean `enabled` (default `false`, COMPANY scope). The system-level file `configs/common/osgi/configs/com.liferay.mcp.server.rest.internal.configuration.MCPServerConfiguration.config` (`enabled=B"true"`) is enough; a `configuration.override.` entry in `portal-ext.properties` is not needed.
+- **Disabled state**: when the flag or `enabled` is off, `MCPServerAuthVerifierFilter` answers HTTP 404 on `/o/mcp`.
+- **Requests**: `/o/mcp` accepts Basic auth. Send `Content-Type: application/json` and `Accept: application/json, text/event-stream`.
+- **`forceBasicAuth` empties the tool list**: to build a profile's tools, `MCPServerServlet` fetches the tool set's OpenAPI document (`/mcp-server/v1.0/openapi.json` for the `default` profile) through an internal request that carries no `Authorization` header. With `forceBasicAuth=B"true"` ([step 2](#2-register-basic-auth-on-the-jsonws-servlet-filter)) that request gets HTTP 401, the log shows `Skipping MCP tool "getToolSetsPage" from tool set "mcp-server-v1.0" ... HTTP 401 for /mcp-server/v1.0/openapi.json`, and `tools/list` returns `{"tools":[]}` while `initialize` still succeeds. The fix is an `urlsExcludes` entry on the Basic Auth verifier for that document. `urlsExcludes` takes exact paths or trailing-`*` prefixes, so each tool set whose OpenAPI document must be read needs its own entry.
+- **Caching**: the servlet caches the built tool list, so a config change needs a fresh container (`./gradlew removeDockerContainer`).
 
 ## Other runtime behaviour
 
