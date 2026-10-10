@@ -5,7 +5,6 @@ import com.liferay.support.tools.it.util.PlaywrightLifecycle
 import com.microsoft.playwright.Locator
 import com.microsoft.playwright.Page
 
-import spock.lang.IgnoreIf
 import spock.lang.Shared
 import spock.lang.Stepwise
 
@@ -40,9 +39,6 @@ class CompanyFunctionalSpec extends BaseLiferaySpec {
 		pw?.close()
 	}
 
-	// Skipped in CI: company creation triggers BundleSiteInitializer and batch-engine
-	// imports that exceed the Playwright HTTP timeout on shared runners.
-	@IgnoreIf({ System.getenv('CI') == 'true' })
 	def 'Company is created via portlet UI'() {
 		given:
 		Page page = pw.page
@@ -74,9 +70,8 @@ class CompanyFunctionalSpec extends BaseLiferaySpec {
 		page.locator('[data-testid="company-submit"]').click()
 
 		then: 'success alert appears'
-		// DXP 2026 runs BundleSiteInitializer (welcome site, ~4s) plus 5
-		// BatchEngineImportTaskExecutor tasks synchronously inside addCompany,
-		// which pushes the server response past 30s under local runs.
+		// addCompany runs the site initializers synchronously (about 10 s
+		// locally), so leave headroom for slower CI runners.
 		page.locator('[data-testid="company-result"].alert-success').waitFor(
 			new Locator.WaitForOptions().setTimeout(90_000)
 		)

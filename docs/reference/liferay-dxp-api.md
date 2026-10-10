@@ -88,6 +88,8 @@ addCompany(Long companyId, String webId, String virtualHostname, String mx,
 
 The shorter overload lives on `CompanyService`, which is blacklisted for remote use. For dummy companies pass `addDefaultAdminUser=false` and `null` admin fields. Used by `CompanyCreator`.
 
+**Call it with an empty `ServiceContext` on the thread.** `addCompany` runs the site initializers, and indexing the CMS site's layouts renders them through `LayoutServiceContextHelper`. That helper reuses the response of the thread's `ServiceContext` (or its theme display), and a CMS fragment calls `sendRedirect` on it, so a resource request answers HTTP 302 instead of JSON. When the thread's context has no request and no response, Liferay renders into a dummy response instead. `CompanyCreator` therefore pushes `new ServiceContext()` around each `addCompany` transaction and pops it in `finally`; `CompanyCreatorTest` locks this.
+
 ### `AssetCategoryLocalService.addCategory` — `boolean system` (2026.Q3+)
 
 From 2026.Q3 the full overload takes `boolean system` between `vocabularyId` and `categoryProperties`; the older 9-argument form no longer compiles.
