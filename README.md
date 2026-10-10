@@ -15,6 +15,7 @@ Generate realistic test data in Liferay in seconds — users, sites, pages, web 
 - **Batch creation for 14 entity types**: organizations, roles, users, sites, pages, web content, documents, blogs, vocabularies, categories, message-board categories, threads and replies, and companies (virtual instances).
 - **Realistic content**: optional Datafaker-generated names and text in several locales, site templates, tags, uploaded template files.
 - **Workflows**: one JSON document creates a whole scenario — e.g. a site, its pages and its web content — with ids flowing from step to step. Plan (validate) before you execute. [Learn more](docs/guides/workflows.md).
+- **Claude Code (MCP)**: Liferay's built-in MCP Server exposes the workflow API as tools, so Claude Code can create dummy data from a prompt. [Set it up](docs/guides/mcp-setup.md).
 - **Honest results**: a batch reports exactly what was requested, created and skipped, and fails loudly instead of silently creating less.
 
 ## Compatibility

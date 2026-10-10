@@ -8,6 +8,7 @@ Organized by what you are trying to do ([Diátaxis](https://diataxis.fr/)): **gu
 |---|---|
 | [Install and use](guides/installation.md) | deploy the JAR and create data from the Control Panel |
 | [Workflows](guides/workflows.md) | create related entities in one run from JSON |
+| [Claude Code (MCP)](guides/mcp-setup.md) | create dummy data from Claude Code prompts through Liferay's MCP Server |
 
 ## Developing
 
