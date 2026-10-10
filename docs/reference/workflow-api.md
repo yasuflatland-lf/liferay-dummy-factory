@@ -98,6 +98,7 @@ Each step result follows the [batch response contract](../architecture/backend.m
 | `mbThread.create` | message-board threads | needs `groupId > 0` |
 | `mbReply.create` | replies | requires `count`, `threadId`, `body`; has **no** `baseName` |
 
+- **`count` is capped per step** and larger values are rejected, never truncated — see the [count cap](../architecture/backend.md#parameters-batchspec-and-batchspec).
 - **`groupId: 0` is not "the default site".** Site-scoped operations reject it. Chain a `site.create` step and reference `steps.<id>.items[0].groupId`.
 - **Optional parameters** are read with the `WorkflowParameterValues.optional*` helpers, which return the documented default when the parameter is absent. Required parameters use the non-optional readers, which fail on absence. Adapters must not re-implement this with `has(...)` checks.
 - **Taxonomy startup fallback.** If the OSGi registration of the `vocabulary.create` / `category.create` adapters is momentarily missing, `WorkflowResource` registers those two operations directly from the Creator services so `/functions` and `/plan` keep working. The fallback is limited to these two operations.

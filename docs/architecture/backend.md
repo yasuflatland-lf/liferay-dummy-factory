@@ -79,6 +79,7 @@ Each `*Creator` wraps the per-entity work in `BatchTransaction.run(() -> { … }
 ### Parameters: `BatchSpec` and `*BatchSpec`
 
 - `BatchSpec(count, baseName)` validates both in its compact constructor. `ResourceCommandUtil.parseBatchSpec(data)` reads `count` and `baseName` from the payload — so any form whose command uses it must include a `baseName` field.
+- **Count cap.** `count` must be between 1 and `BatchSpec.MAX_COUNT` (1000) per request — per workflow step. Larger values are rejected with an error that states the limit, never truncated. `BatchSpec.validateCount` is the single check: the compact constructor, `ResourceCommandUtil.validateCount`, the workflow `WorkflowParameterValues` helpers and `WorkflowInputValidator.requireCount` all call it. Decision: [ADR-0010](../adr/0010-mcp-via-liferay-mcp-server.md).
 - When a Creator needs more than about five parameters, they move into a `*BatchSpec` record (`UserBatchSpec`, `WebContentBatchSpec`, `MBReplyBatchSpec`, …) that composes `BatchSpec batch`. Its compact constructor normalizes nullable inputs to their defaults (e.g. `null` tags → `AssetTagNames.EMPTY`), so callers need no null checks. Creators with few parameters (`OrganizationCreator`, `RoleCreator`) keep raw parameters plus `BatchSpec`.
 - `EmailDomain.of(raw)` rejects blanks and `@`, and defaults to `liferay.com`. `RoleType` and `SiteMembershipType` map UI strings to Liferay constants.
 

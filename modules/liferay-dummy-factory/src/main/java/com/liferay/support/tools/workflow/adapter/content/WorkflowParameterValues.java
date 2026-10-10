@@ -1,5 +1,7 @@
 package com.liferay.support.tools.workflow.adapter.content;
 
+import com.liferay.support.tools.service.BatchSpec;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -117,10 +119,7 @@ final class WorkflowParameterValues {
 	public BatchInput requireBatchInput() {
 		int count = optionalInt("count", -1);
 
-		if (count <= 0) {
-			throw new IllegalArgumentException(
-				"count must be greater than 0");
-		}
+		BatchSpec.validateCount(count);
 
 		String baseName = optionalString("baseName", null);
 

@@ -51,9 +51,7 @@ class ResourceCommandUtil {
 	}
 
 	static void validateCount(int count) {
-		if (count <= 0) {
-			throw new IllegalArgumentException("count must be greater than 0");
-		}
+		BatchSpec.validateCount(count);
 	}
 
 	static void validateNotEmpty(String value, String fieldName) {
