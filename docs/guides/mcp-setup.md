@@ -64,7 +64,7 @@ Run `/mcp` inside Claude Code to confirm that the `ldf` server is connected and 
 | Prompt | Expected tool(s) |
 |---|---|
 | "Create 5 users with base name demo-user" | `createUsers` |
-| "Create a site called demo-site and add 1 web content to it" | `planWorkflow` then `executeWorkflow`; the web content step needs the new site's `groupId`. |
+| "Create a site called demo-site and add 10 web contents to it" | `planWorkflow` then `executeWorkflow`; the web content step needs the new site's `groupId`. |
 | "What can you create?" | `getWorkflowFunctions` |
 
 Claude Code chooses the tools itself, so a run can differ: it may chain `createSites` and `createWebContents` instead of one workflow, or answer the last prompt from the tool list without calling `getWorkflowFunctions`.
