@@ -19,6 +19,7 @@ import com.liferay.support.tools.workflow.spi.WorkflowStepResult;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.jupiter.api.Test;
 
@@ -153,6 +154,60 @@ class WorkflowResourceTest {
 
 		assertEquals(404, outcome.status());
 		assertEquals("OPERATION_UNKNOWN", _errors(outcome).get(0).code());
+	}
+
+	@Test
+	void unknownParametersReturn400WithoutExecuting() {
+		AtomicBoolean executed = new AtomicBoolean();
+		WorkflowResource resource = new WorkflowResource();
+
+		resource.bindSpiWorkflowOperationAdapter(new WorkflowOperationAdapter() {
+
+			@Override
+			public WorkflowStepResult execute(
+				WorkflowExecutionContext context, Map<String, Object> parameters) {
+
+				executed.set(true);
+
+				return _success();
+			}
+
+			@Override
+			public String operationName() {
+				return "user.create";
+			}
+		});
+
+		WorkflowResource.OperationOutcome typoOutcome = resource.executeOperation(
+			1L, 1L, "user.create",
+			Map.of("count", 1, "baseName", "user", "fakerenable", true));
+
+		assertEquals(400, typoOutcome.status());
+		assertEquals(
+			List.of(new WorkflowValidationErrorDto(
+				"UNKNOWN_PARAMETER", "/fakerenable",
+				"Unknown parameter: fakerenable")),
+			_errors(typoOutcome));
+		assertEquals(false, executed.get());
+
+		Map<String, Object> parameters = new LinkedHashMap<>();
+		parameters.put("count", 1);
+		parameters.put("baseName", "user");
+		parameters.put("userId", 999L);
+		parameters.put("companyId", 888L);
+
+		WorkflowResource.OperationOutcome identityOutcome = resource.executeOperation(
+			1L, 1L, "user.create", parameters);
+
+		assertEquals(400, identityOutcome.status());
+		assertEquals(
+			List.of(
+				new WorkflowValidationErrorDto(
+					"UNKNOWN_PARAMETER", "/companyId", "Unknown parameter: companyId"),
+				new WorkflowValidationErrorDto(
+					"UNKNOWN_PARAMETER", "/userId", "Unknown parameter: userId")),
+			_errors(identityOutcome));
+		assertEquals(false, executed.get());
 	}
 
 	@Test

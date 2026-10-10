@@ -61,7 +61,7 @@ class VocabularyCreateWorkflowOperationAdapterTest {
 	}
 
 	@Test
-	void executeHonorsUserIdOverride() throws Throwable {
+	void executeIgnoresUserIdParameter() throws Throwable {
 		StubVocabularyCreator vocabularyCreator = new StubVocabularyCreator(
 			List.of(_assetVocabulary(501L, 601L, "Vocabulary 1")));
 
@@ -76,7 +76,7 @@ class VocabularyCreateWorkflowOperationAdapterTest {
 				"baseName", "Vocabulary",
 				"groupId", 601L));
 
-		assertEquals(99L, vocabularyCreator.userId);
+		assertEquals(41L, vocabularyCreator.userId);
 	}
 
 	@Test

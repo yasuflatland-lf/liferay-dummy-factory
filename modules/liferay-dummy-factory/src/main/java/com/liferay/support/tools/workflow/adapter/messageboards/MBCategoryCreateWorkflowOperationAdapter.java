@@ -44,7 +44,7 @@ public class MBCategoryCreateWorkflowOperationAdapter
 		WorkflowParameterValues values = new WorkflowParameterValues(parameters);
 
 		MBCategoryCreateRequest request = new MBCategoryCreateRequest(
-			_effectiveUserId(values, workflowExecutionContext),
+			workflowExecutionContext.userId(),
 			values.requirePositiveLong("groupId"), _batchSpec(values),
 			values.requireText("description"));
 
@@ -72,19 +72,6 @@ public class MBCategoryCreateWorkflowOperationAdapter
 
 	private static BatchSpec _batchSpec(WorkflowParameterValues values) {
 		return new BatchSpec(values.requireCount(), values.requireText("baseName"));
-	}
-
-	private static long _effectiveUserId(
-		WorkflowParameterValues values,
-		WorkflowExecutionContext workflowExecutionContext) {
-
-		long userId = values.optionalLong("userId", workflowExecutionContext.userId());
-
-		if (userId <= 0) {
-			throw new IllegalArgumentException("userId is required");
-		}
-
-		return userId;
 	}
 
 	@Reference

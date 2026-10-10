@@ -130,7 +130,10 @@ public class WorkflowResource {
 			parameters = Map.of();
 		}
 
-		if (!_workflowFunctions().containsKey(operation) ||
+		WorkflowFunction workflowFunction = _workflowFunctions().get(operation);
+
+		if (!(workflowFunction instanceof
+				DefaultWorkflowFunction defaultWorkflowFunction) ||
 			(WorkflowOpenAPIDocumentBuilder.operationIdOf(operation) == null)) {
 
 			return new OperationOutcome(
@@ -141,6 +144,27 @@ public class WorkflowResource {
 						new WorkflowValidationErrorDto(
 							"OPERATION_UNKNOWN", "/operation",
 							"Unknown operation: " + operation))));
+		}
+
+		List<String> parameterNames =
+			defaultWorkflowFunction.descriptor().parameters(
+			).stream(
+			).map(
+				WorkflowFunctionParameter::name
+			).toList();
+		List<WorkflowValidationErrorDto> errors = parameters.keySet().stream(
+		).filter(
+			key -> !parameterNames.contains(key)
+		).sorted(
+		).map(
+			key -> new WorkflowValidationErrorDto(
+				"UNKNOWN_PARAMETER",
+				"/" + key.replace("~", "~0").replace("/", "~1"),
+				"Unknown parameter: " + key)
+		).toList();
+
+		if (!errors.isEmpty()) {
+			return new OperationOutcome(400, Map.of("errors", errors));
 		}
 
 		List<WorkflowParameterDto> params = new ArrayList<>();

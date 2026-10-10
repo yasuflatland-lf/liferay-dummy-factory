@@ -19,7 +19,7 @@ Registration uses the OSGi JAX-RS whiteboard: `osgi.jaxrs.application.base=/o/ld
 
 Browser callers must send the session cookie **and** a CSRF token ([why](../architecture/frontend.md#server-communication)). Scripts authenticate with Basic Auth.
 
-`execute` and `operations/{operation}` reject a Guest (or unresolvable) user with HTTP 401 and a `Basic realm="PortalRealm"` challenge before they validate or run anything, and run the steps as the signed-in user and that user's company. The guard lives in `WorkflowResource`, not in the application or a Basic Auth config, so `functions`, `schema`, `plan` and `openapi.json` stay anonymous. Liferay MCP fetches `openapi.json` without credentials ([Liferay MCP Server](dxp-runtime-config.md#liferay-mcp-server)), and `plan` only validates. An MCP invocation still passes the guard: the internal forward carries the MCP user as the `USER_ID` request attribute. `McpToolSetSpec` locks the 401.
+`execute` and `operations/{operation}` reject a Guest (or unresolvable) user with HTTP 401 and a `Basic realm="PortalRealm"` challenge before they validate or run anything, and always run the steps as the signed-in user and that user's company. Step parameters cannot override `userId` or `companyId`: `/execute` ignores these identity parameters, while `operations/{operation}` rejects them as `UNKNOWN_PARAMETER`. The guard lives in `WorkflowResource`, not in the application or a Basic Auth config, so `functions`, `schema`, `plan` and `openapi.json` stay anonymous. Liferay MCP fetches `openapi.json` without credentials ([Liferay MCP Server](dxp-runtime-config.md#liferay-mcp-server)), and `plan` only validates. An MCP invocation still passes the guard: the internal forward carries the MCP user as the `USER_ID` request attribute. `McpToolSetSpec` locks the 401.
 
 ## Request
 
@@ -182,6 +182,7 @@ HTTP status contract:
 |---|---|---|
 | 200 | Step succeeded | Step result with `status: SUCCEEDED` |
 | 400 | Request or plan validation failed (for example a missing required parameter) | `errors` list |
+| 400 | Body contains keys absent from the operation descriptor, including `userId` and `companyId` | `errors` list with `UNKNOWN_PARAMETER`, one per unknown key in sorted order |
 | 401 | Guest or unresolvable user; rejected before validation or execution | Authentication challenge |
 | 404 | Operation is unknown or has no mapped tool | `errors` list with `OPERATION_UNKNOWN` |
 | 422 | Step failed or adapter threw an exception | Step result with `status: FAILED` |
