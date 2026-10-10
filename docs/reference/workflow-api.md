@@ -81,7 +81,9 @@ Examples: `input.pageTitle`, `steps.createSite.items[0].groupId`, `steps.createS
 | `execution` | `null` when validation failed, otherwise a `WorkflowExecutionResult` with one result per step |
 | `errors` | empty when validation passed, otherwise structured validation errors |
 
-Each step result follows the [batch response contract](../architecture/backend.md#batch-response-contract): `{success, count, requested, skipped, items, error?}`.
+Each step result follows the [batch response contract](../architecture/backend.md#batch-response-contract): `{success, count, requested, skipped, items, error?}`; over HTTP `error` is emitted as `null` on success (see below).
+
+The workflow layer adds its own checks on each step result (`WorkflowStepResult`): `requested`, `count` and `skipped` are non-negative, `count + skipped == requested`, and `success` requires `count == requested`. `error` is required on failure and `null` on success; the workflow HTTP JSON always carries the `error` key. `count` is not required to equal the number of `items`, because `webContent.create` returns one item per site (see the `WebContentCreator` exception in the [batch response contract](../architecture/backend.md#batch-response-contract)).
 
 ## Operations
 
@@ -97,7 +99,7 @@ Each step result follows the [batch response contract](../architecture/backend.m
 | `blogs.create` | blog entries | needs `groupId > 0` |
 | `document.create` | documents | needs `groupId > 0`; with no `uploadedFiles` it generates placeholder text files (`"Test document: <title>"`) |
 | `layout.create` | pages | needs `groupId > 0` |
-| `webContent.create` | web content articles | takes `groupIds`; a scalar `from` reference is accepted and wrapped in a one-element list |
+| `webContent.create` | web content articles | takes `groupIds`; a scalar `from` reference is accepted and wrapped in a one-element list; the input `count` is per site; returns one item per target site (`{groupId, siteName, created, failed, error?}`), so `steps.<id>.items[0].groupId` indexes sites, with `requested = count × groupIds.length` and `count` = total articles |
 | `vocabulary.create` | vocabularies | needs `groupId > 0` |
 | `category.create` | categories | needs `groupId > 0` and a vocabulary |
 | `mbCategory.create` | message-board categories | needs `groupId > 0` |
