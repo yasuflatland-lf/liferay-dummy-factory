@@ -2,6 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {
 	fetchResource,
+	postJsonResource,
 	postResource,
 } from '../../src/main/resources/META-INF/resources/js/utils/api';
 
@@ -10,6 +11,78 @@ const mockFetch = vi.fn();
 beforeEach(() => {
 	global.fetch = mockFetch;
 	mockFetch.mockReset();
+});
+
+describe.each([
+	['fetchResource', () => fetchResource('/api/resource')],
+	['postResource', () => postResource('/api/resource', {})],
+	['postJsonResource', () => postJsonResource('/o/ldf-workflow/execute', {})],
+] as const)('%s non-2xx responses', (_name, request) => {
+	it('surfaces a 403 authorization message', async () => {
+		mockFetch.mockResolvedValueOnce(
+			new Response(
+				JSON.stringify({
+					errors: [
+						{
+							code: 'FORBIDDEN',
+							message: 'company.create requires an omniadmin.',
+							path: '/',
+						},
+					],
+				}),
+				{status: 403}
+			)
+		);
+
+		expect(await request()).toEqual({
+			error: 'company.create requires an omniadmin.',
+			success: false,
+		});
+	});
+
+	it('joins usable messages with newlines and ignores malformed entries', async () => {
+		mockFetch.mockResolvedValueOnce(
+			new Response(
+				JSON.stringify({
+					errors: [
+						{message: 'First error'},
+						null,
+						{},
+						{message: 42},
+						{message: ''},
+						{message: ' \t '},
+						{message: 'Second error'},
+					],
+				}),
+				{status: 400}
+			)
+		);
+
+		expect(await request()).toEqual({
+			error: 'First error\nSecond error',
+			success: false,
+		});
+	});
+
+	it.each([
+		['non-JSON body', '<html>Forbidden</html>'],
+		['empty body', ''],
+		['JSON without errors', JSON.stringify({message: 'Forbidden'})],
+		['empty errors', JSON.stringify({errors: []})],
+		[
+			'unusable messages',
+			JSON.stringify({errors: [null, {}, {message: 42}, {message: ' \t '}]}),
+		],
+		['non-array errors', JSON.stringify({errors: {message: 'Forbidden'}})],
+		['null JSON', 'null'],
+	])('falls back to the HTTP status for %s', async (_description, body) => {
+		mockFetch.mockResolvedValueOnce(new Response(body, {status: 403}));
+
+		expect(await request()).toEqual({
+			error: 'Server error: 403',
+			success: false,
+		});
+	});
 });
 
 describe('postResource', () => {

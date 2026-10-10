@@ -10,6 +10,25 @@ function toErrorResponse<T>(error: unknown): ApiResponse<T> {
 
 async function parseResponse<T>(response: Response): Promise<ApiResponse<T>> {
 	if (!response.ok) {
+		try {
+			const data = await response.json();
+			const messages = Array.isArray(data?.errors)
+				? data.errors
+						.map((error: {message?: unknown} | null) => error?.message)
+						.filter(
+							(message: unknown): message is string =>
+								typeof message === 'string' && message.trim().length > 0
+						)
+				: [];
+
+			if (messages.length) {
+				return {error: messages.join('\n'), success: false};
+			}
+		}
+		catch {
+			// Empty or non-JSON error bodies use the HTTP status fallback.
+		}
+
 		return {error: `Server error: ${response.status}`, success: false};
 	}
 
