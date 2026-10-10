@@ -3,10 +3,14 @@ package com.liferay.support.tools.workflow.jaxrs;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.support.tools.service.CategoryCreator;
+import com.liferay.support.tools.service.VocabularyCreator;
 import com.liferay.support.tools.workflow.DefaultWorkflowFunction;
 import com.liferay.support.tools.workflow.MapWorkflowFunctionRegistry;
 import com.liferay.support.tools.workflow.WorkflowEngine;
 import com.liferay.support.tools.workflow.WorkflowErrorPolicy;
+import com.liferay.support.tools.workflow.WorkflowExecutionResult;
+import com.liferay.support.tools.workflow.WorkflowExecutionStatus;
 import com.liferay.support.tools.workflow.WorkflowFunction;
 import com.liferay.support.tools.workflow.WorkflowFunctionDescriptor;
 import com.liferay.support.tools.workflow.WorkflowFunctionFactory;
@@ -20,8 +24,6 @@ import com.liferay.support.tools.workflow.WorkflowStepDefinition;
 import com.liferay.support.tools.workflow.WorkflowValidationError;
 import com.liferay.support.tools.workflow.adapter.taxonomy.CategoryCreateWorkflowOperationAdapter;
 import com.liferay.support.tools.workflow.adapter.taxonomy.VocabularyCreateWorkflowOperationAdapter;
-import com.liferay.support.tools.service.CategoryCreator;
-import com.liferay.support.tools.service.VocabularyCreator;
 import com.liferay.support.tools.workflow.dto.WorkflowExecuteResponseDto;
 import com.liferay.support.tools.workflow.dto.WorkflowOnErrorDto;
 import com.liferay.support.tools.workflow.dto.WorkflowParameterDto;
@@ -36,6 +38,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
@@ -45,6 +48,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
@@ -97,6 +101,78 @@ public class WorkflowResource {
 			List.of());
 	}
 
+	@POST
+	@Path("operations/{operation}")
+	public Response executeOperation(
+		@Context HttpServletRequest httpServletRequest,
+		@PathParam("operation") String operation,
+		Map<String, Object> parameters) {
+
+		User user = _signedInUser(httpServletRequest);
+
+		OperationOutcome outcome = executeOperation(
+			user.getUserId(), user.getCompanyId(), operation, parameters);
+
+		return Response.status(
+			outcome.status()
+		).entity(
+			outcome.body()
+		).type(
+			MediaType.APPLICATION_JSON
+		).build();
+	}
+
+	OperationOutcome executeOperation(
+		long userId, long companyId, String operation,
+		Map<String, Object> parameters) {
+
+		if (parameters == null) {
+			parameters = Map.of();
+		}
+
+		if (!_workflowFunctions().containsKey(operation) ||
+			(WorkflowOpenAPIDocumentBuilder.operationIdOf(operation) == null)) {
+
+			return new OperationOutcome(
+				404,
+				Map.of(
+					"errors",
+					List.of(
+						new WorkflowValidationErrorDto(
+							"OPERATION_UNKNOWN", "/operation",
+							"Unknown operation: " + operation))));
+		}
+
+		List<WorkflowParameterDto> params = new ArrayList<>();
+
+		for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+			params.add(
+				new WorkflowParameterDto(entry.getKey(), entry.getValue(), null));
+		}
+
+		WorkflowRequestDto request = new WorkflowRequestDto(
+			"1.0", "operation-" + operation, Map.of(),
+			List.of(
+				new WorkflowStepDto(
+					"step", operation, UUID.randomUUID().toString(), params, null)));
+		ValidationResult validationResult = _validatedPlan(request);
+
+		if (!validationResult.errors().isEmpty()) {
+			return new OperationOutcome(
+				400, Map.of("errors", validationResult.errors()));
+		}
+
+		WorkflowExecutionResult execution = _workflowEngine().execute(
+			validationResult.plan(), userId, companyId);
+
+		return new OperationOutcome(
+			(execution.status() == WorkflowExecutionStatus.SUCCEEDED) ? 200 : 422,
+			execution.steps().get(0));
+	}
+
+	record OperationOutcome(int status, Object body) {
+	}
+
 	@GET
 	@Path("functions")
 	public Map<String, Object> functions() {
@@ -122,7 +198,14 @@ public class WorkflowResource {
 		@QueryParam("type") String type, @Context UriInfo uriInfo) {
 
 		return Response.ok(
-			WorkflowOpenAPIDocumentBuilder.build(_schemaDocument())
+			WorkflowOpenAPIDocumentBuilder.build(
+				_schemaDocument(),
+				_workflowFunctions().values().stream(
+				).filter(
+					workflowFunction -> workflowFunction instanceof DefaultWorkflowFunction
+				).map(
+					workflowFunction -> ((DefaultWorkflowFunction)workflowFunction).descriptor()
+				).toList())
 		).build();
 	}
 
