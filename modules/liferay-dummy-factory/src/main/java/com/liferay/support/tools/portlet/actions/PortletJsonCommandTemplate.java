@@ -11,6 +11,7 @@ import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.support.tools.security.DataCreationAuthorization;
 import com.liferay.support.tools.utils.ProgressCallback;
 import com.liferay.support.tools.utils.ProgressManager;
 
@@ -41,6 +42,7 @@ class PortletJsonCommandTemplate {
 		boolean progressStarted = false;
 
 		try {
+			requirePermission(resourceRequest);
 			progressManager.start(resourceRequest);
 			progressStarted = true;
 
@@ -93,6 +95,16 @@ class PortletJsonCommandTemplate {
 		}
 
 		ResourceCommandUtil.setErrorResponse(responseJson, throwable);
+	}
+
+	static void requirePermission(ResourceRequest resourceRequest)
+		throws PrincipalException {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		DataCreationAuthorization.requirePermission(
+			themeDisplay.getPermissionChecker(), resourceRequest.getResourceID());
 	}
 
 	static void permissionDenied(

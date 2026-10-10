@@ -45,6 +45,8 @@ public class DocumentUploadResourceCommand extends BaseMVCResourceCommand {
 		JSONObject responseJson = JSONFactoryUtil.createJSONObject();
 
 		try {
+			PortletJsonCommandTemplate.requirePermission(resourceRequest);
+
 			if ("add_temp".equals(cmd)) {
 				String sourceFileName = uploadPortletRequest.getFileName(
 					"file");
@@ -109,10 +111,9 @@ public class DocumentUploadResourceCommand extends BaseMVCResourceCommand {
 			}
 		}
 		catch (Exception exception) {
-			_log.error(
+			PortletJsonCommandTemplate.handleFailure(
+				resourceRequest, responseJson, _log,
 				"Temp file operation failed (cmd=" + cmd + ")", exception);
-
-			ResourceCommandUtil.setErrorResponse(responseJson, exception);
 		}
 
 		JSONPortletResponseUtil.writeJSON(
