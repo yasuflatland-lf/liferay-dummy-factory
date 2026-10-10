@@ -370,7 +370,11 @@ final class WorkflowFunctionDescriptors {
 					parameter(
 						"threadId", "long", true, "Target thread id.", null),
 					parameter("body", "string", true, "Reply body.", null),
-					parameter("format", "string", false, "Reply format.", "html")),
+					parameter("format", "string", false, "Reply format.", "html"),
+					parameter(
+						"fakerEnable", "boolean", false,
+						"Use faker profile generation.", false),
+					parameter("locale", "string", false, "Locale id.", "en_US")),
 				"WorkflowStepResult"));
 	}
 

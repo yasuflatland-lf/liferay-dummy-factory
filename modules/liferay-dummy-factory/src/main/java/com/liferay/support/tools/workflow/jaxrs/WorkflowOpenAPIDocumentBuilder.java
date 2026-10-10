@@ -70,13 +70,19 @@ public final class WorkflowOpenAPIDocumentBuilder {
 				continue;
 			}
 
+			String summary = descriptor.description();
+
+			if (summary.endsWith(".")) {
+				summary = summary.substring(0, summary.length() - 1);
+			}
+
 			paths.put(
 				"/operations/" + operation,
 				_map(
 					"post",
 					_operation(
-						operationId, descriptor.description(),
-						"Runs " + operation + " as a single step. Returns the step result {stepId, operation, status, result: {success, requested, count, skipped, items, error}, error}. HTTP 400 when parameters are invalid, HTTP 422 when the step fails, HTTP 404 when the operation is unknown.",
+						operationId, summary,
+						"Runs " + operation + " as a single step. Returns the step result {stepId, operation, status, result: {success, requested, count, skipped, items, error}, error}. HTTP 400 when a parameter is unknown or a required parameter is missing; HTTP 422 when the step fails, including invalid values such as a count out of range. HTTP 404 when the operation is unknown.",
 						"Step succeeded", _parameterSchema(descriptor))));
 		}
 
@@ -147,6 +153,13 @@ public final class WorkflowOpenAPIDocumentBuilder {
 				default -> throw new IllegalStateException(
 					"Unsupported workflow parameter type: " + parameter.type());
 			};
+
+			if (parameter.type().equals("integer") &&
+				parameter.name().equals("count")) {
+
+				property.put("minimum", 1);
+				property.put("maximum", BatchSpec.MAX_COUNT);
+			}
 
 			String description = parameter.description();
 

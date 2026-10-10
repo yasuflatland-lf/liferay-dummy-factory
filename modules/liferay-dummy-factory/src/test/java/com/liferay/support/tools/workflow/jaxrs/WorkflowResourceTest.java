@@ -157,6 +157,70 @@ class WorkflowResourceTest {
 	}
 
 	@Test
+	void unmappedRegisteredOperationReturns404WithoutExecuting() {
+		AtomicBoolean executed = new AtomicBoolean();
+		WorkflowResource resource = new WorkflowResource();
+
+		resource.bindSpiWorkflowOperationAdapter(new WorkflowOperationAdapter() {
+
+			@Override
+			public WorkflowStepResult execute(
+				WorkflowExecutionContext context, Map<String, Object> parameters) {
+
+				executed.set(true);
+
+				return _success();
+			}
+
+			@Override
+			public String operationName() {
+				return "custom.op";
+			}
+		});
+
+		WorkflowResource.OperationOutcome outcome = resource.executeOperation(
+			1L, 1L, "custom.op", Map.of());
+
+		assertEquals(404, outcome.status(), "Unexpected outcome: " + outcome);
+		assertEquals("OPERATION_UNKNOWN", _errors(outcome).get(0).code());
+		assertEquals(false, executed.get(), "Unmapped adapter must not execute");
+	}
+
+	@Test
+	void mbReplyAcceptsFakerEnableAndLocale() {
+		AtomicBoolean executed = new AtomicBoolean();
+		WorkflowResource resource = new WorkflowResource();
+
+		resource.bindSpiWorkflowOperationAdapter(new WorkflowOperationAdapter() {
+
+			@Override
+			public WorkflowStepResult execute(
+				WorkflowExecutionContext context, Map<String, Object> parameters) {
+
+				assertEquals(true, parameters.get("fakerEnable"));
+				assertEquals("en_US", parameters.get("locale"));
+				executed.set(true);
+
+				return _success();
+			}
+
+			@Override
+			public String operationName() {
+				return "mbReply.create";
+			}
+		});
+
+		WorkflowResource.OperationOutcome outcome = resource.executeOperation(
+			1L, 1L, "mbReply.create",
+			Map.of(
+				"count", 1, "threadId", 101L, "body", "Reply",
+				"fakerEnable", true, "locale", "en_US"));
+
+		assertEquals(200, outcome.status(), "Unexpected outcome: " + outcome);
+		assertTrue(executed.get(), "Reply adapter was not executed");
+	}
+
+	@Test
 	void unknownParametersReturn400WithoutExecuting() {
 		AtomicBoolean executed = new AtomicBoolean();
 		WorkflowResource resource = new WorkflowResource();

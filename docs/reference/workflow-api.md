@@ -185,7 +185,7 @@ HTTP status contract:
 | 400 | Body contains keys absent from the operation descriptor, including `userId` and `companyId` | `errors` list with `UNKNOWN_PARAMETER`, one per unknown key in sorted order |
 | 401 | Guest or unresolvable user; rejected before validation or execution | Authentication challenge |
 | 404 | Operation is unknown or has no mapped tool | `errors` list with `OPERATION_UNKNOWN` |
-| 422 | Step failed or adapter threw an exception | Step result with `status: FAILED` |
+| 422 | Step failed or adapter threw an exception, including invalid values such as a count out of range | Step result with `status: FAILED` |
 
 The [count cap](../architecture/backend.md#parameters-batchspec-and-batchspec) is checked during adapter execution, so `count: 0` and a count above the cap return 422, while an omitted required `count` returns 400.
 

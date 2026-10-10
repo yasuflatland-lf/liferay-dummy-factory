@@ -129,6 +129,11 @@ class McpToolSetSpec extends BaseLiferaySpec {
 			'/operations/vocabulary.create', '/operations/webContent.create'
 		] as Set) :
 			"unexpected paths: ${(document.paths as Map).keySet()}"
+		assert document.paths['/operations/role.create'].post.summary == 'Create roles' :
+			"unexpected role summary: ${document.paths['/operations/role.create']}"
+		assert document.paths['/operations/role.create'].post.description ==
+			'Runs role.create as a single step. Returns the step result {stepId, operation, status, result: {success, requested, count, skipped, items, error}, error}. HTTP 400 when a parameter is unknown or a required parameter is missing; HTTP 422 when the step fails, including invalid values such as a count out of range. HTTP 404 when the operation is unknown.' :
+			"unexpected role description: ${document.paths['/operations/role.create']}"
 	}
 
 	def 'execute rejects a request without credentials and creates nothing'() {
@@ -216,12 +221,24 @@ class McpToolSetSpec extends BaseLiferaySpec {
 		Map result = _callTool(
 			'postToolSetToolSetNameToolInvoke',
 			[toolSetName: 'ldf-workflow', toolName: 'createUsers',
-			 body: [body: [count: 1001, baseName: 'mcpuser']]])
+			 body: [body: [count: 1001, baseName: 'mcpcap']]])
 
 		then:
 		assert result.isError == true : "count above the cap was accepted: ${result}"
 		assert (result.content[0].text as String).contains('Status code: 422') :
 			"unexpected failure status: ${result}"
+		assert (result.content[0].text as String).contains('1000') :
+			"count cap missing from failure: ${result}"
+
+		when:
+		jsonwsGet("user/get-user-by-email-address?companyId=${companyId}&emailAddress=mcpcap1@liferay.com")
+
+		then:
+		IllegalStateException exception = thrown()
+		assert exception.message.contains('HTTP 404') :
+			"unexpected user lookup failure: ${exception.message}"
+		assert exception.message.contains('NoSuchUserException') :
+			"user absence was not confirmed: ${exception.message}"
 	}
 
 	def 'operations endpoint rejects a request without credentials and creates nothing'() {

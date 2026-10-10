@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.liferay.support.tools.service.BatchSpec;
 import com.liferay.support.tools.workflow.WorkflowFunctionDescriptor;
 import com.liferay.support.tools.workflow.WorkflowFunctionParameter;
 
@@ -149,7 +150,9 @@ class WorkflowOpenAPIDocumentBuilderTest {
 		assertEquals(
 			Map.of("type", "string", "description", "Text"), properties.get("text"));
 		assertEquals(
-			Map.of("type", "integer", "format", "int32", "description", "Count"),
+			Map.of(
+				"type", "integer", "format", "int32", "description", "Count",
+				"minimum", 1, "maximum", BatchSpec.MAX_COUNT),
 			properties.get("count"));
 		assertEquals(
 			Map.of("type", "integer", "format", "int64", "description", "Id"),
@@ -171,6 +174,38 @@ class WorkflowOpenAPIDocumentBuilderTest {
 			new ArrayList<>(properties.keySet()));
 		assertEquals("object", schema.get("type"));
 		assertEquals(false, schema.get("additionalProperties"));
+	}
+
+	@Test
+	void otherIntegerParametersHaveNoCountBounds() {
+		Map<String, Object> properties = _map(
+			_parameterSchema(new WorkflowFunctionParameter(
+				"priority", "integer", false, "Priority", null)),
+			"properties");
+
+		assertEquals(
+			Map.of("type", "integer", "format", "int32", "description", "Priority"),
+			properties.get("priority"), "Unexpected schema: " + properties);
+	}
+
+	@Test
+	void perOperationSummaryAndDescriptionExplainFailures() {
+		for (String description : List.of("Create roles.", "Create roles")) {
+			Map<String, Object> paths = _map(
+				WorkflowOpenAPIDocumentBuilder.build(
+					_schema(),
+					List.of(new WorkflowFunctionDescriptor(
+						"role.create", description, List.of(), "WorkflowStepResult"))),
+				"paths");
+			Map<String, Object> post = _map(
+				_map(paths, "/operations/role.create"), "post");
+
+			assertEquals(
+				"Create roles", post.get("summary"), "Unexpected operation: " + post);
+			assertEquals(
+				"Runs role.create as a single step. Returns the step result {stepId, operation, status, result: {success, requested, count, skipped, items, error}, error}. HTTP 400 when a parameter is unknown or a required parameter is missing; HTTP 422 when the step fails, including invalid values such as a count out of range. HTTP 404 when the operation is unknown.",
+				post.get("description"), "Unexpected operation: " + post);
+		}
 	}
 
 	@Test
