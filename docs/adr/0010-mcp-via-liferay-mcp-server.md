@@ -115,3 +115,5 @@ Alternatives rejected:
 - **The profile REST endpoints belong to a beta feature too.** The provisioning script depends on the `/o/mcp/server-profiles` endpoint. If they change, the script and the integration tests break, but the bundle is unaffected. That is the reason this dependency lives in the repository and not in the bundle.
 - **The batch cap is a behavior change for the portlet UI.** Requests above 1000 that used to be accepted are now rejected. This is intentional (one rule for every entry point) and must be noted in the release notes.
 - **Dev environment needs the feature flag.** `configs/common/portal-ext.properties` gains `feature.flag.LPD-63311=true`, and the MCP Server must be switched on in Instance Settings (or via configuration) for integration tests.
+
+Developer guide: [Use Dummy Factory from Claude Code](../guides/mcp-setup.md).

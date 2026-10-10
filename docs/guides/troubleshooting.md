@@ -81,3 +81,14 @@ curl -u test@liferay.com:Test12345 \
 | Text assertion passes with a missing key | Asserted on the key | Assert on the resolved English text |
 | Uppercase mismatch on a badge | `innerText()` under `text-transform` | Use `textContent()` |
 | Search returns nothing right after create | `?search=` is Elasticsearch-backed | `?pageSize=100` and filter |
+
+## MCP
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `/o/mcp` returns 404 | MCP Server disabled | [Liferay MCP Server](../reference/dxp-runtime-config.md#liferay-mcp-server) |
+| `/o/mcp/ldf` returns 404 | The `ldf` profile is missing | Re-run `./gradlew :integration-test:setupMcpProfile` |
+| `setupMcpProfile` fails with `HTTP 401` | Stale admin password | Pass the current one with `-Pldf.password=...` ([task](../reference/test-harness.md#mcp-profile-task-setupmcpprofile)) |
+| `setupMcpProfile` fails with `Authenticated as ..., expected ...` | The credentials were ignored and the request ran as Guest | [When Basic Auth falls through to Guest](../reference/dxp-runtime-config.md#when-basic-auth-falls-through-to-guest) |
+| New or changed tools not visible after redeploying the bundle | Liferay caches each tool set's OpenAPI document | "Stale definitions after a redeploy" in [MCP tool set](../reference/workflow-api.md#mcp-tool-set) |
+| Tool call returns `isError` with `Status code: 422` | The step failed | Read `error` in the tool result |
