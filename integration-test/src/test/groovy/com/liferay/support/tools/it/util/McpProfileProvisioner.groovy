@@ -3,7 +3,6 @@ package com.liferay.support.tools.it.util
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
-import java.net.HttpURLConnection
 import java.nio.charset.StandardCharsets
 
 /** Lives in it/util/ because it is also a developer CLI run through the setupMcpProfile JavaExec task, not just a test helper. */
@@ -17,12 +16,6 @@ class McpProfileProvisioner {
 		_baseUrl = baseUrl.endsWith('/') ? baseUrl[0..-2] : baseUrl
 		_authorizationHeader = authorizationHeader
 		_expectedEmail = expectedEmail
-	}
-
-	McpProfileProvisioner(String baseUrl, String authorizationHeader) {
-		this(baseUrl, authorizationHeader,
-			new String(Base64.decoder.decode(authorizationHeader.substring(6)),
-				StandardCharsets.UTF_8).split(':', 2)[0])
 	}
 
 	/** Creates or updates the ldf profile; returns the sorted list of pinned tool names. */
@@ -42,7 +35,7 @@ class McpProfileProvisioner {
 		])
 		Map page = new JsonSlurper().parseText(
 			discovery.result.content[0].text as String) as Map
-		List<String> tools = page.items*.name as List<String>
+		List<String> tools = (page.items*.name as List<String>)?.sort(false)
 
 		if (!tools) {
 			throw new IllegalStateException("No tools discovered for ${TOOL_SET_NAME}: ${page}")
@@ -51,7 +44,7 @@ class McpProfileProvisioner {
 		_request('PUT',
 			"/o/mcp/server-profiles/by-external-reference-code/${PROFILE_ERC}",
 			[name: PROFILE_NAME, description: _DESCRIPTION,
-				tools: tools.sort(false).collect { "${TOOL_SET_NAME} ${it}" }.join('\n')])
+				tools: tools.collect { "${TOOL_SET_NAME} ${it}" }.join('\n')])
 
 		Map listing = _mcpPost("/o/mcp/${PROFILE_NAME}", [
 			jsonrpc: '2.0', id: 1, method: 'tools/list', params: [:]
@@ -64,7 +57,7 @@ class McpProfileProvisioner {
 				"Profile tools ${listedTools} differ from discovered tools ${discoveredTools}")
 		}
 
-		return tools.sort(false)
+		return tools
 	}
 
 	static void main(String[] args) {
