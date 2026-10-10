@@ -48,5 +48,5 @@ Entities you can create:
 ### Rules that may surprise you
 
 - **A batch succeeds only if every entity is created.** Asking for 10 and getting 9 is reported as a failure, with the 9 created entities listed and the error explained. Already-created entities are kept.
-- **One request has a maximum count.** A larger count is rejected, not reduced. The limit: [count cap](../architecture/backend.md#parameters-batchspec-and-batchspec).
+- **One request has a maximum count.** A larger count is rejected, not reduced. For web content the limit covers count × selected sites. The limit: [count cap](../architecture/backend.md#parameters-batchspec-and-batchspec).
 - **Names you type are validated, not rewritten.** If a base name contains characters Liferay does not allow (for example in a user screen name), the request is rejected with a message instead of being silently changed.
