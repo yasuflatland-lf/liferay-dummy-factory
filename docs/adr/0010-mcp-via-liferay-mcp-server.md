@@ -71,7 +71,7 @@ Measured with `McpToolSetSpec` and by hand on the pinned image. Operational deta
 
 An LLM can emit `count: 100000` as easily as `count: 10`. The cap is enforced at the input boundary and applies to **every** creation path, not only MCP. That covers the portlet UI, `/execute`, and `/operations/*`. The UI and MCP must not disagree about what is a valid request.
 
-- `MAX_BATCH_COUNT = 1000` per request (per workflow step). A request above the cap is **rejected** with an error that states the limit. It is never truncated (input boundary policy).
+- `BatchSpec.MAX_COUNT = 1000` per request (per workflow step). A request above the cap is **rejected** with an error that states the limit. It is never truncated (input boundary policy).
 - The check lives where `count` is already validated: the `BatchSpec` compact constructor, which every `*BatchSpec` composes and every workflow adapter constructs, and `ResourceCommandUtil.validateCount` for `CompanyCreator`, which takes a raw `count`. No per-entry-point copies.
 - The cap is per step. A multi-step `executeWorkflow` can create more than 1000 entities in total. That is accepted: each step is still bounded, and the plan is visible via `planWorkflow` before execution.
 - The frontend count inputs may mirror the cap as a `max` attribute for UX, but the server-side check is the contract.
@@ -82,9 +82,11 @@ The `default` profile reaches our tools only through the meta tools: list, get s
 
 The profile is created by a **script in this repository** that calls Liferay's public REST endpoints, `/o/mcp/server-profiles` and `/o/mcp/server-profile-tools`. These are the same endpoints the MCP Server admin UI uses. The script:
 
-- derives the tool list from `GET /o/ldf-workflow/functions` plus the four coarse tools, so new operations need no script change;
-- is idempotent. Liferay rejects an active profile with zero tools and duplicate tool rows, so the script creates the profile inactive, upserts the tools, then activates it;
+- derives the tool list from the `ldf-workflow` tool set itself, so new operations need no script change;
+- is idempotent;
 - is the same code the integration tests use as their fixture, and is exposed to developers as a Gradle task.
+
+The pinned DXP image has no `/o/mcp/server-profile-tools` and no profile status, so the implemented sequence differs from the endpoints named here: see [Workflow API → `ldf` profile](../reference/workflow-api.md#ldf-profile).
 
 Alternatives rejected:
 
@@ -110,6 +112,8 @@ Alternatives rejected:
 - **The OpenAPI contract becomes public surface.** Renaming an `operationId` breaks any profile that pinned the tool. Operation names are treated as stable once released.
 - **`execute` returns 200 even when a step fails.** Through MCP, a failed multi-step run is reported with `isError=false` and the failure is only visible in the body. This is documented in the tool description. Changing it would break the existing UI contract.
 - **Stale tool definitions after a redeploy.** Liferay caches each tool set's OpenAPI JSON per company in a static map (`ToolSetUtil._openAPIJSONObjects`). It clears that map only when an Object definition, field, action, or relationship changes. Each profile's MCP servlet also snapshots tool schemas until that profile changes. Redeploying the bundle with a new or changed operation may therefore leave MCP clients seeing the old definitions. This directly affects the local edit → deploy → try loop. The Phase 0 spike must measure it. The fallback is to restart the container after a redeploy that changes the operation set; re-running the profile script refreshes only the servlet snapshot, not the OpenAPI cache.
-- **The profile REST endpoints belong to a beta feature too.** The provisioning script depends on `/o/mcp/server-profiles` and `/o/mcp/server-profile-tools`. If they change, the script and the integration tests break, but the bundle is unaffected. That is the reason this dependency lives in the repository and not in the bundle.
+- **The profile REST endpoints belong to a beta feature too.** The provisioning script depends on the `/o/mcp/server-profiles` endpoint. If they change, the script and the integration tests break, but the bundle is unaffected. That is the reason this dependency lives in the repository and not in the bundle.
 - **The batch cap is a behavior change for the portlet UI.** Requests above 1000 that used to be accepted are now rejected. This is intentional (one rule for every entry point) and must be noted in the release notes.
 - **Dev environment needs the feature flag.** `configs/common/portal-ext.properties` gains `feature.flag.LPD-63311=true`, and the MCP Server must be switched on in Instance Settings (or via configuration) for integration tests.
+
+Developer guide: [Use Dummy Factory from Claude Code](../guides/mcp-setup.md).

@@ -34,10 +34,6 @@ public record WorkflowStepResult(
 		items = _copyItems(items);
 		data = Map.copyOf(new LinkedHashMap<>(_nullSafeMap(data)));
 
-		if (count != items.size()) {
-			throw new IllegalArgumentException("count must match items size");
-		}
-
 		if ((count + skipped) != requested) {
 			throw new IllegalArgumentException(
 				"count + skipped must equal requested");
