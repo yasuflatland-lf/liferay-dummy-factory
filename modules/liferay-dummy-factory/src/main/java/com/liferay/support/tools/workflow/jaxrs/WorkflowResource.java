@@ -94,19 +94,8 @@ public class WorkflowResource {
 		WorkflowRequestDto workflowRequestDto) {
 
 		User user = _signedInUser(httpServletRequest);
-		List<String> operations = new ArrayList<>();
 
-		if ((workflowRequestDto != null) &&
-			(workflowRequestDto.steps() != null)) {
-
-			for (WorkflowStepDto step : workflowRequestDto.steps()) {
-				if (step != null) {
-					operations.add(step.operation());
-				}
-			}
-		}
-
-		_requirePermission(user, operations);
+		_requirePermission(user, _operations(workflowRequestDto));
 
 		ValidationResult validationResult = _validatedPlan(workflowRequestDto);
 
@@ -489,26 +478,48 @@ public class WorkflowResource {
 		);
 	}
 
+	private List<String> _operations(WorkflowRequestDto workflowRequestDto) {
+		List<String> operations = new ArrayList<>();
+
+		if ((workflowRequestDto == null) ||
+			(workflowRequestDto.steps() == null)) {
+
+			return operations;
+		}
+
+		for (WorkflowStepDto workflowStepDto : workflowRequestDto.steps()) {
+			if (workflowStepDto != null) {
+				operations.add(workflowStepDto.operation());
+			}
+		}
+
+		return operations;
+	}
+
 	private void _requirePermission(User user, Collection<String> operations) {
 		PermissionChecker permissionChecker = _permissionCheckerFactory.create(
 			user);
+
 		String reason = forbiddenReason(
 			permissionChecker.isCompanyAdmin(), permissionChecker.isOmniadmin(),
 			operations);
 
-		if (reason != null) {
-			throw new ForbiddenException(
-				Response.status(
-					Response.Status.FORBIDDEN
-				).type(
-					MediaType.APPLICATION_JSON
-				).entity(
-					Map.of(
-						"errors",
-						List.of(
-							new WorkflowValidationErrorDto("FORBIDDEN", "/", reason)))
-				).build());
+		if (reason == null) {
+			return;
 		}
+
+		throw new ForbiddenException(
+			Response.status(
+				Response.Status.FORBIDDEN
+			).entity(
+				Map.of(
+					"errors",
+					List.of(
+						new WorkflowValidationErrorDto(
+							"FORBIDDEN", "/", reason)))
+			).type(
+				MediaType.APPLICATION_JSON
+			).build());
 	}
 
 	private User _signedInUser(HttpServletRequest httpServletRequest) {

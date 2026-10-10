@@ -8,6 +8,7 @@ import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -40,12 +41,16 @@ public class CompanyResourceCommand extends BaseMVCResourceCommand {
 			resourceRequest, resourceResponse, _portal, _log,
 			"Failed to create companies",
 			(context, data, responseJson) -> {
-				ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
+				ThemeDisplay themeDisplay =
+					(ThemeDisplay)resourceRequest.getAttribute(
+						WebKeys.THEME_DISPLAY);
 
-				if (!themeDisplay.getPermissionChecker().isOmniadmin()) {
+				PermissionChecker permissionChecker =
+					themeDisplay.getPermissionChecker();
+
+				if (!permissionChecker.isOmniadmin()) {
 					throw new PrincipalException.MustBeOmniadmin(
-						themeDisplay.getPermissionChecker());
+						permissionChecker);
 				}
 
 				int count = GetterUtil.getInteger(data.getString("count"));

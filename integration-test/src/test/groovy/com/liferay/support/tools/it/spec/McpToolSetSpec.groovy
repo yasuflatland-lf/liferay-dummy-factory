@@ -229,8 +229,7 @@ class McpToolSetSpec extends BaseLiferaySpec {
 			"authorization error missing: ${response}"
 
 		when:
-		List roleNames = (jsonwsGet(
-			"role/get-roles/company-id/${companyId}/types/1") as List)*.name
+		List roleNames = _regularRoleNames()
 
 		then:
 		assert roleNames.contains('Administrator') :
@@ -351,8 +350,7 @@ class McpToolSetSpec extends BaseLiferaySpec {
 			"authorization error missing: ${response}"
 
 		when:
-		List roleNames = (jsonwsGet(
-			"role/get-roles/company-id/${companyId}/types/1") as List)*.name
+		List roleNames = _regularRoleNames()
 
 		then:
 		assert roleNames.contains('Administrator') :
@@ -431,6 +429,11 @@ class McpToolSetSpec extends BaseLiferaySpec {
 		finally {
 			conn.disconnect()
 		}
+	}
+
+	private List _regularRoleNames() {
+		return (jsonwsGet(
+			"role/get-roles/company-id/${companyId}/types/1") as List)*.name
 	}
 
 	private Map _callTool(String name, Map<String, Object> arguments) {
