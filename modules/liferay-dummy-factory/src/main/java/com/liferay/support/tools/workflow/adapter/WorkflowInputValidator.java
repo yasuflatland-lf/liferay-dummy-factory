@@ -1,5 +1,7 @@
 package com.liferay.support.tools.workflow.adapter;
 
+import com.liferay.support.tools.service.BatchSpec;
+
 public final class WorkflowInputValidator {
 
 	public static String normalizeText(String value, String defaultValue) {
@@ -11,10 +13,7 @@ public final class WorkflowInputValidator {
 	}
 
 	public static int requireCount(int count) {
-		if (count <= 0) {
-			throw new IllegalArgumentException(
-				"count must be greater than 0");
-		}
+		BatchSpec.validateCount(count);
 
 		return count;
 	}

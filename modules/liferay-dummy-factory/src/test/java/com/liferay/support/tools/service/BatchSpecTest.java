@@ -55,4 +55,31 @@ class BatchSpecTest {
 		assertEquals("baseName is required", exception.getMessage());
 	}
 
+	@Test
+	void maxCountIsAccepted() {
+		BatchSpec spec = new BatchSpec(1000, "a");
+
+		assertEquals(1000, spec.count());
+	}
+
+	@Test
+	void aboveMaxCountThrows() {
+		IllegalArgumentException exception = assertThrows(
+			IllegalArgumentException.class,
+			() -> new BatchSpec(1001, "a"));
+
+		assertEquals(
+			"count must be less than or equal to 1000", exception.getMessage());
+	}
+
+	@Test
+	void validateCountRejectsAboveMax() {
+		IllegalArgumentException exception = assertThrows(
+			IllegalArgumentException.class,
+			() -> BatchSpec.validateCount(1001));
+
+		assertEquals(
+			"count must be less than or equal to 1000", exception.getMessage());
+	}
+
 }

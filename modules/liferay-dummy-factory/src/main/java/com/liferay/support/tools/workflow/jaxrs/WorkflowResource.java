@@ -1,10 +1,16 @@
 package com.liferay.support.tools.workflow.jaxrs;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.support.tools.service.CategoryCreator;
+import com.liferay.support.tools.service.VocabularyCreator;
 import com.liferay.support.tools.workflow.DefaultWorkflowFunction;
 import com.liferay.support.tools.workflow.MapWorkflowFunctionRegistry;
 import com.liferay.support.tools.workflow.WorkflowEngine;
 import com.liferay.support.tools.workflow.WorkflowErrorPolicy;
+import com.liferay.support.tools.workflow.WorkflowExecutionResult;
+import com.liferay.support.tools.workflow.WorkflowExecutionStatus;
 import com.liferay.support.tools.workflow.WorkflowFunction;
 import com.liferay.support.tools.workflow.WorkflowFunctionDescriptor;
 import com.liferay.support.tools.workflow.WorkflowFunctionFactory;
@@ -18,8 +24,6 @@ import com.liferay.support.tools.workflow.WorkflowStepDefinition;
 import com.liferay.support.tools.workflow.WorkflowValidationError;
 import com.liferay.support.tools.workflow.adapter.taxonomy.CategoryCreateWorkflowOperationAdapter;
 import com.liferay.support.tools.workflow.adapter.taxonomy.VocabularyCreateWorkflowOperationAdapter;
-import com.liferay.support.tools.service.CategoryCreator;
-import com.liferay.support.tools.service.VocabularyCreator;
 import com.liferay.support.tools.workflow.dto.WorkflowExecuteResponseDto;
 import com.liferay.support.tools.workflow.dto.WorkflowOnErrorDto;
 import com.liferay.support.tools.workflow.dto.WorkflowParameterDto;
@@ -34,17 +38,23 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -53,6 +63,8 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 
 @Component(
 	property = {
+		"openapi.resource=true",
+		"openapi.resource.path=/ldf-workflow",
 		"osgi.jaxrs.application.select=(osgi.jaxrs.name=ldf-workflow)",
 		"osgi.jaxrs.resource=true"
 	},
@@ -63,6 +75,9 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 @Produces(MediaType.APPLICATION_JSON)
 public class WorkflowResource {
 
+	private static final String _BASIC_CHALLENGE =
+		"Basic realm=\"PortalRealm\"";
+
 	private static final Pattern _STEP_ID_PATTERN = Pattern.compile(
 		"[A-Za-z0-9_-]+");
 
@@ -72,6 +87,8 @@ public class WorkflowResource {
 		@Context HttpServletRequest httpServletRequest,
 		WorkflowRequestDto workflowRequestDto) {
 
+		User user = _signedInUser(httpServletRequest);
+
 		ValidationResult validationResult = _validatedPlan(workflowRequestDto);
 
 		if (!validationResult.errors().isEmpty()) {
@@ -80,9 +97,104 @@ public class WorkflowResource {
 
 		return new WorkflowExecuteResponseDto(
 			_workflowEngine().execute(
-				validationResult.plan(), _currentUserId(httpServletRequest),
-				_currentCompanyId(httpServletRequest)),
+				validationResult.plan(), user.getUserId(), user.getCompanyId()),
 			List.of());
+	}
+
+	@POST
+	@Path("operations/{operation}")
+	public Response executeOperation(
+		@Context HttpServletRequest httpServletRequest,
+		@PathParam("operation") String operation,
+		Map<String, Object> parameters) {
+
+		User user = _signedInUser(httpServletRequest);
+
+		OperationOutcome outcome = executeOperation(
+			user.getUserId(), user.getCompanyId(), operation, parameters);
+
+		return Response.status(
+			outcome.status()
+		).entity(
+			outcome.body()
+		).type(
+			MediaType.APPLICATION_JSON
+		).build();
+	}
+
+	OperationOutcome executeOperation(
+		long userId, long companyId, String operation,
+		Map<String, Object> parameters) {
+
+		if (parameters == null) {
+			parameters = Map.of();
+		}
+
+		WorkflowFunction workflowFunction = _workflowFunctions().get(operation);
+
+		if (!(workflowFunction instanceof
+				DefaultWorkflowFunction defaultWorkflowFunction) ||
+			(WorkflowOpenAPIDocumentBuilder.operationIdOf(operation) == null)) {
+
+			return new OperationOutcome(
+				404,
+				Map.of(
+					"errors",
+					List.of(
+						new WorkflowValidationErrorDto(
+							"OPERATION_UNKNOWN", "/operation",
+							"Unknown operation: " + operation))));
+		}
+
+		List<String> parameterNames =
+			defaultWorkflowFunction.descriptor().parameters(
+			).stream(
+			).map(
+				WorkflowFunctionParameter::name
+			).toList();
+		List<WorkflowValidationErrorDto> errors = parameters.keySet().stream(
+		).filter(
+			key -> !parameterNames.contains(key)
+		).sorted(
+		).map(
+			key -> new WorkflowValidationErrorDto(
+				"UNKNOWN_PARAMETER",
+				"/" + key.replace("~", "~0").replace("/", "~1"),
+				"Unknown parameter: " + key)
+		).toList();
+
+		if (!errors.isEmpty()) {
+			return new OperationOutcome(400, Map.of("errors", errors));
+		}
+
+		List<WorkflowParameterDto> params = new ArrayList<>();
+
+		for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+			params.add(
+				new WorkflowParameterDto(entry.getKey(), entry.getValue(), null));
+		}
+
+		WorkflowRequestDto request = new WorkflowRequestDto(
+			"1.0", "operation-" + operation, Map.of(),
+			List.of(
+				new WorkflowStepDto(
+					"step", operation, UUID.randomUUID().toString(), params, null)));
+		ValidationResult validationResult = _validatedPlan(request);
+
+		if (!validationResult.errors().isEmpty()) {
+			return new OperationOutcome(
+				400, Map.of("errors", validationResult.errors()));
+		}
+
+		WorkflowExecutionResult execution = _workflowEngine().execute(
+			validationResult.plan(), userId, companyId);
+
+		return new OperationOutcome(
+			(execution.status() == WorkflowExecutionStatus.SUCCEEDED) ? 200 : 422,
+			execution.steps().get(0));
+	}
+
+	record OperationOutcome(int status, Object body) {
 	}
 
 	@GET
@@ -101,6 +213,26 @@ public class WorkflowResource {
 		document.put("referenceSyntax", _referenceSyntax());
 
 		return Map.copyOf(document);
+	}
+
+	@GET
+	@Path("openapi.json")
+	public Response getOpenAPI(
+		@Context HttpServletRequest httpServletRequest,
+		@QueryParam("type") String type, @Context UriInfo uriInfo) {
+
+		return Response.ok(
+			WorkflowOpenAPIDocumentBuilder.build(
+				_schemaDocument(),
+				_workflowFunctions().values().stream(
+				).filter(
+					DefaultWorkflowFunction.class::isInstance
+				).map(
+					DefaultWorkflowFunction.class::cast
+				).map(
+					DefaultWorkflowFunction::descriptor
+				).toList())
+		).build();
 	}
 
 	@POST
@@ -148,22 +280,6 @@ public class WorkflowResource {
 			workflowOperationAdapter) {
 
 		_spiWorkflowOperationAdapters.remove(workflowOperationAdapter.operationName());
-	}
-
-	private long _currentCompanyId(HttpServletRequest httpServletRequest) {
-		if ((_portal == null) || (httpServletRequest == null)) {
-			return 0L;
-		}
-
-		return _portal.getCompanyId(httpServletRequest);
-	}
-
-	private long _currentUserId(HttpServletRequest httpServletRequest) {
-		if ((_portal == null) || (httpServletRequest == null)) {
-			return 0L;
-		}
-
-		return _portal.getUserId(httpServletRequest);
 	}
 
 	private Map<String, Object> _functionDocument(WorkflowFunction workflowFunction) {
@@ -336,6 +452,26 @@ public class WorkflowResource {
 			(map, entry) -> map.put(entry.getKey(), entry.getValue()),
 			Map::putAll
 		);
+	}
+
+	private User _signedInUser(HttpServletRequest httpServletRequest) {
+		User user;
+
+		try {
+			user = _portal.getUser(httpServletRequest);
+		}
+		catch (PortalException portalException) {
+			throw new NotAuthorizedException(
+				portalException.getMessage(), _BASIC_CHALLENGE);
+		}
+
+		if ((user == null) || user.isGuestUser()) {
+			throw new NotAuthorizedException(
+				"Executing a workflow requires a signed-in user.",
+				_BASIC_CHALLENGE);
+		}
+
+		return user;
 	}
 
 	private void _addFallbackWorkflowFunction(

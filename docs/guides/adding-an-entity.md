@@ -32,6 +32,7 @@ The end-to-end checklist for a new kind of dummy data (here: a hypothetical `Wid
 - [ ] A descriptor for `widget.create` in `WorkflowFunctionDescriptors` (parameters, types, required flags, descriptions, defaults).
 - [ ] `WidgetCreateWorkflowOperationAdapter` (`service = WorkflowOperationAdapter.class`) building the same spec as the resource command and returning `WorkflowResultNormalizer.normalize(...)`.
 - [ ] Optional parameters via `WorkflowParameterValues.optional*`.
+- [ ] An operationId for `widget.create` in `WorkflowOpenAPIDocumentBuilder`'s fixed table; `WorkflowOperationIdCoverageTest` fails otherwise.
 - [ ] Item fields identical, in the same order, to the resource command's `toJson` ([parity](../reference/workflow-api.md#rc--workflow-adapter-field-parity)).
 
 ## 5. Tests
@@ -43,6 +44,6 @@ The end-to-end checklist for a new kind of dummy data (here: a hypothetical `Wid
 
 ## 6. Documentation
 
-- [ ] Operations and parity tables in [workflow-api.md](../reference/workflow-api.md).
+- [ ] Operations, parity and [per-operation tool](../reference/workflow-api.md#per-operation-tools) tables in [workflow-api.md](../reference/workflow-api.md).
 - [ ] The entity table in [installation.md](installation.md#4-create-data) and the feature list in the [README](../../README.md).
 - [ ] `node scripts/check-docs.mjs` passes.

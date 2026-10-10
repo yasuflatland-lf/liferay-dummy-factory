@@ -14,23 +14,14 @@ public class WorkflowFunctionFactory {
 			_descriptorOrGeneric(
 				adapter.operationName(), adapter.getClass().getSimpleName()),
 			request -> {
-				WorkflowParameterValues values = _values(request);
-
 				return _invoke(
 					() -> _toStepResult(
 						adapter.execute(
 							new WorkflowExecutionContext(
-								_userId(request, values),
-								_companyId(request, values)),
+								_userId(request),
+								_runtimeCompanyId(request.context())),
 							request.parameters())));
 			});
-	}
-
-	private static long _companyId(
-		WorkflowStepExecutionRequest request, WorkflowParameterValues values) {
-
-		return values.optionalLong(
-			"companyId", _runtimeCompanyId(request.context()));
 	}
 
 	private static WorkflowFunctionDescriptor _descriptorOrGeneric(
@@ -96,11 +87,8 @@ public class WorkflowFunctionFactory {
 			result.data());
 	}
 
-	private static long _userId(
-		WorkflowStepExecutionRequest request, WorkflowParameterValues values) {
-
-		long userId = values.optionalLong(
-			"userId", _runtimeUserId(request.context()));
+	private static long _userId(WorkflowStepExecutionRequest request) {
+		long userId = _runtimeUserId(request.context());
 
 		if (userId <= 0) {
 			throw new IllegalArgumentException("userId is required");
@@ -113,12 +101,6 @@ public class WorkflowFunctionFactory {
 
 		WorkflowStepResult get() throws Throwable;
 
-	}
-
-	private static WorkflowParameterValues _values(
-		WorkflowStepExecutionRequest request) {
-
-		return new WorkflowParameterValues(request.parameters());
 	}
 
 	private static final Map<String, WorkflowFunctionDescriptor> _DESCRIPTORS =

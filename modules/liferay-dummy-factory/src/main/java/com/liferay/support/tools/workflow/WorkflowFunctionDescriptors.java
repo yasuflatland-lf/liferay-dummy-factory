@@ -209,9 +209,6 @@ final class WorkflowFunctionDescriptors {
 					parameter(
 						"groupId", "long", true, "Target site group id.",
 						null),
-					parameter(
-						"userId", "long", false,
-						"Override execution user id.", "current user"),
 					parameter("content", "string", false, "Body content.", ""),
 					parameter("subtitle", "string", false, "Blog subtitle.", ""),
 					parameter(
@@ -355,10 +352,7 @@ final class WorkflowFunctionDescriptors {
 						null),
 					parameter(
 						"description", "string", true,
-						"Category description.", null),
-					parameter(
-						"userId", "long", false,
-						"Override execution user id.", "current user")),
+						"Category description.", null)),
 				"WorkflowStepResult"));
 	}
 
@@ -378,8 +372,9 @@ final class WorkflowFunctionDescriptors {
 					parameter("body", "string", true, "Reply body.", null),
 					parameter("format", "string", false, "Reply format.", "html"),
 					parameter(
-						"userId", "long", false,
-						"Override execution user id.", "current user")),
+						"fakerEnable", "boolean", false,
+						"Use faker profile generation.", false),
+					parameter("locale", "string", false, "Locale id.", "en_US")),
 				"WorkflowStepResult"));
 	}
 
@@ -404,10 +399,7 @@ final class WorkflowFunctionDescriptors {
 						"categoryId", "long", false,
 						"Target category id. Use 0 for root.", 0),
 					parameter("body", "string", true, "Thread body.", null),
-					parameter("format", "string", false, "Thread body format.", "html"),
-					parameter(
-						"userId", "long", false,
-						"Override execution user id.", "current user")),
+					parameter("format", "string", false, "Thread body format.", "html")),
 				"WorkflowStepResult"));
 	}
 
@@ -430,10 +422,7 @@ final class WorkflowFunctionDescriptors {
 						null),
 					parameter(
 						"vocabularyId", "long", true,
-						"Target vocabulary id.", null),
-					parameter(
-						"userId", "long", false,
-						"Override execution user id.", "current user")),
+						"Target vocabulary id.", null)),
 				"WorkflowStepResult"));
 	}
 
@@ -453,10 +442,7 @@ final class WorkflowFunctionDescriptors {
 						null),
 					parameter(
 						"groupId", "long", true, "Target site group id.",
-						null),
-					parameter(
-						"userId", "long", false,
-						"Override execution user id.", "current user")),
+						null)),
 				"WorkflowStepResult"));
 	}
 

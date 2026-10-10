@@ -115,6 +115,34 @@ class WebContentBatchSpecTest {
 	}
 
 	@Test
+	void totalAcrossSitesAtCapAccepted() {
+		WebContentBatchSpec spec = _builder().batch(
+			new BatchSpec(500, "Article")
+		).groupIds(
+			new long[] {1L, 2L}
+		).build();
+
+		assertEquals(500, spec.batch().count());
+		assertEquals(2, spec.groupIds().length);
+	}
+
+	@Test
+	void totalAcrossSitesAboveCapRejected() {
+		IllegalArgumentException exception = assertThrows(
+			IllegalArgumentException.class,
+			() -> _builder().batch(
+				new BatchSpec(600, "Article")
+			).groupIds(
+				new long[] {1L, 2L}
+			).build());
+
+		assertEquals(
+			"count multiplied by the number of groupIds must be less than " +
+				"or equal to 1000",
+			exception.getMessage());
+	}
+
+	@Test
 	void defaultsForDummyMode() {
 		WebContentBatchSpec spec = new WebContentBatchSpec(
 			new BatchSpec(1, "Dummy"),

@@ -15,6 +15,6 @@ New ADR: copy [`template.md`](template.md) to `NNNN-short-title.md` with the nex
 | 0007 | — | Number not used |
 | [0008](0008-dxp-2026-migration.md) | Migrate to Liferay DXP 2026 | Accepted |
 | [0009](0009-unified-batch-result.md) | Unify all batch Creators on `BatchResult<T>` | Accepted |
-| [0010](0010-mcp-via-liferay-mcp-server.md) | Expose data creation through Liferay's MCP Server | Proposed |
+| [0010](0010-mcp-via-liferay-mcp-server.md) | Expose data creation through Liferay's MCP Server | Accepted |
 
 Version numbers, file paths and plugin versions inside an ADR describe the moment of the decision. For the current state, follow the links to `docs/reference/` and `docs/architecture/`.

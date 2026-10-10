@@ -1,6 +1,9 @@
 package com.liferay.support.tools.workflow.adapter.content;
 
+import com.liferay.support.tools.service.BatchSpec;
+
 import java.lang.reflect.Array;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,7 +30,7 @@ final class WorkflowParameterValues {
 		}
 
 		if (value instanceof Number number) {
-			return number.intValue();
+			return _asInt(name, number);
 		}
 
 		if (value instanceof String string) {
@@ -117,10 +120,7 @@ final class WorkflowParameterValues {
 	public BatchInput requireBatchInput() {
 		int count = optionalInt("count", -1);
 
-		if (count <= 0) {
-			throw new IllegalArgumentException(
-				"count must be greater than 0");
-		}
+		BatchSpec.validateCount(count);
 
 		String baseName = optionalString("baseName", null);
 
@@ -171,6 +171,15 @@ final class WorkflowParameterValues {
 	}
 
 	public record BatchInput(int count, String baseName) {
+	}
+
+	private int _asInt(String name, Number number) {
+		try {
+			return new BigDecimal(number.toString()).intValueExact();
+		}
+		catch (ArithmeticException | NumberFormatException exception) {
+			throw _invalid(name, "an integer");
+		}
 	}
 
 	private long _asLong(String name, Object value) {

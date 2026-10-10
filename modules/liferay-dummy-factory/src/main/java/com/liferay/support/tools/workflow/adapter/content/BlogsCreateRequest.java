@@ -12,15 +12,9 @@ record BlogsCreateRequest(long userId, BlogsBatchSpec batchSpec) {
 
 		WorkflowParameterValues.BatchInput batchInput =
 			workflowParameterValues.requireBatchInput();
-		long effectiveUserId = workflowParameterValues.optionalLong(
-			"userId", workflowExecutionContext.userId());
-
-		if (effectiveUserId <= 0) {
-			throw new IllegalArgumentException("userId must be positive");
-		}
 
 		return new BlogsCreateRequest(
-			effectiveUserId,
+			workflowExecutionContext.userId(),
 			new BlogsBatchSpec(
 				new BatchSpec(batchInput.count(), batchInput.baseName()),
 				workflowParameterValues.requirePositiveLong("groupId"),

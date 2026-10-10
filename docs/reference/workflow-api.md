@@ -10,10 +10,16 @@ The JAX-RS application at `/o/ldf-workflow` that runs multi-step workflows. This
 | `GET /o/ldf-workflow/schema` | JSON Schema of the request; includes the current `operation` enum and the `from` syntax |
 | `POST /o/ldf-workflow/plan` | Validate a workflow without running it |
 | `POST /o/ldf-workflow/execute` | Validate, then run the steps |
+| `POST /o/ldf-workflow/operations/{operation}` | Run one operation with literal parameters — see [per-operation tools](#per-operation-tools) |
+| `GET /o/ldf-workflow/openapi.json` | OpenAPI 3.1.0 document, JSON only — see [MCP tool set](#mcp-tool-set) |
 
 Registration uses the OSGi JAX-RS whiteboard: `osgi.jaxrs.application.base=/o/ldf-workflow`, `osgi.jaxrs.name=ldf-workflow`, and `osgi.jaxrs.application.select=(osgi.jaxrs.name=ldf-workflow)` on the resource.
 
+### Authentication
+
 Browser callers must send the session cookie **and** a CSRF token ([why](../architecture/frontend.md#server-communication)). Scripts authenticate with Basic Auth.
+
+`execute` and `operations/{operation}` reject a Guest (or unresolvable) user with HTTP 401 and a `Basic realm="PortalRealm"` challenge before they validate or run anything, and always run the steps as the signed-in user and that user's company. Step parameters cannot override `userId` or `companyId`: `/execute` ignores these identity parameters, while `operations/{operation}` rejects them as `UNKNOWN_PARAMETER`. The guard lives in `WorkflowResource`, not in the application or a Basic Auth config, so `functions`, `schema`, `plan` and `openapi.json` stay anonymous. Liferay MCP fetches `openapi.json` without credentials ([Liferay MCP Server](dxp-runtime-config.md#liferay-mcp-server)), and `plan` only validates. An MCP invocation still passes the guard: the internal forward carries the MCP user as the `USER_ID` request attribute. `McpToolSetSpec` locks the 401.
 
 ## Request
 
@@ -98,6 +104,7 @@ Each step result follows the [batch response contract](../architecture/backend.m
 | `mbThread.create` | message-board threads | needs `groupId > 0` |
 | `mbReply.create` | replies | requires `count`, `threadId`, `body`; has **no** `baseName` |
 
+- **`count` is capped per step** and larger values are rejected, never truncated; for `webContent.create` the cap applies to `count × groupIds.length` — see the [count cap](../architecture/backend.md#parameters-batchspec-and-batchspec).
 - **`groupId: 0` is not "the default site".** Site-scoped operations reject it. Chain a `site.create` step and reference `steps.<id>.items[0].groupId`.
 - **Optional parameters** are read with the `WorkflowParameterValues.optional*` helpers, which return the documented default when the parameter is absent. Required parameters use the non-optional readers, which fail on absence. Adapters must not re-implement this with `has(...)` checks.
 - **Taxonomy startup fallback.** If the OSGi registration of the `vocabulary.create` / `category.create` adapters is momentarily missing, `WorkflowResource` registers those two operations directly from the Creator services so `/functions` and `/plan` keep working. The fallback is limited to these two operations.
@@ -134,7 +141,55 @@ Each sample is one JSON file under `integration-test/src/test/resources/workflow
 
 Adding a sample: create the fixture first, then the TS copy, then extend the parity test.
 
+## MCP tool set
+
+`GET /openapi.json` turns this application into a Liferay MCP Server tool set (design: [ADR-0010](../adr/0010-mcp-via-liferay-mcp-server.md); container setup: [Liferay MCP Server](dxp-runtime-config.md#liferay-mcp-server)).
+
+- **Publication**: `WorkflowResource` carries `openapi.resource=true` and `openapi.resource.path=/ldf-workflow` and exposes `getOpenAPI(HttpServletRequest, String, UriInfo)`, which Liferay looks up by reflection. Keep that exact signature. The document is built by `WorkflowOpenAPIDocumentBuilder` from the same request schema `/schema` returns, with `$schema` and `$id` removed, plus the registered function descriptors for the typed per-operation request schemas. There is no `api.version` property and no version path segment.
+- **Tool set name**: `ldf-workflow`.
+- **Tools** (`operationId`s): `getWorkflowFunctions` (`GET /functions`), `getWorkflowSchema` (`GET /schema`), `planWorkflow` (`POST /plan`), `executeWorkflow` (`POST /execute`), plus one tool per operation ([per-operation tools](#per-operation-tools)). **The operationIds are public API: do not rename them.** A rename breaks every MCP profile that pinned the tool. `WorkflowOpenAPIDocumentBuilderTest.operationIdsAreStable` locks the four coarse names; `McpToolSetSpec` locks all 18 names.
+- **Invocation through the `default` profile** uses the meta tool `postToolSetToolSetNameToolInvoke`. A tool with a JSON request body takes the workflow request nested twice under `body`: `{"toolSetName": "ldf-workflow", "toolName": "planWorkflow", "body": {"body": <workflow request>}}`. The outer `body` is the meta tool's payload. The inner `body` is how Liferay maps an operation's request body into tool input. Tools without a request body take `"body": {}`.
+- **Error mapping**: Liferay reports `isError=true` only for HTTP status >= 300. `/plan` and `/execute` return 200 even on validation errors or a failed step, so an MCP caller must read `errors` and `execution.status` in the body. Per-operation tools do surface failures as `isError=true` because they return HTTP 400, 404 or 422.
+- **Stale definitions after a redeploy (measured on the pinned DXP image)**: after changing a `summary` in the builder and redeploying the JAR into a running container, `/o/ldf-workflow/openapi.json` served the new text right away, but `getToolSetToolSetNameToolSummariesPage` and `getToolSetToolSetNameTool` kept the old text until the container was restarted. Liferay caches each tool set's OpenAPI document per company in memory. **Workaround: restart the container** (`docker restart <container>`; verified) after a redeploy that changes the OpenAPI document.
+- **Regression guard**: `McpToolSetSpec`.
+
+### Per-operation tools
+
+Each per-operation tool calls `POST /operations/<operation>` with a plain parameter object (for example `{"count": 3, "baseName": "mcpuser"}`). It accepts **literal values only, no `from`**. It runs one step through the workflow engine and returns the step result directly: `{stepId, operation, status, result: {success, requested, count, skipped, items, error}, error}`. Through the MCP meta tool, nest the parameter object under `body.body` as for the coarse POST tools.
+
+This table is the single source of truth for per-operation tool names. `WorkflowOpenAPIDocumentBuilder`'s fixed operationId table must match it, and `WorkflowOperationIdCoverageTest` checks coverage and uniqueness.
+
+| Workflow operation | operationId |
+|---|---|
+| `blogs.create` | `createBlogsEntries` |
+| `category.create` | `createCategories` |
+| `company.create` | `createCompanies` |
+| `document.create` | `createDocuments` |
+| `layout.create` | `createLayouts` |
+| `mbCategory.create` | `createMBCategories` |
+| `mbReply.create` | `createMBReplies` |
+| `mbThread.create` | `createMBThreads` |
+| `organization.create` | `createOrganizations` |
+| `role.create` | `createRoles` |
+| `site.create` | `createSites` |
+| `user.create` | `createUsers` |
+| `vocabulary.create` | `createVocabularies` |
+| `webContent.create` | `createWebContents` |
+
+HTTP status contract:
+
+| Status | Meaning | Body |
+|---|---|---|
+| 200 | Step succeeded | Step result with `status: SUCCEEDED` |
+| 400 | Request or plan validation failed (for example a missing required parameter) | `errors` list |
+| 400 | Body contains keys absent from the operation descriptor, including `userId` and `companyId` | `errors` list with `UNKNOWN_PARAMETER`, one per unknown key in sorted order |
+| 401 | Guest or unresolvable user; rejected before validation or execution | Authentication challenge |
+| 404 | Operation is unknown or has no mapped tool | `errors` list with `OPERATION_UNKNOWN` |
+| 422 | Step failed or adapter threw an exception, including invalid values such as a count out of range | Step result with `status: FAILED` |
+
+The [count cap](../architecture/backend.md#parameters-batchspec-and-batchspec) is checked during adapter execution, so `count: 0` and a count above the cap return 422, while an omitted required `count` returns 400.
+
 ## Limitations
 
 - Sequential execution only; `FAIL_FAST` only.
-- The JSON Schema describes the generic step shape. Per-operation required parameters are exposed through `/functions` and enforced at validation time, not encoded as schema branches.
+- The JSON Schema describes the generic step shape. Per-operation required parameters are exposed through `/functions` and enforced at validation time, not encoded as schema branches. Typed per-operation request schemas exist only in `openapi.json`, for the [per-operation tools](#per-operation-tools).
