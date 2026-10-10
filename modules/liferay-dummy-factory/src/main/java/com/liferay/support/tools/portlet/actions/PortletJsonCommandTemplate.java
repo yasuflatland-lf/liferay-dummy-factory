@@ -55,18 +55,9 @@ class PortletJsonCommandTemplate {
 				responseJson = handledResponseJson;
 			}
 		}
-		catch (IllegalArgumentException illegalArgumentException) {
-			ResourceCommandUtil.setErrorResponse(
-				responseJson, illegalArgumentException);
-		}
-		catch (PrincipalException principalException) {
-			permissionDenied(
-				resourceRequest, responseJson, log, principalException);
-		}
 		catch (Throwable throwable) {
-			log.error(errorLogMessage, throwable);
-
-			ResourceCommandUtil.setErrorResponse(responseJson, throwable);
+			handleFailure(
+				resourceRequest, responseJson, log, errorLogMessage, throwable);
 		}
 		finally {
 			if (progressStarted) {
@@ -76,6 +67,32 @@ class PortletJsonCommandTemplate {
 
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse, responseJson);
+	}
+
+	/**
+	 * Deliberate authorization denials become a WARN without a stack trace and a
+	 * localized message. Any other PrincipalException is unexpected and stays on
+	 * the ERROR path with its stack trace.
+	 */
+	static void handleFailure(
+		ResourceRequest resourceRequest, JSONObject responseJson, Log log,
+		String errorLogMessage, Throwable throwable) {
+
+		if ((throwable instanceof PrincipalException.MustBeCompanyAdmin) ||
+			(throwable instanceof PrincipalException.MustBeOmniadmin)) {
+
+			permissionDenied(
+				resourceRequest, responseJson, log,
+				(PrincipalException)throwable);
+
+			return;
+		}
+
+		if (!(throwable instanceof IllegalArgumentException)) {
+			log.error(errorLogMessage, throwable);
+		}
+
+		ResourceCommandUtil.setErrorResponse(responseJson, throwable);
 	}
 
 	static void permissionDenied(

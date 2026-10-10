@@ -1,6 +1,7 @@
 package com.liferay.support.tools.portlet.actions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.liferay.portal.kernel.json.JSONObject;
@@ -9,7 +10,6 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
-import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -33,30 +33,82 @@ class PortletJsonCommandTemplateTest {
 	@Test
 	void companyAdminDenialIsLocalizedAndLoggedWithoutStackTrace() {
 		_assertDenial(
-			new PrincipalException("denied"), "/ldf/user",
+			new PrincipalException.MustBeCompanyAdmin(42L), "/ldf/user",
 			"Creating data requires a company administrator.");
 	}
 
 	@Test
+	void illegalArgumentIsReturnedWithoutLogging() {
+		List<String> logCalls = new ArrayList<>();
+
+		Map<String, Object> response = _handleFailure(
+			new IllegalArgumentException("count must be positive"), logCalls);
+
+		assertEquals(
+			Map.of("success", false, "error", "count must be positive"),
+			response);
+		assertEquals(List.of(), logCalls);
+	}
+
+	@Test
 	void omniadminDenialIsLocalizedAndLoggedWithoutStackTrace() {
-		PermissionChecker permissionChecker = _proxy(
-			PermissionChecker.class,
-			(proxy, method, args) -> {
-				if (method.getReturnType() == long.class) {
-					return 42L;
-				}
-
-				return false;
-			});
-
 		_assertDenial(
-			new PrincipalException.MustBeOmniadmin(permissionChecker),
-			"/ldf/company", "Creating companies requires an omniadmin.");
+			new PrincipalException.MustBeOmniadmin(42L), "/ldf/company",
+			"Creating companies requires an omniadmin.");
+	}
+
+	@Test
+	void otherPrincipalExceptionStaysOnTheErrorPath() {
+		_assertError(
+			new PrincipalException.MustHavePermission(42L, "ADD_ENTRY"));
+	}
+
+	@Test
+	void unexpectedFailureIsLoggedWithStackTrace() {
+		_assertError(new RuntimeException("boom"));
 	}
 
 	private void _assertDenial(
 		PrincipalException principalException, String command,
 		String expectedMessage) {
+
+		List<String> logCalls = new ArrayList<>();
+
+		Map<String, Object> response = _handleFailure(
+			principalException, command, logCalls);
+
+		assertEquals(
+			Map.of("success", false, "error", expectedMessage), response);
+		assertEquals(1, logCalls.size());
+
+		String warning = logCalls.get(0);
+
+		assertTrue(warning.startsWith("warn:"), warning);
+		assertTrue(warning.contains("userId=42"), warning);
+		assertTrue(warning.contains("command=" + command), warning);
+		assertTrue(
+			warning.contains("reason=" + principalException.getMessage()),
+			warning);
+	}
+
+	private void _assertError(Throwable throwable) {
+		List<String> logCalls = new ArrayList<>();
+
+		Map<String, Object> response = _handleFailure(throwable, logCalls);
+
+		assertEquals(
+			Map.of("success", false, "error", throwable.getMessage()), response);
+		assertEquals(List.of("error:" + _ERROR_LOG_MESSAGE), logCalls);
+	}
+
+	private Map<String, Object> _handleFailure(
+		Throwable throwable, List<String> logCalls) {
+
+		return _handleFailure(throwable, "/ldf/user", logCalls);
+	}
+
+	private Map<String, Object> _handleFailure(
+		Throwable throwable, String command, List<String> logCalls) {
 
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
@@ -98,15 +150,19 @@ class PortletJsonCommandTemplateTest {
 				return proxy;
 			});
 
-		List<String> warnings = new ArrayList<>();
-
 		Log log = _proxy(
 			Log.class,
 			(proxy, method, args) -> {
-				assertEquals("warn", method.getName());
-				assertEquals(1, args.length);
+				if (method.getName().equals("warn")) {
+					assertEquals(1, args.length);
+				}
+				else {
+					assertEquals("error", method.getName());
+					assertEquals(2, args.length);
+					assertSame(throwable, args[1]);
+				}
 
-				warnings.add((String)args[0]);
+				logCalls.add(method.getName() + ":" + args[0]);
 
 				return null;
 			});
@@ -122,18 +178,14 @@ class PortletJsonCommandTemplateTest {
 					(proxy, method, args) -> ((ResourceBundle)args[0]).getString(
 						(String)args[1])));
 
-			PortletJsonCommandTemplate.permissionDenied(
-				resourceRequest, responseJson, log, principalException);
+			PortletJsonCommandTemplate.handleFailure(
+				resourceRequest, responseJson, log, _ERROR_LOG_MESSAGE, throwable);
 		}
 		finally {
 			languageUtil.setLanguage(originalLanguage);
 		}
 
-		assertEquals(
-			Map.of("success", false, "error", expectedMessage), response);
-		assertEquals(1, warnings.size());
-		assertTrue(warnings.get(0).contains("userId=42"));
-		assertTrue(warnings.get(0).contains("command=" + command));
+		return response;
 	}
 
 	private static <T> T _proxy(Class<T> type, InvocationHandler handler) {
@@ -141,5 +193,7 @@ class PortletJsonCommandTemplateTest {
 			Proxy.newProxyInstance(
 				type.getClassLoader(), new Class<?>[] {type}, handler));
 	}
+
+	private static final String _ERROR_LOG_MESSAGE = "Failed to create users";
 
 }

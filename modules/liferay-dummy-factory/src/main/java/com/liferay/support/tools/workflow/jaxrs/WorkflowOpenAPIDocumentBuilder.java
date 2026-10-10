@@ -54,7 +54,7 @@ public final class WorkflowOpenAPIDocumentBuilder {
 				"post",
 				_operation(
 					"executeWorkflow", "Create data by running a workflow",
-					"Runs the steps top to bottom and stops at the first failing step. Returns HTTP 200 even when a step fails: check execution.status (SUCCEEDED or FAILED) and errors in the response body.",
+					"Runs the steps top to bottom and stops at the first failing step. Returns HTTP 200 even when a step fails: check execution.status (SUCCEEDED or FAILED) and errors in the response body. HTTP 401 when not signed in; HTTP 403 when not a company administrator, or when a step is company.create and the caller is not an omniadmin.",
 					"Execution result", schema)));
 
 		List<WorkflowFunctionDescriptor> sortedDescriptors = descriptors.stream(
@@ -82,7 +82,9 @@ public final class WorkflowOpenAPIDocumentBuilder {
 					"post",
 					_operation(
 						operationId, summary,
-						"Runs " + operation + " as a single step. Returns the step result {stepId, operation, status, result: {success, requested, count, skipped, items, error}, error}. HTTP 401 when not signed in; HTTP 403 when not a company administrator or when company.create is called without omniadmin permission. HTTP 400 when a parameter is unknown or a required parameter is missing; HTTP 422 when the step fails, including invalid values such as a count out of range. HTTP 404 when the operation is unknown.",
+						"Runs " + operation + " as a single step. Returns the step result {stepId, operation, status, result: {success, requested, count, skipped, items, error}, error}. HTTP 401 when not signed in; HTTP 403 when not a company administrator" +
+							(operation.equals("company.create") ? " or not an omniadmin" : "") +
+							". HTTP 400 when a parameter is unknown or a required parameter is missing; HTTP 422 when the step fails, including invalid values such as a count out of range. HTTP 404 when the operation is unknown.",
 						"Step succeeded", _parameterSchema(descriptor))));
 		}
 

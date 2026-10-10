@@ -7,6 +7,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.support.tools.service.CategoryCreator;
 import com.liferay.support.tools.service.VocabularyCreator;
 import com.liferay.support.tools.workflow.DefaultWorkflowFunction;
@@ -515,7 +516,9 @@ public class WorkflowResource {
 
 		_log.warn(
 			"Workflow permission denied: userId=" + user.getUserId() +
-				", operations=" + operations + ", reason=" + reason);
+				", operations=" +
+				StringUtil.shorten(String.valueOf(operations), 200) +
+					", reason=" + reason);
 
 		throw new ForbiddenException(
 			Response.status(
