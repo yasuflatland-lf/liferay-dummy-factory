@@ -39,7 +39,7 @@ public class MBReplyCreateWorkflowOperationAdapter
 		WorkflowParameterValues values = new WorkflowParameterValues(parameters);
 
 		MBReplyCreateRequest request = new MBReplyCreateRequest(
-			_effectiveUserId(values, workflowExecutionContext),
+			workflowExecutionContext.userId(),
 			values.requirePositiveLong("threadId"),
 			values.requireCount(), values.requireText("body"),
 			values.optionalString("format", "html"),
@@ -70,20 +70,6 @@ public class MBReplyCreateWorkflowOperationAdapter
 	@Override
 	public String operationName() {
 		return "mbReply.create";
-	}
-
-	private static long _effectiveUserId(
-		WorkflowParameterValues values,
-		WorkflowExecutionContext workflowExecutionContext) {
-
-		long userId = values.optionalLong(
-			"userId", workflowExecutionContext.userId());
-
-		if (userId <= 0) {
-			throw new IllegalArgumentException("userId must be positive");
-		}
-
-		return userId;
 	}
 
 	@Reference

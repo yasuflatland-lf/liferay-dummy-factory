@@ -44,7 +44,7 @@ public class MBThreadCreateWorkflowOperationAdapter
 		WorkflowParameterValues values = new WorkflowParameterValues(parameters);
 
 		MBThreadCreateRequest request = new MBThreadCreateRequest(
-			_effectiveUserId(values, workflowExecutionContext),
+			workflowExecutionContext.userId(),
 			values.requirePositiveLong("groupId"),
 			values.optionalLong("categoryId", 0L), _batchSpec(values),
 			values.requireText("body"), values.optionalString("format", "html"));
@@ -78,19 +78,6 @@ public class MBThreadCreateWorkflowOperationAdapter
 
 	private static BatchSpec _batchSpec(WorkflowParameterValues values) {
 		return new BatchSpec(values.requireCount(), values.requireText("baseName"));
-	}
-
-	private static long _effectiveUserId(
-		WorkflowParameterValues values,
-		WorkflowExecutionContext workflowExecutionContext) {
-
-		long userId = values.optionalLong("userId", workflowExecutionContext.userId());
-
-		if (userId <= 0) {
-			throw new IllegalArgumentException("userId is required");
-		}
-
-		return userId;
 	}
 
 	@Reference

@@ -33,7 +33,7 @@ class McpToolSetSpec extends BaseLiferaySpec {
 		assert names.contains('ldf-workflow') : "ldf-workflow missing from tool sets: ${names}"
 	}
 
-	def 'ldf-workflow exposes exactly the four coarse tools'() {
+	def 'ldf-workflow exposes the coarse tools and one tool per operation'() {
 		when:
 		Map result = _callTool(
 			'getToolSetToolSetNameToolSummariesPage',
@@ -49,7 +49,11 @@ class McpToolSetSpec extends BaseLiferaySpec {
 		then:
 		assert (page.items*.name as Set) == ([
 			'getWorkflowFunctions', 'getWorkflowSchema', 'planWorkflow',
-			'executeWorkflow'
+			'executeWorkflow', 'createBlogsEntries', 'createCategories',
+			'createCompanies', 'createDocuments', 'createLayouts',
+			'createMBCategories', 'createMBReplies', 'createMBThreads',
+			'createOrganizations', 'createRoles', 'createSites', 'createUsers',
+			'createVocabularies', 'createWebContents'
 		] as Set) : "unexpected workflow tools: ${page.items*.name}"
 	}
 
@@ -114,8 +118,22 @@ class McpToolSetSpec extends BaseLiferaySpec {
 
 		then:
 		assert document.openapi == '3.1.0' : "unexpected openapi version: ${document.openapi}"
-		assert (document.paths as Map).keySet() == (['/functions', '/schema', '/plan', '/execute'] as Set) :
+		assert (document.paths as Map).keySet() == ([
+			'/functions', '/schema', '/plan', '/execute',
+			'/operations/blogs.create', '/operations/category.create',
+			'/operations/company.create', '/operations/document.create',
+			'/operations/layout.create', '/operations/mbCategory.create',
+			'/operations/mbReply.create', '/operations/mbThread.create',
+			'/operations/organization.create', '/operations/role.create',
+			'/operations/site.create', '/operations/user.create',
+			'/operations/vocabulary.create', '/operations/webContent.create'
+		] as Set) :
 			"unexpected paths: ${(document.paths as Map).keySet()}"
+		assert document.paths['/operations/role.create'].post.summary == 'Create roles' :
+			"unexpected role summary: ${document.paths['/operations/role.create']}"
+		assert document.paths['/operations/role.create'].post.description ==
+			'Runs role.create as a single step. Returns the step result {stepId, operation, status, result: {success, requested, count, skipped, items, error}, error}. HTTP 400 when a parameter is unknown or a required parameter is missing; HTTP 422 when the step fails, including invalid values such as a count out of range. HTTP 404 when the operation is unknown.' :
+			"unexpected role description: ${document.paths['/operations/role.create']}"
 	}
 
 	def 'execute rejects a request without credentials and creates nothing'() {
@@ -149,6 +167,127 @@ class McpToolSetSpec extends BaseLiferaySpec {
 		assert roleNames.contains('Administrator') :
 			"role listing did not return regular roles: ${roleNames}"
 		assert !roleNames.contains(roleName) : "guest execute created role ${roleName}"
+	}
+
+	def 'createUsers creates users through MCP'() {
+		when:
+		Map result = _callTool(
+			'postToolSetToolSetNameToolInvoke',
+			[toolSetName: 'ldf-workflow', toolName: 'createUsers',
+			 body: [body: [count: 3, baseName: 'mcpuser']]])
+
+		then:
+		assert result.isError == false : "createUsers failed: ${result}"
+
+		when:
+		Map response = new JsonSlurper().parseText(
+			result.content[0].text as String) as Map
+
+		then:
+		assert response.status == 'SUCCEEDED' : "createUsers did not succeed: ${response}"
+		assert response.result.success == true : "createUsers batch failed: ${response}"
+		assert response.result.count == 3 : "unexpected created count: ${response}"
+		assert response.result.requested == 3 : "unexpected requested count: ${response}"
+		assert response.result.containsKey('skipped') : "skipped missing: ${response}"
+
+		when:
+		List users = (1..3).collect { i ->
+			jsonwsGet("user/get-user-by-email-address?companyId=${companyId}&emailAddress=mcpuser${i}@liferay.com")
+		}
+
+		then:
+		(1..3).each { i ->
+			Map user = users[i - 1] as Map
+			assert (user.emailAddress as String)?.equalsIgnoreCase("mcpuser${i}@liferay.com") :
+				"JSONWS returned a different user: ${user}"
+		}
+	}
+
+	def 'createUsers rejects an invalid baseName with isError'() {
+		when:
+		Map result = _callTool(
+			'postToolSetToolSetNameToolInvoke',
+			[toolSetName: 'ldf-workflow', toolName: 'createUsers',
+			 body: [body: [count: 1, baseName: "O'Brien"]]])
+
+		then:
+		assert result.isError == true : "invalid baseName was accepted: ${result}"
+		assert (result.content[0].text as String).contains('Status code: 422') :
+			"unexpected failure status: ${result}"
+	}
+
+	def 'createUsers rejects count above the cap'() {
+		when:
+		Map result = _callTool(
+			'postToolSetToolSetNameToolInvoke',
+			[toolSetName: 'ldf-workflow', toolName: 'createUsers',
+			 body: [body: [count: 1001, baseName: 'mcpcap']]])
+
+		then:
+		assert result.isError == true : "count above the cap was accepted: ${result}"
+		assert (result.content[0].text as String).contains('Status code: 422') :
+			"unexpected failure status: ${result}"
+		assert (result.content[0].text as String).contains('1000') :
+			"count cap missing from failure: ${result}"
+
+		when:
+		jsonwsGet("user/get-user-by-email-address?companyId=${companyId}&emailAddress=mcpcap1@liferay.com")
+
+		then:
+		IllegalStateException exception = thrown()
+		assert exception.message.contains('returned HTTP 404') :
+			"unexpected user lookup failure: ${exception.message}"
+
+		and: 'the same lookup finds an existing user, so the 404 means absence'
+		Map admin = jsonwsGet("user/get-user-by-email-address?companyId=${companyId}&emailAddress=test@liferay.com") as Map
+		assert (admin?.emailAddress as String)?.equalsIgnoreCase('test@liferay.com') :
+			"admin lookup failed: ${admin}"
+	}
+
+	def 'operations endpoint rejects a request without credentials and creates nothing'() {
+		given:
+		String roleName = "mcp-guest-operation-role-${System.currentTimeMillis()}"
+
+		when:
+		Map response = _rawRequest(
+			'POST', '/o/ldf-workflow/operations/role.create', null,
+			JsonOutput.toJson([count: 1, baseName: roleName, roleType: 'regular']))
+
+		then:
+		assert response.status == 401 : "unauthenticated operation was not rejected: ${response}"
+
+		when:
+		List roleNames = (jsonwsGet(
+			"role/get-roles/company-id/${companyId}/types/1") as List)*.name
+
+		then:
+		assert roleNames.contains('Administrator') :
+			"role listing did not return regular roles: ${roleNames}"
+		assert !roleNames.contains(roleName) : "guest operation created role ${roleName}"
+	}
+
+	def 'operations endpoint answers 404 for an unknown operation'() {
+		when:
+		Map response = _rawRequest(
+			'POST', '/o/ldf-workflow/operations/nope.create', basicAuthHeader(),
+			JsonOutput.toJson([count: 1, baseName: 'unknown-role']))
+
+		then:
+		assert response.status == 404 : "unexpected unknown-operation status: ${response}"
+		assert (response.body as String).contains('OPERATION_UNKNOWN') :
+			"unknown-operation error missing: ${response}"
+	}
+
+	def 'operations endpoint answers 422 when count is 0'() {
+		when:
+		Map response = _rawRequest(
+			'POST', '/o/ldf-workflow/operations/role.create', basicAuthHeader(),
+			JsonOutput.toJson([count: 0, baseName: 'zero-role']))
+
+		then:
+		assert response.status == 422 : "unexpected zero-count status: ${response}"
+		assert (response.body as String).contains('FAILED') :
+			"failed step missing: ${response}"
 	}
 
 	def 'a wrong password on ldf-workflow is answered with HTTP 401'() {

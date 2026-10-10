@@ -1,14 +1,20 @@
 package com.liferay.support.tools.workflow.jaxrs;
 
 import com.liferay.support.tools.service.BatchSpec;
+import com.liferay.support.tools.workflow.WorkflowFunctionDescriptor;
+import com.liferay.support.tools.workflow.WorkflowFunctionParameter;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class WorkflowOpenAPIDocumentBuilder {
 
 	public static Map<String, Object> build(
-		Map<String, Object> workflowRequestSchema) {
+		Map<String, Object> workflowRequestSchema,
+		List<WorkflowFunctionDescriptor> descriptors) {
 
 		Map<String, Object> schema = new LinkedHashMap<>(workflowRequestSchema);
 
@@ -51,6 +57,35 @@ public final class WorkflowOpenAPIDocumentBuilder {
 					"Runs the steps top to bottom and stops at the first failing step. Returns HTTP 200 even when a step fails: check execution.status (SUCCEEDED or FAILED) and errors in the response body.",
 					"Execution result", schema)));
 
+		List<WorkflowFunctionDescriptor> sortedDescriptors = descriptors.stream(
+		).sorted(
+			Comparator.comparing(WorkflowFunctionDescriptor::operation)
+		).toList();
+
+		for (WorkflowFunctionDescriptor descriptor : sortedDescriptors) {
+			String operation = descriptor.operation();
+			String operationId = operationIdOf(operation);
+
+			if (operationId == null) {
+				continue;
+			}
+
+			String summary = descriptor.description();
+
+			if (summary.endsWith(".")) {
+				summary = summary.substring(0, summary.length() - 1);
+			}
+
+			paths.put(
+				"/operations/" + operation,
+				_map(
+					"post",
+					_operation(
+						operationId, summary,
+						"Runs " + operation + " as a single step. Returns the step result {stepId, operation, status, result: {success, requested, count, skipped, items, error}, error}. HTTP 400 when a parameter is unknown or a required parameter is missing; HTTP 422 when the step fails, including invalid values such as a count out of range. HTTP 404 when the operation is unknown.",
+						"Step succeeded", _parameterSchema(descriptor))));
+		}
+
 		return _map(
 			"openapi", "3.1.0",
 			"info",
@@ -58,6 +93,10 @@ public final class WorkflowOpenAPIDocumentBuilder {
 				"title", "Liferay Dummy Factory Workflow", "version", "1.0",
 				"description", _INFO_DESCRIPTION),
 			"paths", paths);
+	}
+
+	public static String operationIdOf(String operation) {
+		return (operation == null) ? null : _OPERATION_IDS.get(operation);
 	}
 
 	private WorkflowOpenAPIDocumentBuilder() {
@@ -94,6 +133,59 @@ public final class WorkflowOpenAPIDocumentBuilder {
 		return operation;
 	}
 
+	private static Map<String, Object> _parameterSchema(
+		WorkflowFunctionDescriptor descriptor) {
+
+		Map<String, Object> properties = new LinkedHashMap<>();
+		List<String> required = new ArrayList<>();
+
+		for (WorkflowFunctionParameter parameter : descriptor.parameters()) {
+			Map<String, Object> property = switch (parameter.type()) {
+				case "string" -> _map("type", "string");
+				case "integer" -> _map("type", "integer", "format", "int32");
+				case "long" -> _map("type", "integer", "format", "int64");
+				case "boolean" -> _map("type", "boolean");
+				case "long[]" -> _map(
+					"type", "array", "items",
+					_map("type", "integer", "format", "int64"));
+				case "string[]" -> _map(
+					"type", "array", "items", _map("type", "string"));
+				default -> throw new IllegalStateException(
+					"Unsupported workflow parameter type: " + parameter.type());
+			};
+
+			if (parameter.type().equals("integer") &&
+				parameter.name().equals("count")) {
+
+				property.put("minimum", 1);
+				property.put("maximum", BatchSpec.MAX_COUNT);
+			}
+
+			String description = parameter.description();
+
+			if (parameter.defaultValue() != null) {
+				description += " Default: " + parameter.defaultValue() + ".";
+			}
+
+			property.put("description", description);
+			properties.put(parameter.name(), property);
+
+			if (parameter.required()) {
+				required.add(parameter.name());
+			}
+		}
+
+		Map<String, Object> schema = _map(
+			"type", "object", "additionalProperties", false,
+			"properties", properties);
+
+		if (!required.isEmpty()) {
+			schema.put("required", required);
+		}
+
+		return schema;
+	}
+
 	private static Map<String, Object> _requestBody(Map<String, Object> schema) {
 		return _map("required", true, "content", _content(schema));
 	}
@@ -103,6 +195,22 @@ public final class WorkflowOpenAPIDocumentBuilder {
 			"description", description,
 			"content", _content(_map("type", "object")));
 	}
+
+	private static final Map<String, String> _OPERATION_IDS = Map.ofEntries(
+		Map.entry("blogs.create", "createBlogsEntries"),
+		Map.entry("category.create", "createCategories"),
+		Map.entry("company.create", "createCompanies"),
+		Map.entry("document.create", "createDocuments"),
+		Map.entry("layout.create", "createLayouts"),
+		Map.entry("mbCategory.create", "createMBCategories"),
+		Map.entry("mbReply.create", "createMBReplies"),
+		Map.entry("mbThread.create", "createMBThreads"),
+		Map.entry("organization.create", "createOrganizations"),
+		Map.entry("role.create", "createRoles"),
+		Map.entry("site.create", "createSites"),
+		Map.entry("user.create", "createUsers"),
+		Map.entry("vocabulary.create", "createVocabularies"),
+		Map.entry("webContent.create", "createWebContents"));
 
 	private static final String _INFO_DESCRIPTION = "Creates dummy data (sites, users, organizations, roles, web content, documents, blogs, pages, vocabularies, categories, message boards) in this Liferay instance. Workflow: call getWorkflowFunctions to learn operations, compose a request, validate it with planWorkflow, then run executeWorkflow. Inside a workflow, a step parameter is either {\"name\", \"value\"} or {\"name\", \"from\"}; \"from\" reads input.<field> or an earlier result such as steps.<stepId>.items[0].groupId. Site-scoped operations need groupId > 0: create or look up the site first and pass its groupId. count is limited to " + BatchSpec.MAX_COUNT + " per step; for webContent.create the limit applies to count × groupIds.";
 

@@ -67,7 +67,7 @@ class MBThreadCreateWorkflowOperationAdapterTest {
 	}
 
 	@Test
-	void executeHonorsUserIdOverride() throws Throwable {
+	void executeIgnoresUserIdParameter() throws Throwable {
 		StubMBThreadCreator mbThreadCreator = new StubMBThreadCreator(
 			List.of(_mbMessage(901L, 1001L, 1101L, 1201L, "Thread 1")));
 
@@ -80,7 +80,7 @@ class MBThreadCreateWorkflowOperationAdapterTest {
 				"baseName", "Thread", "body", "body", "categoryId", 1101L,
 				"count", 1, "groupId", 1001L));
 
-		assertEquals(99L, mbThreadCreator.userId);
+		assertEquals(61L, mbThreadCreator.userId);
 	}
 
 	@Test

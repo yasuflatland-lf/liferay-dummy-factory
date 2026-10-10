@@ -62,7 +62,7 @@ class MBCategoryCreateWorkflowOperationAdapterTest {
 	}
 
 	@Test
-	void executeHonorsUserIdOverride() throws Throwable {
+	void executeIgnoresUserIdParameter() throws Throwable {
 		StubMBCategoryCreator mbCategoryCreator = new StubMBCategoryCreator(
 			List.of(_mbCategory(701L, 801L, "MB Category 1")));
 
@@ -75,7 +75,7 @@ class MBCategoryCreateWorkflowOperationAdapterTest {
 				"baseName", "MB Category", "count", 1, "description",
 				"desc", "groupId", 801L));
 
-		assertEquals(99L, mbCategoryCreator.userId);
+		assertEquals(51L, mbCategoryCreator.userId);
 	}
 
 	@Test

@@ -2,6 +2,7 @@ package com.liferay.support.tools.workflow;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -85,10 +86,20 @@ class WorkflowFunctionFactoryTest {
 
 		workflowFunction.executor().execute(
 			new WorkflowStepExecutionRequest(
-				"w-1", "s-1", "custom.identity.operation", "idem-1", Map.of(),
+				"w-1", "s-1", "custom.identity.operation", "idem-1",
+				Map.of("userId", 999L, "companyId", 888L),
 				new DefaultWorkflowExecutionContext(
 					Map.of("userId", 999L, "companyId", 888L), 1001L, 2002L)));
 
+		IllegalArgumentException exception = assertThrows(
+			IllegalArgumentException.class,
+			() -> workflowFunction.executor().execute(
+				new WorkflowStepExecutionRequest(
+					"w-1", "s-2", "custom.identity.operation", "idem-2",
+					Map.of("userId", 999L, "companyId", 888L),
+					new DefaultWorkflowExecutionContext(Map.of(), 0L, 2002L))));
+
+		assertEquals("userId is required", exception.getMessage());
 		assertEquals(1001L, capturedContext.get().userId());
 		assertEquals(2002L, capturedContext.get().companyId());
 		assertTrue(capturedContext.get().userId() != 999L);

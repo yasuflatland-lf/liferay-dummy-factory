@@ -67,7 +67,7 @@ class CategoryCreateWorkflowOperationAdapterTest {
 	}
 
 	@Test
-	void executeHonorsUserIdOverride() throws Throwable {
+	void executeIgnoresUserIdParameter() throws Throwable {
 		StubCategoryCreator categoryCreator = new StubCategoryCreator(
 			List.of(_assetCategory(101L, 201L, 301L, "Category 1")));
 
@@ -82,7 +82,7 @@ class CategoryCreateWorkflowOperationAdapterTest {
 				"groupId", 201L,
 				"vocabularyId", 301L));
 
-		assertEquals(99L, categoryCreator.userId);
+		assertEquals(11L, categoryCreator.userId);
 	}
 
 	@Test
