@@ -142,9 +142,7 @@ class BatchCountCapSpec extends BaseLiferaySpec {
 			return false
 		}
 		catch (IllegalStateException exception) {
-			if (exception.message.contains('HTTP 404') &&
-				exception.message.contains('NoSuchUserException')) {
-
+			if (exception.message.contains('returned HTTP 404')) {
 				return true
 			}
 
