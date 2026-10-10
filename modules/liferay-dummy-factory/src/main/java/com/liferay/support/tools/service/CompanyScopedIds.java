@@ -89,6 +89,11 @@ public class CompanyScopedIds {
 			companyId, parameter, id, _mbThreadLocalService.fetchMBThread(id));
 	}
 
+	public void user(long companyId, String parameter, long userId) {
+		_requireCompany(
+			companyId, parameter, userId, _userLocalService.fetchUser(userId));
+	}
+
 	public void userGroup(long companyId, String parameter, long id) {
 		_requireCompany(
 			companyId, parameter, id,

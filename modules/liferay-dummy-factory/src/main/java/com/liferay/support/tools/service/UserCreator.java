@@ -185,10 +185,8 @@ public class UserCreator {
 
 						if ((groupIds != null) && (groupIds.length > 0)) {
 							for (long groupId : groupIds) {
-								if (groupId > 0) {
-									_groupLocalService.addUserGroup(
-										u.getUserId(), groupId);
-								}
+								_groupLocalService.addUserGroup(
+									u.getUserId(), groupId);
 							}
 						}
 
@@ -196,16 +194,14 @@ public class UserCreator {
 							(groupIds != null) && (groupIds.length > 0)) {
 
 							for (long groupId : groupIds) {
-								if (groupId > 0) {
-									Group group =
-										_groupLocalService.fetchGroup(groupId);
+								Group group =
+									_groupLocalService.fetchGroup(groupId);
 
-									if ((group != null) && group.isSite()) {
-										_userGroupRoleLocalService.
-											addUserGroupRoles(
-												u.getUserId(), groupId,
-												siteRoleIds);
-									}
+								if ((group != null) && group.isSite()) {
+									_userGroupRoleLocalService.
+										addUserGroupRoles(
+											u.getUserId(), groupId,
+											siteRoleIds);
 								}
 							}
 						}

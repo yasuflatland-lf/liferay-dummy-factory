@@ -228,6 +228,59 @@ class WebContentCreationSpec extends BaseLiferaySpec {
 		countB == 0
 	}
 
+	def 'reports per-site failure when the article title is too long'() {
+		// The article title fails inside each site transaction.
+		given:
+		Map siteA = jsonws.createSite(
+			"WcmLongTitleA-${System.nanoTime()}")
+		Map siteB = jsonws.createSite(
+			"WcmLongTitleB-${System.nanoTime()}")
+
+		Long siteAId = siteA.groupId as Long
+		Long siteBId = siteB.groupId as Long
+
+		when:
+		Map response = ldf.createWebContent([
+			count: 3,
+			baseName: 'x' * 900,
+			groupIds: [siteAId, siteBId],
+			createContentsType: '0',
+			baseArticle: 'Sample body',
+			folderId: 0
+		])
+
+		then: 'overall response is not ok and nothing was created'
+		response.ok == false
+		response.totalRequested == 6
+		response.totalCreated == 0
+
+		and: 'JSONWS shows both sites have zero articles'
+		int countA = jsonwsGet(
+			"journal.journalarticle/get-articles-count" +
+			"/group-id/${siteAId}/folder-id/0") as int
+		int countB = jsonwsGet(
+			"journal.journalarticle/get-articles-count" +
+			"/group-id/${siteBId}/folder-id/0") as int
+
+		countA == 0
+		countB == 0
+
+		and: 'perSite payload reports a non-empty error for each site'
+		List perSite = response.perSite as List
+		perSite.size() == 2
+
+		Map entryA = perSite.find { (it.groupId as Long) == siteAId } as Map
+		Map entryB = perSite.find { (it.groupId as Long) == siteBId } as Map
+
+		entryA != null
+		(entryA.failed as int) == 3
+		(entryA.error as String)?.trim()
+
+		entryB != null
+		(entryB.failed as int) == 3
+		(entryB.error as String)?.trim()
+	}
+
 	private static int _countParagraphLines(String content) {
 		if ((content == null) || content.isEmpty()) {
 			return 0

@@ -10,6 +10,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -47,6 +49,21 @@ public class CompanyScopedIdsTest {
 
 	@Test
 	public void everyEntityResolverChecksCompanyAndExistence() throws Exception {
+		Map<String, String> serviceFields = Map.ofEntries(
+			Map.entry("ddmStructure", "_ddmStructureLocalService"),
+			Map.entry("ddmTemplate", "_ddmTemplateLocalService"),
+			Map.entry("dlFolder", "_dlFolderLocalService"),
+			Map.entry("group", "_groupLocalService"),
+			Map.entry("journalFolder", "_journalFolderLocalService"),
+			Map.entry("layoutSetPrototype", "_layoutSetPrototypeLocalService"),
+			Map.entry("mbCategory", "_mbCategoryLocalService"),
+			Map.entry("organization", "_organizationLocalService"),
+			Map.entry("role", "_roleLocalService"),
+			Map.entry("thread", "_mbThreadLocalService"),
+			Map.entry("user", "_userLocalService"),
+			Map.entry("userGroup", "_userGroupLocalService"),
+			Map.entry("vocabulary", "_assetVocabularyLocalService"));
+
 		for (var method : CompanyScopedIds.class.getDeclaredMethods()) {
 			if (!Modifier.isPublic(method.getModifiers()) ||
 				(method.getParameterCount() != 3) ||
@@ -56,28 +73,61 @@ public class CompanyScopedIdsTest {
 			}
 
 			CompanyScopedIds ids = new CompanyScopedIds();
+			List<String> calls = new ArrayList<>();
+			String expectedField = serviceFields.get(method.getName());
+
+			assertNotNull(expectedField, method.getName());
 
 			for (Field field : CompanyScopedIds.class.getDeclaredFields()) {
 				Class<?> serviceType = field.getType();
 				Object service = Proxy.newProxyInstance(
 					serviceType.getClassLoader(), new Class<?>[] {serviceType},
-					(proxy, fetch, args) -> TestModelProxyUtil.proxy(
-						fetch.getReturnType(), Map.of("getCompanyId", 10L)));
+					(proxy, fetch, args) -> {
+						calls.add(field.getName());
+
+						if (fetch.getName().startsWith("fetch") &&
+							(args != null) && (args.length > 0) &&
+							Long.valueOf(20L).equals(args[0])) {
+
+							return TestModelProxyUtil.proxy(
+								fetch.getReturnType(), Map.of("getCompanyId", 10L));
+						}
+
+						return null;
+					});
 
 				field.setAccessible(true);
 				field.set(ids, service);
 			}
 
 			assertDoesNotThrow(() -> method.invoke(ids, 10L, method.getName(), 20L));
+			assertEquals(List.of(expectedField), calls, method.getName());
+			calls.clear();
+
 			var error = assertThrows(
 				InvocationTargetException.class,
 				() -> method.invoke(ids, 11L, method.getName(), 20L));
 
 			assertInstanceOf(IllegalArgumentException.class, error.getCause());
+			assertEquals(
+				method.getName() + " 20 does not belong to the caller's company",
+				error.getCause().getMessage());
+			assertEquals(List.of(expectedField), calls, method.getName());
+			calls.clear();
 
 			for (Field field : CompanyScopedIds.class.getDeclaredFields()) {
+				Class<?> serviceType = field.getType();
+
 				field.setAccessible(true);
-				field.set(ids, TestModelProxyUtil.proxy(field.getType(), Map.of()));
+				field.set(
+					ids,
+					Proxy.newProxyInstance(
+						serviceType.getClassLoader(), new Class<?>[] {serviceType},
+						(proxy, fetch, args) -> {
+							calls.add(field.getName());
+
+							return null;
+						}));
 			}
 
 			var missing = assertThrows(
@@ -85,7 +135,10 @@ public class CompanyScopedIdsTest {
 				() -> method.invoke(ids, 10L, method.getName(), 20L));
 
 			assertInstanceOf(IllegalArgumentException.class, missing.getCause());
-			assertTrue(missing.getCause().getMessage().contains("does not exist"));
+			assertEquals(
+				method.getName() + " 20 does not exist",
+				missing.getCause().getMessage());
+			assertEquals(List.of(expectedField), calls, method.getName());
 		}
 	}
 
