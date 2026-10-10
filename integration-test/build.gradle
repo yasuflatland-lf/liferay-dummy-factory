@@ -228,6 +228,16 @@ tasks.register('installPlaywrightBrowsers', JavaExec) {
 	args = ['install', 'chromium']
 }
 
+tasks.register('setupMcpProfile', JavaExec) {
+	group = 'liferay dummy factory'
+	description = 'Creates or updates the "ldf" Liferay MCP Server profile on a running Liferay. See docs/reference/test-harness.md (MCP profile task).'
+	classpath = sourceSets.test.runtimeClasspath
+	mainClass = 'com.liferay.support.tools.it.util.McpProfileProvisioner'
+	systemProperty 'ldf.baseUrl', project.findProperty('ldf.baseUrl') ?: 'http://localhost:8080'
+	systemProperty 'ldf.user', project.findProperty('ldf.user') ?: 'test@liferay.com'
+	systemProperty 'ldf.password', project.findProperty('ldf.password') ?: 'test'
+}
+
 tasks.register('jacocoIntegrationReport', JacocoReport) {
 	dependsOn ':modules:liferay-dummy-factory:classes'
 
