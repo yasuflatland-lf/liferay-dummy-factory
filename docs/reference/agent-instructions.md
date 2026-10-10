@@ -28,6 +28,8 @@ There are no tool-specific rule files (`.claude/rules/`, `.cursor/rules/`, `.git
 
 Because Codex does not load an `AGENTS.md` below the directory it was started in, the root file lists every scoped file and tells the agent to read the ones on the path to any file it edits. Claude Code reads `AGENTS.md` natively only in recent versions and only when no `CLAUDE.md` is present; the one-line `@AGENTS.md` shim works in every version and with every other `CLAUDE.md`-only tool.
 
+Start either tool at the repository root. Claude Code started in a subdirectory asks once before following an `@AGENTS.md` import that lies outside its working directory, and in non-interactive mode (`claude -p`) it skips those imports — so the ancestor rules are missing.
+
 ## Adding or changing instructions
 
 - **A rule for one area:** add it to the `AGENTS.md` that owns the directory. For a new area, create `<dir>/AGENTS.md`, a `<dir>/CLAUDE.md` containing `@AGENTS.md`, and a row in the root index.

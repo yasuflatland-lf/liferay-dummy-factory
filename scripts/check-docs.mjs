@@ -232,24 +232,17 @@ for (const file of agentsFiles) {
 		report('AGENTS.md', 0, `scoped instructions not indexed: ${file}`);
 	}
 
-	let chainBytes = 0;
-
-	for (
-		let ancestor = dir;
-		;
-		ancestor = path.posix.dirname(ancestor)
-	) {
-		const candidate =
-			ancestor === '.' ? 'AGENTS.md' : `${ancestor}/AGENTS.md`;
-
-		if (existsSync(path.join(ROOT, candidate))) {
-			chainBytes += statSync(path.join(ROOT, candidate)).size;
-		}
-
-		if (ancestor === '.') {
-			break;
-		}
-	}
+	// Codex concatenates the AGENTS.md of every directory from the root down.
+	const chainBytes = dir
+		.split('/')
+		.map((_, index, parts) => parts.slice(0, index + 1).join('/'))
+		.map((ancestor) => (ancestor === '.' ? 'AGENTS.md' : `${ancestor}/AGENTS.md`))
+		.concat(dir === '.' ? [] : ['AGENTS.md'])
+		.filter((candidate) => existsSync(path.join(ROOT, candidate)))
+		.reduce(
+			(total, candidate) => total + statSync(path.join(ROOT, candidate)).size,
+			0
+		);
 
 	if (chainBytes > CODEX_CHAIN_BUDGET) {
 		report(
