@@ -419,6 +419,63 @@ describe('WorkflowJsonEditor layout', () => {
 		});
 	});
 
+	it('reports a 403 authorization message in the danger result summary', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockImplementation((url: string) => {
+				if (url === '/o/ldf-workflow/schema') {
+					return Promise.resolve({
+						json: () => Promise.resolve({schema: VALID_SCHEMA}),
+						ok: true,
+					});
+				}
+
+				return Promise.resolve(
+					new Response(
+						JSON.stringify({
+							errors: [
+								{
+									code: 'FORBIDDEN',
+									message: 'company.create requires an omniadmin.',
+									path: '/',
+								},
+							],
+						}),
+						{status: 403}
+					)
+				);
+			})
+		);
+
+		render(
+			<WorkflowJsonEditor
+				{...defaultProps}
+				value='{"schemaVersion":"1.0","workflowId":"t","steps":[{"id":"a","operation":"noop","idempotencyKey":"x"}]}'
+			/>
+		);
+
+		await waitFor(() => {
+			expect(
+				(
+					screen.getByTestId(
+						'workflow-json-execute'
+					) as HTMLButtonElement
+				).disabled
+			).toBe(false);
+		});
+
+		fireEvent.click(screen.getByTestId('workflow-json-execute'));
+
+		await waitFor(() => {
+			const panel = screen.getByTestId('workflow-json-result-panel');
+
+			expect(panel.className).toContain('alert-danger');
+			expect(
+				screen.getByTestId('workflow-json-result-summary').textContent
+			).toContain('company.create requires an omniadmin.');
+		});
+	});
+
 	it('reports warning tone when response data errors is non-empty', async () => {
 		vi.stubGlobal(
 			'fetch',

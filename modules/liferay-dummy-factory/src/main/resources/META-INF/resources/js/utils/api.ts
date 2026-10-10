@@ -75,7 +75,7 @@ export async function fetchResource<T>(
 			method: 'GET',
 		});
 
-		return parseResponse<T>(response);
+		return await parseResponse<T>(response);
 	}
 	catch (error) {
 		return toErrorResponse<T>(error);
@@ -101,7 +101,7 @@ export async function postResource<T>(
 			method: 'POST',
 		});
 
-		return parseResponse<T>(response);
+		return await parseResponse<T>(response);
 	}
 	catch (error) {
 		return toErrorResponse<T>(error);
@@ -123,7 +123,7 @@ export async function postJsonResource<T>(
 			method: 'POST',
 		});
 
-		return parseResponse<T>(response);
+		return await parseResponse<T>(response);
 	}
 	catch (error) {
 		return toErrorResponse<T>(error);

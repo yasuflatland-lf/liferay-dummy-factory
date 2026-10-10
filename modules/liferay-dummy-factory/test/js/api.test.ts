@@ -17,7 +17,16 @@ describe.each([
 	['fetchResource', () => fetchResource('/api/resource')],
 	['postResource', () => postResource('/api/resource', {})],
 	['postJsonResource', () => postJsonResource('/o/ldf-workflow/execute', {})],
-] as const)('%s non-2xx responses', (_name, request) => {
+] as const)('%s responses', (_name, request) => {
+	it('resolves with an error for a 200 non-JSON body', async () => {
+		mockFetch.mockResolvedValueOnce(new Response('<html>', {status: 200}));
+
+		await expect(request()).resolves.toEqual({
+			error: expect.any(String),
+			success: false,
+		});
+	});
+
 	it('surfaces a 403 authorization message', async () => {
 		mockFetch.mockResolvedValueOnce(
 			new Response(
@@ -166,10 +175,7 @@ describe('postResource', () => {
 	});
 
 	it('returns success false with server error when response.ok is false', async () => {
-		mockFetch.mockResolvedValueOnce({
-			ok: false,
-			status: 500,
-		});
+		mockFetch.mockResolvedValueOnce(new Response('', {status: 500}));
 
 		const result = await postResource('/api/resource', {num1: '10'});
 
@@ -250,10 +256,7 @@ describe('fetchResource', () => {
 	});
 
 	it('returns success false with server error when response.ok is false', async () => {
-		mockFetch.mockResolvedValueOnce({
-			ok: false,
-			status: 404,
-		});
+		mockFetch.mockResolvedValueOnce(new Response('', {status: 404}));
 
 		const result = await fetchResource('http://localhost/api/resource');
 
