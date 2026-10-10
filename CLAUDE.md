@@ -1,35 +1,47 @@
 # liferay-dummy-factory
 
-Liferay DXP 2026.Q3.6 Workspace: MVCPortlet + React portlet + Spock integration tests against `liferay/dxp:2026.q3.6`.
+A Liferay DXP Control Panel app that generates dummy data (users, sites, pages, web content, documents, taxonomy, message boards, …) through per-entity forms and multi-step JSON workflows. One OSGi bundle (MVCPortlet + JAX-RS workflow API + React UI) in a Liferay Workspace, tested with JUnit, Vitest, and Spock + Playwright against a real DXP container. The exact DXP version is in `gradle.properties`.
 
-## Routing — read the matching L2 file for the task you're starting
+## Map
 
-- Feature / refactor / general code change → `.claude/rules/writing-code.md` · Tests → `.claude/rules/testing.md`
-- Bug or test-failure investigation → `.claude/rules/debugging.md` · PR / code-quality review → `.claude/rules/code-review.md`
+| Path | What |
+|---|---|
+| `modules/liferay-dummy-factory/src/main/java/…/tools/` | `portlet/actions` (resource commands) → `service` (Creators) ; `workflow/` (engine, adapters, JAX-RS) |
+| `modules/liferay-dummy-factory/src/main/resources/META-INF/resources/` | `view.jsp`, React/TypeScript in `js/` |
+| `modules/liferay-dummy-factory/src/test/java/`, `…/test/` | JUnit, Vitest |
+| `integration-test/` | Spock + Playwright specs, workflow sample fixtures |
+| `configs/common/` | portal and OSGi config baked into the test image |
+| `docs/` | documentation — start at `docs/README.md` |
 
-## Where to find concrete details and history
-
-- `docs/details/` — concrete commands, selectors, version pins, API constraints (read on demand); `workflow-api.md` is SoT for `site.create` / `organization.create` / taxonomy-only startup fallback. `docs/ADR/` — past decisions.
-- `.claude/plan/` — gitignored scratch for orchestration plans; never lands in a diff.
-
-## Core contracts — break these and things go silently wrong
-
-1. **Input boundary policy** — reject user input at the boundary; sanitize external-generated data. Never mix the two strategies.
-2. **Single source of truth** — every fact, rule, or contract lives in exactly one file. Other files link to it.
-3. **Creator + batch response contract** — `*Creator` classes wrap per-entity work in `TransactionInvokerUtil.invoke` + `throws Throwable` and return `{success, count, requested, skipped, error?, items}` with strict `success := created == requested`; `error` MUST be set whenever `success == false`. Detail in `.claude/rules/writing-code.md`.
-4. **JSONWS-first verification** — test post-conditions through `/api/jsonws/...`, not Playwright UI navigation. Detail in `.claude/rules/testing.md`.
-5. **`jakarta.portlet` 4.0** — DXP 2026.Q3.6 uses `jakarta.portlet.*` imports and `jakarta.portlet.version=4.0` component properties. JSP taglib URI stays `http://xmlns.jcp.org/portlet_3_0` (JCP namespace). See `docs/ADR/adr-0008-dxp-2026-migration.md`.
-6. **`data-testid` is mechanically named** — `${entityKey}-${kebab(field)}-${typeSuffix}`. Do not invent ids; follow the contract in `.claude/rules/writing-code.md`.
-7. **One package manager per repo** — `yarn.lock` only. Never coexist with `package-lock.json`.
-
-## Common Gradle commands
+## Commands
 
 ```bash
-./gradlew :modules:liferay-dummy-factory:jar              # Build the bundle JAR
-./gradlew :modules:liferay-dummy-factory:test             # Host-JVM unit tests + JaCoCo
-./gradlew :integration-test:integrationTest               # Spock + Workspace-native Docker (DXP 2026)
-./gradlew startDockerContainer                            # Start DXP 2026 container (for local dev loops)
-./gradlew stopDockerContainer                             # Stop the container (keeps volume; reuse next run)
-./gradlew removeDockerContainer                           # Hard clean (force volume recreation)
-./gradlew :modules:liferay-dummy-factory:copyJarToLatest  # Release only — publish JAR to latest/; see docs/details/testing-gradle.md
+./gradlew :modules:liferay-dummy-factory:jar                 # build the bundle (includes the esbuild frontend build)
+./gradlew :modules:liferay-dummy-factory:test                # Java unit tests + JaCoCo
+(cd modules/liferay-dummy-factory && yarn test)              # Vitest
+./gradlew :integration-test:compileTestGroovy                # compile specs without Docker
+./gradlew :integration-test:integrationTest [--tests "<FQCN>"]   # full E2E; needs Docker + LIFERAY_DXP_LICENSE_FILE
+./gradlew startDockerContainer | stopDockerContainer | removeDockerContainer
+node scripts/check-docs.mjs                                  # docs consistency (CI-enforced)
 ```
+
+## Contracts that fail silently when broken
+
+1. **Input boundary** — reject user input, sanitize generated data, never mix. → `docs/architecture/backend.md#input-boundary-policy`
+2. **Batch contract** — Creators return `BatchResult<T>` → `{success, count, requested, skipped, items, error?}`, `success := count == requested`, `error` iff failure; per-entity `BatchTransaction.run`, `throws Throwable`. → `docs/architecture/backend.md#batch-response-contract`
+3. **Two entry points, one behaviour** — resource command and workflow adapter call the same Creator and expose identical item fields; new `/ldf/*` commands are registered in `view.jsp`. → `docs/reference/workflow-api.md`
+4. **DXP 2026 platform** — `jakarta.portlet` 4.0 (JSP taglib URI stays `http://xmlns.jcp.org/portlet_3_0`), no `javax.servlet` import, `release.dxp.api` without a version. → `docs/reference/liferay-dxp-api.md`
+5. **Tests verify through JSONWS**; Playwright only for DOM concerns, never selecting by visible text, always asserting the success class. → `.claude/rules/tests.md`
+6. **`data-testid`s are generated**, never invented. → `docs/reference/test-ids.md`
+7. **One fact, one file; no versions in prose; Yarn only.** → `.claude/rules/documentation.md`, `docs/reference/dependencies.md`
+
+## How guidance is organized
+
+- `.claude/rules/*.md` are **path-scoped** and load automatically when you touch matching files: `backend-java`, `frontend`, `tests`, `build-and-ci`, `documentation`.
+- `.claude/skills/` hold task procedures: `liferay-debug` (any failure), `contract-review` (reviews), `parallel-orchestration` (only on explicit request).
+- Explanations and facts live in `docs/` (guides / reference / architecture / adr). Look there before re-deriving anything; record new findings there, once.
+- `.claude/plan/` is git-ignored scratch space.
+
+## Done means
+
+Code, tests and docs changed together; the relevant unit suites pass; `node scripts/check-docs.mjs` passes; integration specs at least compile (`compileTestGroovy`). If you could not run the integration suite (it needs Docker and a DXP license), say so explicitly.

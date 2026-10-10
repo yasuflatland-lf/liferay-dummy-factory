@@ -1,143 +1,63 @@
-# liferay-dummy-factory
+# Liferay Dummy Factory
 
 [![Unit Tests](https://github.com/yasuflatland-lf/liferay-dummy-factory/actions/workflows/unit-test.yml/badge.svg?branch=master)](https://github.com/yasuflatland-lf/liferay-dummy-factory/actions/workflows/unit-test.yml)
+[![Integration Tests](https://github.com/yasuflatland-lf/liferay-dummy-factory/actions/workflows/integration-test.yml/badge.svg?branch=master)](https://github.com/yasuflatland-lf/liferay-dummy-factory/actions/workflows/integration-test.yml)
 [![codecov](https://codecov.io/gh/yasuflatland-lf/liferay-dummy-factory/branch/master/graph/badge.svg)](https://codecov.io/gh/yasuflatland-lf/liferay-dummy-factory)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Dummy Factory generates dummy data for debugging use. Please don't use this for a production use.
+Generate realistic test data in Liferay in seconds — users, sites, pages, web content, documents and more — from a Control Panel app or a JSON workflow.
 
-## What does Dummy Factory generate?
+> [!WARNING]
+> Dummy Factory is a development and testing tool. Do not install it on a production system.
 
-* Organizations
-* Sites
-* Pages
-* Users
-* Web Content Articles
-* Documents
-* Message Board (Threads / Categories)
-* Category (Categories / Vocabularies)
-* Wiki
-* Blogs
-* Company
-* Workflows — chain the generators above into a single run
+## Features
 
-### Workflows
+- **Batch creation for 14 entity types**: organizations, roles, users, sites, pages, web content, documents, blogs, vocabularies, categories, message-board categories, threads and replies, and companies (virtual instances).
+- **Realistic content**: optional Datafaker-generated names and text in several locales, site templates, tags, uploaded template files.
+- **Workflows**: one JSON document creates a whole scenario — e.g. a site, its pages and its web content — with ids flowing from step to step. Plan (validate) before you execute. [Learn more](docs/guides/workflows.md).
+- **Honest results**: a batch reports exactly what was requested, created and skipped, and fails loudly instead of silently creating less.
 
-A **Workflow** is a JSON document that orchestrates several of the generators above into one declarative run. Each step calls an operation (`company.create`, `site.create`, `layout.create`, `user.create`, …) with its own parameters, and later steps can pull values from earlier ones via `from` references such as `"steps.createSite.items[0].groupId"` — so the generated `groupId` of a Site is fed straight into the Page creation step with no manual copy-paste.
+## Compatibility
 
-Why it's useful:
+Pick the JAR that matches your Liferay version and drop it into `${LIFERAY_HOME}/deploy/`.
 
-- **One submit, full scenario.** Stand up realistic fixtures (Company → Users → Organization, or Site → Pages → Web Content) without clicking through the Control Panel form-by-form.
-- **Cross-step wiring.** Dependent IDs (`groupId`, `companyId`, primary keys) flow automatically between steps, so you never have to look up an ID and paste it into the next form.
-- **Per-step error policy and idempotency.** Each step carries an `idempotencyKey` and an `onError` policy (e.g. `FAIL_FAST`), making reruns safe and failures diagnosable.
-- **Reproducible environments.** Workflow JSON is plain text — commit it, share it, replay it. The same sample files drive both the React UI and the Spock integration tests, so what you run locally is exactly what CI verifies.
+| Liferay | Download |
+|---|---|
+| DXP 2026.Q3.6 | [`master/latest`](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/master/latest) |
+| DXP 2026.Q1.9 LTS | [`2026.Q1.9-LTS/latest`](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/2026.Q1.9-LTS/latest) |
+| DXP 2026.Q1.3 LTS | [`2026.Q1.3-LTS.1/latest`](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/2026.Q1.3-LTS.1/latest) |
+| DXP 2025.Q1.14 LTS | [`2025.Q1.14-LTS/latest`](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/2025.Q1.14-LTS/latest) |
+| DXP 2025.Q1.11 | [`2025.Q1.11/latest`](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/2025.Q1.11/latest) |
+| DXP 2024.Q3.9 | [`2024.q3.9/latest`](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/2024.q3.9/latest) |
+| DXP 2024.Q1.12 | [`2024.q1.12/latest`](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/2024.q1.12/latest) |
+| DXP 2023.Q4.9 | [`2023.q4.9/latest`](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/2023.q4.9/latest) |
+| 7.4 | [`7.4.4/latest`](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.4.4/latest) |
+| 7.3 | [`7.3.x/latest`](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.3.x/latest) |
+| 7.2 | [`7.2.x/latest`](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.2.x/latest) |
+| 7.1 | [`7.1.x/latest`](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.1.x/latest) |
+| 7.0 | [`7.0.x/latest`](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.0.x/latest) |
 
-Ready-made samples live under `integration-test/src/test/resources/workflow-samples/` (e.g. `company-user-organization.json`, `site-and-page.json`, `blogs-and-web-content.json`).
+Older branches may offer fewer features than `master`.
 
-## Required environment
-* Java 21 or above
-* Liferay DXP 2026.Q3.6 (this branch)
-* Liferay 7.4 (please see the 7.4.x branch)
-* Liferay 7.3 GA1 (please see the 7.3.x branch)
-* Liferay 7.2 (please see the 7.2.x branch)
-* Liferay 7.1 (please see the 7.1.x branch)
-* Liferay 7.0 (please see the 7.0.x branch)
+## Quick start
 
-> For development rules and contracts, start with [`CLAUDE.md`](CLAUDE.md) and the task-based files under [`.claude/rules/`](.claude/rules/). Concrete details live under [`docs/details/`](docs/details/), and architectural decisions in [`docs/ADR/`](docs/ADR/).
+1. Copy the JAR into `${LIFERAY_HOME}/deploy/` and wait for `STARTED liferay.dummy.factory_` in the log.
+2. Sign in as an administrator and open **Control Panel → Liferay Dummy Factory**.
+3. Choose an entity type, set how many to create, and submit — or switch to the **Workflow JSON** tab and load a sample.
 
+Full instructions: [Install and use](docs/guides/installation.md).
 
-## Tech Stack
-
-| Layer | Technology |
-|-------|------------|
-| Portal | Liferay DXP 2026.Q3.6 |
-| Backend | MVCPortlet + MVCResourceCommand (layered) |
-| Frontend | React + Clay CSS |
-| Build | Gradle 8.5 + Liferay Workspace Plugin 10.1.9 |
-| Testing | Spock 2.4 / Groovy 5.0 / Playwright 1.59.0 |
-| Java | JDK 21 |
-
-## Usage
-| Version | Link                                                                                                                                                       | 
-|---------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------| 
-| 7.4     | [https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/master/latest](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/master/latest) |
-| 7.3     | [https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.3.x/latest](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.3.x/latest)   | 
-| 7.2     | [https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.2.x/latest](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.2.x/latest)   | 
-| 7.1     | [https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.1.x/latest](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.1.x/latest)   | 
-| 7.0     | [https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.0.x/latest](https://github.com/yasuflatland-lf/liferay-dummy-factory/tree/7.0.x/latest)   | 
-
-1. Download jar file according to the version above and place it int `${liferay-home}/deploy ` 
-1. Start Liferay bundle and login as an administrator.
-1. After the jar is properly installed, navigate to `Control Panel -> System Settings -> Platform -> Thrid party` and enable JQuery.
-1. Reboot the bundle.
-1. Navigate to `Control Panel`, under `Marketplace`, `Dummy Factory` will be found.
-1. Now you are ready to create dummy data! Enjoy!
-
-## Quick Start (Docker via Workspace Plugin)
-
-Provision the DXP 2026 activation key (required):
+## Development
 
 ```bash
-# Local: point to your file
-export LIFERAY_DXP_LICENSE_FILE=/path/to/activation-key.xml
-
-# Or CI: base64-encoded XML in an env var
-export LIFERAY_DXP_LICENSE_BASE64="$(base64 -w0 /path/to/activation-key.xml)"
+export LIFERAY_DXP_LICENSE_FILE=/path/to/activation-key.xml   # DXP activation key
+./gradlew :modules:liferay-dummy-factory:jar                  # build the bundle
+./gradlew startDockerContainer                                # run DXP with the bundle on http://localhost:8080
+./gradlew :integration-test:integrationTest                   # end-to-end tests
 ```
 
-Start the container:
+Requires JDK 21, Node and Yarn (see `mise.toml`), and Docker. Start with the [development guide](docs/guides/development.md) and [CONTRIBUTING.md](CONTRIBUTING.md). All documentation: [docs/](docs/README.md).
 
-```bash
-./gradlew startDockerContainer       # builds the image and boots Liferay on :8080
-./gradlew stopDockerContainer        # stop (preserves state for next run by default)
-./gradlew removeDockerContainer      # hard reset (forces image rebuild next start)
-```
+## License
 
-The workspace plugin manages everything — the old `docker run liferay/portal:...` workflow is no longer used.
-
-### Verify Operation
-
-Navigate to http://localhost:8080 and log in as admin (`test@liferay.com` / `test`).
-**Liferay Dummy Factory** will appear under Control Panel > Configuration.
-
-Check bundle status via GoGo Shell:
-
-```bash
-docker exec liferay bash -c "(echo 'lb dummy.factory'; sleep 2) | telnet localhost 11311"
-```
-
-## Build
-
-```bash
-# Module build
-./gradlew :modules:liferay-dummy-factory:build
-```
-
-## Testing
-
-Requires Docker to be running and a valid DXP activation key.
-
-```bash
-# Run all integration tests (inline license path)
-LIFERAY_DXP_LICENSE_FILE=/path/to/activation-key.xml ./gradlew :integration-test:integrationTest --info
-
-# CI: base64-encoded XML
-export LIFERAY_DXP_LICENSE_BASE64="$(base64 -w0 /path/to/activation-key.xml)"
-
-# Run all integration tests (if env var already exported)
-./gradlew :integration-test:integrationTest --info
-
-# Run a specific spec
-LIFERAY_DXP_LICENSE_FILE=/path/to/activation-key.xml ./gradlew :integration-test:integrationTest --tests "com.liferay.support.tools.it.spec.DeploymentSpec"
-```
-
-The `integrationTest` task manages the DXP container lifecycle via the Liferay Workspace Plugin (no Testcontainers). It starts the container, deploys the bundle, waits up to 8 minutes for Liferay to become ready, runs the specs, then stops the container.
-
-Specs:
-
-- **DeploymentSpec** -- Bundle deployment and activation (via GoGo Shell)
-- **PortletRenderSpec** -- Login and portlet rendering through the browser (Playwright)
-- **OrganizationFunctionalSpec** -- Organization batch creation via portlet UI with REST API verification (Playwright)
-
-## CI
-
-GitHub Actions (`.github/workflows/integration-test.yml`) runs automatically on push / PR to `master`.
+[MIT](LICENSE)

@@ -66,7 +66,7 @@ class JsonwsSetupHelper {
 		// OrganizationService.addOrganization on DXP 2026 is exposed via JSONWS, but
 		// form-encoded POSTs still tend to drop the ServiceContext structure. Route
 		// through the headless-admin-user REST API for cleaner JSON body handling.
-		// See docs/details/api-liferay-dxp2026.md §5.
+		// See docs/reference/liferay-dxp-api.md (Known endpoint behaviour).
 		String body = "{\"name\":${_jsonQuote(name)}}"
 		Map response = _postJson(
 			'/o/headless-admin-user/v1.0/organizations', body) as Map

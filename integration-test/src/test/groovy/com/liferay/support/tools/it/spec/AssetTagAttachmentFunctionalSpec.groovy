@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
 /**
  * Verifies that AssetTag attachment works correctly for WebContent, Document,
  * MBThread, and MBReply creators. JSONWS-only verification per
- * .claude/rules/testing.md §"Verification strategy: JSONWS only".
+ * .claude/rules/tests.md ("Verify database state through JSONWS").
  *
  * No @Stepwise — each feature method is independent and self-contained.
  */

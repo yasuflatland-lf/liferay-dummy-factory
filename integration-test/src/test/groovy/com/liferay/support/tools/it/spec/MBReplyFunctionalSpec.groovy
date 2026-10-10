@@ -203,7 +203,7 @@ class MBReplyFunctionalSpec extends BaseLiferaySpec {
 		when:
 		Map response = ldf.post('/ldf/mb-reply', payload) as Map
 
-		then: 'batch contract — diagnostic-first per .claude/rules/testing.md §Spock then: ordering'
+		then: 'batch contract — diagnostic-first per .claude/rules/tests.md'
 		assert response.success == true : "creator failed: ${response}"
 		response.count == 20
 		response.requested == 20
