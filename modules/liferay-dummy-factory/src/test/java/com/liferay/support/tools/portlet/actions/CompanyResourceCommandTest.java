@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.support.tools.security.DataCreationAuthorization;
 
 import java.lang.reflect.Proxy;
 
@@ -18,7 +19,7 @@ class CompanyResourceCommandTest {
 
 		assertThrows(
 			PrincipalException.MustBeOmniadmin.class,
-			() -> CompanyResourceCommand.requireOmniadmin(permissionChecker));
+			() -> DataCreationAuthorization.requirePermission(permissionChecker, "/ldf/company"));
 	}
 
 	@Test
@@ -26,7 +27,7 @@ class CompanyResourceCommandTest {
 		PermissionChecker permissionChecker = _permissionChecker(true);
 
 		assertDoesNotThrow(
-			() -> CompanyResourceCommand.requireOmniadmin(permissionChecker));
+			() -> DataCreationAuthorization.requirePermission(permissionChecker, "/ldf/company"));
 	}
 
 	private PermissionChecker _permissionChecker(boolean omniadmin) {
@@ -35,6 +36,10 @@ class CompanyResourceCommandTest {
 				PermissionChecker.class.getClassLoader(),
 				new Class<?>[] {PermissionChecker.class},
 				(proxy, method, args) -> {
+					if (method.getName().equals("isCompanyAdmin")) {
+						return true;
+					}
+
 					if (method.getName().equals("isOmniadmin")) {
 						return omniadmin;
 					}

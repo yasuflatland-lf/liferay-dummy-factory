@@ -9,6 +9,7 @@ import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -45,6 +46,8 @@ public class DocumentUploadResourceCommand extends BaseMVCResourceCommand {
 		JSONObject responseJson = JSONFactoryUtil.createJSONObject();
 
 		try {
+			PortletJsonCommandTemplate.requirePermission(resourceRequest);
+
 			if ("add_temp".equals(cmd)) {
 				String sourceFileName = uploadPortletRequest.getFileName(
 					"file");
@@ -107,6 +110,10 @@ public class DocumentUploadResourceCommand extends BaseMVCResourceCommand {
 				responseJson.put("error", "unknown cmd: " + cmd);
 				responseJson.put("success", false);
 			}
+		}
+		catch (PrincipalException principalException) {
+			PortletJsonCommandTemplate.permissionDenied(
+				resourceRequest, responseJson, _log, principalException);
 		}
 		catch (Exception exception) {
 			_log.error(

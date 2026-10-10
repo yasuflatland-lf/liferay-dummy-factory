@@ -110,6 +110,12 @@ class LdfResourceClient implements Closeable {
 		return [result: parsed] as Map
 	}
 
+	boolean canReachPortlet() {
+		_ensureLoggedIn()
+
+		return _resolveResourceURL('/ldf/user') != null
+	}
+
 	Map createUser(Map<String, Object> fields) {
 		return post('/ldf/user', fields)
 	}
@@ -232,22 +238,7 @@ class LdfResourceClient implements Closeable {
 			_waitForLiferayGlobal(_page)
 		}
 
-		// Liferay forces a password change on first login for the default admin
-		// even when passwords.default.policy.change.required=false: the reset
-		// happens because the admin's password has never been changed. Fill the
-		// form with a stable value so subsequent navigations reach the portlet.
-		if (_page.url().contains('/c/portal/update_password') ||
-				_page.title()?.contains('New Password')) {
-
-			_page.locator('#password1').fill(NEW_PASSWORD)
-			_page.locator('#password2').fill(NEW_PASSWORD)
-			_page.waitForNavigation({ ->
-				_page.locator('[type=submit], button.btn-primary').first().click()
-			})
-			_password = NEW_PASSWORD
-
-			_waitForLiferayGlobal(_page)
-		}
+		_completePasswordChangeIfPrompted()
 
 		// Ignore the reminder-query prompt that some builds still render even
 		// with users.reminder.query.enabled=false.
@@ -264,6 +255,30 @@ class LdfResourceClient implements Closeable {
 		log.info(
 			'LdfResourceClient logged in as {} (p_auth={})',
 			_username, _authToken ? 'present' : 'missing')
+	}
+
+	// Liferay forces a password change on first login for a user whose
+	// password has never been changed, even when
+	// passwords.default.policy.change.required=false. The default admin hits it
+	// on "/", a freshly created user on its first Control Panel request. Fill the
+	// form with a stable value so subsequent navigations reach the portlet.
+	private boolean _completePasswordChangeIfPrompted() {
+		if (!_page.url().contains('/c/portal/update_password') &&
+				!(_page.title()?.contains('New Password'))) {
+
+			return false
+		}
+
+		_page.locator('#password1').fill(NEW_PASSWORD)
+		_page.locator('#password2').fill(NEW_PASSWORD)
+		_page.waitForNavigation({ ->
+			_page.locator('[type=submit], button.btn-primary').first().click()
+		})
+		_password = NEW_PASSWORD
+
+		_waitForLiferayGlobal(_page)
+
+		return true
 	}
 
 	private String _resolveResourceURL(String mvcCommandName) {
@@ -283,6 +298,13 @@ class LdfResourceClient implements Closeable {
 			renderURL,
 			new Page.NavigateOptions().setTimeout(NAV_TIMEOUT_MS))
 		_page.waitForLoadState()
+
+		if (_completePasswordChangeIfPrompted()) {
+			_page.navigate(
+				renderURL,
+				new Page.NavigateOptions().setTimeout(NAV_TIMEOUT_MS))
+			_page.waitForLoadState()
+		}
 
 		String html = _page.content()
 

@@ -165,7 +165,7 @@ class McpToolSetSpec extends BaseLiferaySpec {
 		assert document.paths['/operations/role.create'].post.summary == 'Create roles' :
 			"unexpected role summary: ${document.paths['/operations/role.create']}"
 		assert document.paths['/operations/role.create'].post.description ==
-			'Runs role.create as a single step. Returns the step result {stepId, operation, status, result: {success, requested, count, skipped, items, error}, error}. HTTP 400 when a parameter is unknown or a required parameter is missing; HTTP 422 when the step fails, including invalid values such as a count out of range. HTTP 404 when the operation is unknown.' :
+			'Runs role.create as a single step. Returns the step result {stepId, operation, status, result: {success, requested, count, skipped, items, error}, error}. HTTP 401 when not signed in; HTTP 403 when not a company administrator or when company.create is called without omniadmin permission. HTTP 400 when a parameter is unknown or a required parameter is missing; HTTP 422 when the step fails, including invalid values such as a count out of range. HTTP 404 when the operation is unknown.' :
 			"unexpected role description: ${document.paths['/operations/role.create']}"
 	}
 

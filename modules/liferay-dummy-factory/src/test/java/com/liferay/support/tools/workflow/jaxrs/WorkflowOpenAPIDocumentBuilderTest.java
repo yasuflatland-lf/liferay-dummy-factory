@@ -203,7 +203,7 @@ class WorkflowOpenAPIDocumentBuilderTest {
 			assertEquals(
 				"Create roles", post.get("summary"), "Unexpected operation: " + post);
 			assertEquals(
-				"Runs role.create as a single step. Returns the step result {stepId, operation, status, result: {success, requested, count, skipped, items, error}, error}. HTTP 400 when a parameter is unknown or a required parameter is missing; HTTP 422 when the step fails, including invalid values such as a count out of range. HTTP 404 when the operation is unknown.",
+				"Runs role.create as a single step. Returns the step result {stepId, operation, status, result: {success, requested, count, skipped, items, error}, error}. HTTP 401 when not signed in; HTTP 403 when not a company administrator or when company.create is called without omniadmin permission. HTTP 400 when a parameter is unknown or a required parameter is missing; HTTP 422 when the step fails, including invalid values such as a count out of range. HTTP 404 when the operation is unknown.",
 				post.get("description"), "Unexpected operation: " + post);
 		}
 	}

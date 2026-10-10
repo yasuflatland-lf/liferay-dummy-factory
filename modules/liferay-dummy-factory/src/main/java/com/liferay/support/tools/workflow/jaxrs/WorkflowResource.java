@@ -1,10 +1,13 @@
 package com.liferay.support.tools.workflow.jaxrs;
 
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.support.tools.security.DataCreationAuthorization;
 import com.liferay.support.tools.service.CategoryCreator;
 import com.liferay.support.tools.service.VocabularyCreator;
 import com.liferay.support.tools.workflow.DefaultWorkflowFunction;
@@ -82,7 +85,7 @@ public class WorkflowResource {
 	private static final String _BASIC_CHALLENGE =
 		"Basic realm=\"PortalRealm\"";
 
-	private static final String _COMPANY_CREATE = "company.create";
+	private static final Log _log = LogFactoryUtil.getLog(WorkflowResource.class);
 
 	private static final Pattern _STEP_ID_PATTERN = Pattern.compile(
 		"[A-Za-z0-9_-]+");
@@ -130,20 +133,6 @@ public class WorkflowResource {
 		).type(
 			MediaType.APPLICATION_JSON
 		).build();
-	}
-
-	static String forbiddenReason(
-		boolean companyAdmin, boolean omniadmin, Collection<String> operations) {
-
-		if (!companyAdmin) {
-			return "Executing a workflow requires a company administrator.";
-		}
-
-		if (!omniadmin && operations.contains(_COMPANY_CREATE)) {
-			return "company.create requires an omniadmin.";
-		}
-
-		return null;
 	}
 
 	OperationOutcome executeOperation(
@@ -500,13 +489,17 @@ public class WorkflowResource {
 		PermissionChecker permissionChecker = _permissionCheckerFactory.create(
 			user);
 
-		String reason = forbiddenReason(
+		String reason = DataCreationAuthorization.forbiddenReason(
 			permissionChecker.isCompanyAdmin(), permissionChecker.isOmniadmin(),
 			operations);
 
 		if (reason == null) {
 			return;
 		}
+
+		_log.warn(
+			"Workflow permission denied: userId=" + user.getUserId() +
+				", operations=" + operations + ", reason=" + reason);
 
 		throw new ForbiddenException(
 			Response.status(

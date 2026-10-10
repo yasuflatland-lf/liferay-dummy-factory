@@ -10,6 +10,7 @@ This setup is for local development only: it creates dummy data with Basic Auth 
 - The Dummy Factory bundle deployed and active.
 - The MCP Server enabled ([how](../reference/dxp-runtime-config.md#liferay-mcp-server)). The development container already enables it.
 - A DXP activation key ([license](../reference/test-harness.md#license)).
+- An MCP user who is a company admin (omniadmin for `createCompanies`), per the [authorization rule](../reference/workflow-api.md#authentication).
 - The Claude Code CLI.
 
 ## 1. Start Liferay

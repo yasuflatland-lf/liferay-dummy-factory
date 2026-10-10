@@ -27,6 +27,7 @@ Notes:
 
 - **Workflow JSON is user input.** A sample template reaches `UserCreator` through the same path as a form submission, so template values must pass the same validation (for example, a non-faker user `baseName` must match `^[a-z0-9._-]+$` after lowercasing — use `sample-workflow-user`, not `Sample Workflow User`).
 - **`AssetTagNames` is the one normalizing parser for tags.** `AssetTagNames.of(String)` lowercases, trims, splits on commas, drops empty tokens and de-duplicates in first-seen order; blank input is `AssetTagNames.EMPTY`. Creators that attach tags call `ServiceContext.setAssetTagNames(tags.toArray())` only when `!tags.isEmpty()`. Liferay-side behaviour: [liferay-dxp-api](../reference/liferay-dxp-api.md#servicecontextsetassettagnames--auto-create-and-group-scope).
+- **Entity IDs stay within the caller's virtual instance.** Every Creator validates incoming group, membership, parent, folder and template IDs through the shared `CompanyScopedIds` service before creating anything. The caller's company comes from the entry point's companyId or the creator user. Missing entities and company mismatches throw `IllegalArgumentException`, following the same input-error path as other rejected input in both entry points. A multi-site batch validates every ID before its first transaction; it cannot create in earlier sites before rejecting a later site. Zero is skipped only for optional IDs whose contract defines it as the root or no-selection sentinel. Omniadmin permission does not bypass this rule.
 - **Validation runs outside the transaction.** Throw validation exceptions before the first `BatchTransaction.run(...)`; no transaction has started, so nothing needs rolling back, and the resource command's `catch (Throwable)` turns the exception into `{success: false, error}`.
 
 ## Batch response contract
@@ -85,9 +86,9 @@ Each `*Creator` wraps the per-entity work in `BatchTransaction.run(() -> { … }
 
 ## Resource commands
 
-The portlet's Control Panel permission governs access to its resource commands. `/ldf/company` additionally requires the request's permission checker to be an omniadmin, matching DXP's Virtual Instances app: a company administrator of a secondary instance must not create virtual instances. `CompanyResourceCommandTest` covers the check. A denial returns the template's usual `{success:false, error}` JSON with HTTP 200, unlike the REST path's HTTP 403. REST and MCP authorization is defined in [Workflow API authentication](../reference/workflow-api.md#authentication).
+Portlet data creation and multipart temp-file operations enforce the shared [authorization rule](../reference/workflow-api.md#authentication) through `DataCreationAuthorization`, using the request's `ThemeDisplay` permission checker. The template checks permission before parsing input or starting progress; `DocumentUploadResourceCommand` checks before adding or deleting temp files. Control Panel access alone does not authorize data creation. Denials return `{success:false, error}` with HTTP 200 and a localized message from the portlet resource bundle. They are logged at WARN with userId, command and reason, without a stack trace. `/ldf/progress` only reads the current session's progress and retains the existing portlet access check; `/ldf/data` likewise only supplies dropdown options.
 
-Every resource command except `DocumentUploadResourceCommand` (multipart upload) delegates to the template:
+Every data-creating resource command except `DocumentUploadResourceCommand` (multipart upload) delegates to the template:
 
 ```java
 PortletJsonCommandTemplate.serveJsonWithProgress(
