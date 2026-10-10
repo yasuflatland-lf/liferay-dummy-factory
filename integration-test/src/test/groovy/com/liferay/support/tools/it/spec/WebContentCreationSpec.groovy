@@ -188,15 +188,9 @@ class WebContentCreationSpec extends BaseLiferaySpec {
 		}
 	}
 
-	def 'reports per-site failure when structure id is missing'() {
-		// DDMStructureService#addStructure does not accept a raw definition
-		// JSON via JSONWS form-encoded POST on Liferay (it expects a
-		// serialized DDMForm Java object), so we cannot cheaply build a
-		// site-scoped structure for this test. Instead, we pass a
-		// deliberately nonexistent ddmStructureId; the WebContentCreator
-		// reports per-site failure for both target sites and the overall
-		// payload flags the batch as not-ok with totalCreated=0. This still
-		// exercises the per-site error pipeline end to end.
+	def 'rejects a missing structure id before creating in any site'() {
+		// CompanyScopedIds validates ddmStructureId before the first site's
+		// transaction, so the whole batch is rejected as invalid input.
 		given:
 		Map siteA = jsonws.createSite(
 			"WcmStructA-${System.nanoTime()}")
@@ -214,6 +208,44 @@ class WebContentCreationSpec extends BaseLiferaySpec {
 			createContentsType: '2',
 			ddmStructureId: 999_999_999,
 			ddmTemplateId: 999_999_999,
+			folderId: 0
+		])
+
+		then: 'the batch is rejected with the missing-structure error'
+		assert response.success == false : "${response}"
+		assert (response.error as String)?.contains(
+			'ddmStructureId 999999999 does not exist') : "${response}"
+
+		and: 'JSONWS shows both sites have zero articles'
+		int countA = jsonwsGet(
+			"journal.journalarticle/get-articles-count" +
+			"/group-id/${siteAId}/folder-id/0") as int
+		int countB = jsonwsGet(
+			"journal.journalarticle/get-articles-count" +
+			"/group-id/${siteBId}/folder-id/0") as int
+
+		countA == 0
+		countB == 0
+	}
+
+	def 'reports per-site failure when the article title is too long'() {
+		// The article title fails inside each site transaction.
+		given:
+		Map siteA = jsonws.createSite(
+			"WcmLongTitleA-${System.nanoTime()}")
+		Map siteB = jsonws.createSite(
+			"WcmLongTitleB-${System.nanoTime()}")
+
+		Long siteAId = siteA.groupId as Long
+		Long siteBId = siteB.groupId as Long
+
+		when:
+		Map response = ldf.createWebContent([
+			count: 3,
+			baseName: 'x' * 900,
+			groupIds: [siteAId, siteBId],
+			createContentsType: '0',
+			baseArticle: 'Sample body',
 			folderId: 0
 		])
 

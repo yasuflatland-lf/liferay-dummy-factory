@@ -14,6 +14,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.support.tools.constants.LDFPortletKeys;
+import com.liferay.support.tools.service.CompanyScopedIds;
 
 import java.io.InputStream;
 
@@ -65,6 +66,9 @@ public class DocumentUploadResourceCommand extends BaseMVCResourceCommand {
 						return;
 					}
 
+					_companyScopedIds.group(
+						_portal.getCompanyId(resourceRequest), "groupId", groupId);
+
 					InputStream inputStream =
 						uploadPortletRequest.getFileAsStream("file");
 					String mimeType = uploadPortletRequest.getContentType(
@@ -97,6 +101,9 @@ public class DocumentUploadResourceCommand extends BaseMVCResourceCommand {
 					return;
 				}
 
+				_companyScopedIds.group(
+					_portal.getCompanyId(resourceRequest), "groupId", groupId);
+
 				_dlAppService.deleteTempFileEntry(
 					groupId, 0, LDFPortletKeys.DOCUMENT_TEMP_FOLDER_NAME, fileName);
 
@@ -107,6 +114,9 @@ public class DocumentUploadResourceCommand extends BaseMVCResourceCommand {
 				responseJson.put("error", "unknown cmd: " + cmd);
 				responseJson.put("success", false);
 			}
+		}
+		catch (IllegalArgumentException exception) {
+			ResourceCommandUtil.setErrorResponse(responseJson, exception);
 		}
 		catch (Exception exception) {
 			_log.error(
@@ -121,6 +131,9 @@ public class DocumentUploadResourceCommand extends BaseMVCResourceCommand {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DocumentUploadResourceCommand.class);
+
+	@Reference
+	private CompanyScopedIds _companyScopedIds;
 
 	@Reference
 	private DLAppService _dlAppService;

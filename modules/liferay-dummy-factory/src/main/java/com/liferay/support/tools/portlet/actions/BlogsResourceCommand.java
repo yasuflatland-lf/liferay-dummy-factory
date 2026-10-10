@@ -14,6 +14,7 @@ import com.liferay.support.tools.service.BatchResult;
 import com.liferay.support.tools.service.BatchSpec;
 import com.liferay.support.tools.service.BlogsBatchSpec;
 import com.liferay.support.tools.service.BlogsCreator;
+import com.liferay.support.tools.service.CompanyScopedIds;
 
 import jakarta.portlet.ResourceRequest;
 import jakarta.portlet.ResourceResponse;
@@ -60,6 +61,8 @@ public class BlogsResourceCommand extends BaseMVCResourceCommand {
 				long userId = GetterUtil.getLong(
 					data.getString("userId"), context.getUserId());
 
+				_companyScopedIds.user(context.getCompanyId(), "userId", userId);
+
 				BatchResult<BlogsEntry> result = _blogsCreator.create(
 					userId, blogsBatchSpec, context.getProgressCallback());
 
@@ -81,6 +84,9 @@ public class BlogsResourceCommand extends BaseMVCResourceCommand {
 
 	@Reference
 	private BlogsCreator _blogsCreator;
+
+	@Reference
+	private CompanyScopedIds _companyScopedIds;
 
 	@Reference
 	private Portal _portal;

@@ -127,7 +127,7 @@ class WorkflowWebContentCountSpec extends BaseLiferaySpec {
 		assert articleCount == 5 : "article count ${articleCount}; ${payload}"
 	}
 
-	def 'operations endpoint reports the per-site error when web content creation fails'() {
+	def 'operations endpoint rejects missing structure input before web content creation'() {
 		given:
 		assert groupId != null && groupId > 0 :
 			'prior feature method did not populate groupId; @Stepwise ordering broken'
@@ -136,6 +136,38 @@ class WorkflowWebContentCountSpec extends BaseLiferaySpec {
 			baseName: "WFWebContentFailedArticle${RUN_SUFFIX}",
 			createContentsType: 2, ddmStructureId: 999_999_999,
 			ddmTemplateId: 999_999_999, folderId: 0
+		]
+
+		when:
+		Map response = _postJson(
+			'/o/ldf-workflow/operations/webContent.create', parameters)
+
+		then:
+		assert response.status == 422 : "${response}"
+
+		when:
+		Map payload = new JsonSlurper().parseText(response.body as String) as Map
+
+		then:
+		assert payload.status == 'FAILED' : "${payload}"
+		assert payload.error?.message?.contains('ddmStructureId 999999999 does not exist') :
+			"${payload}"
+
+		when:
+		int articleCount = _articleCount()
+
+		then:
+		assert articleCount == 5 : "article count ${articleCount}; ${payload}"
+	}
+
+	def 'operations endpoint reports the per-site error when the article title is too long'() {
+		given:
+		assert groupId != null && groupId > 0 :
+			'prior feature method did not populate groupId; @Stepwise ordering broken'
+		Map parameters = [
+			count: 2, groupIds: [groupId],
+			baseName: 'x' * 900,
+			createContentsType: 0, baseArticle: 'Workflow HTTP e2e body', folderId: 0
 		]
 
 		when:

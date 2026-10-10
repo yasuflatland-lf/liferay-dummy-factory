@@ -27,6 +27,14 @@ public class MBThreadCreator {
 		String format = spec.format();
 		BatchSpec batchSpec = spec.batch();
 
+		long companyId = _companyScopedIds.companyId(userId);
+
+		_companyScopedIds.group(companyId, "groupId", groupId);
+
+		if (categoryId != 0) {
+			_companyScopedIds.mbCategory(companyId, "categoryId", categoryId);
+		}
+
 		int count = batchSpec.count();
 
 		String userName = _userLocalService.getUser(userId).getFullName();
@@ -58,6 +66,9 @@ public class MBThreadCreator {
 
 		return BatchResult.success(count, messages, 0);
 	}
+
+	@Reference
+	private CompanyScopedIds _companyScopedIds;
 
 	@Reference
 	private MBMessageLocalService _mbMessageLocalService;

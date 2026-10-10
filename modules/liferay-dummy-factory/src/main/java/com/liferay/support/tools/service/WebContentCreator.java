@@ -62,6 +62,26 @@ public class WebContentCreator {
 		long ddmTemplateId = spec.ddmTemplateId();
 		AssetTagNames tags = spec.tags();
 
+		long companyId = _companyScopedIds.companyId(userId);
+
+		for (long groupId : groupIds) {
+			_companyScopedIds.group(companyId, "groupIds", groupId);
+		}
+
+		if (folderId != 0) {
+			_companyScopedIds.journalFolder(companyId, "folderId", folderId);
+		}
+
+		if (ddmStructureId != 0) {
+			_companyScopedIds.ddmStructure(
+				companyId, "ddmStructureId", ddmStructureId);
+		}
+
+		if (ddmTemplateId != 0) {
+			_companyScopedIds.ddmTemplate(
+				companyId, "ddmTemplateId", ddmTemplateId);
+		}
+
 		int count = batch.count();
 		String baseName = batch.baseName();
 
@@ -656,6 +676,9 @@ public class WebContentCreator {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		WebContentCreator.class);
+
+	@Reference
+	private CompanyScopedIds _companyScopedIds;
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;

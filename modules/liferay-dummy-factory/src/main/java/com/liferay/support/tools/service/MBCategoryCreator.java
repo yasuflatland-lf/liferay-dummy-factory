@@ -20,6 +20,9 @@ public class MBCategoryCreator {
 			ProgressCallback progress)
 		throws Throwable {
 
+		_companyScopedIds.group(
+			_companyScopedIds.companyId(userId), "groupId", groupId);
+
 		int count = batchSpec.count();
 
 		ServiceContext serviceContext = new ServiceContext();
@@ -43,6 +46,9 @@ public class MBCategoryCreator {
 
 		return BatchResult.success(count, categories, 0);
 	}
+
+	@Reference
+	private CompanyScopedIds _companyScopedIds;
 
 	@Reference
 	private MBCategoryLocalService _mbCategoryLocalService;
