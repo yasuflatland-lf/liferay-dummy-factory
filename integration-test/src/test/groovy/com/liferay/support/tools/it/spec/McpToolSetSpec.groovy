@@ -235,10 +235,13 @@ class McpToolSetSpec extends BaseLiferaySpec {
 
 		then:
 		IllegalStateException exception = thrown()
-		assert exception.message.contains('HTTP 404') :
+		assert exception.message.contains('returned HTTP 404') :
 			"unexpected user lookup failure: ${exception.message}"
-		assert exception.message.contains('NoSuchUserException') :
-			"user absence was not confirmed: ${exception.message}"
+
+		and: 'the same lookup finds an existing user, so the 404 means absence'
+		Map admin = jsonwsGet("user/get-user-by-email-address?companyId=${companyId}&emailAddress=test@liferay.com") as Map
+		assert (admin?.emailAddress as String)?.equalsIgnoreCase('test@liferay.com') :
+			"admin lookup failed: ${admin}"
 	}
 
 	def 'operations endpoint rejects a request without credentials and creates nothing'() {
