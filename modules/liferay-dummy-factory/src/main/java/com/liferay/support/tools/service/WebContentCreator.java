@@ -46,6 +46,26 @@ public class WebContentCreator {
 			long userId, WebContentBatchSpec spec, ProgressCallback progress)
 		throws Throwable {
 
+		long companyId = _companyScopedIds.companyId(userId);
+
+		for (long groupId : spec.groupIds()) {
+			_companyScopedIds.group(companyId, "groupIds", groupId);
+		}
+
+		if (spec.folderId() != 0) {
+			_companyScopedIds.journalFolder(companyId, "folderId", spec.folderId());
+		}
+
+		if (spec.ddmStructureId() != 0) {
+			_companyScopedIds.ddmStructure(
+				companyId, "ddmStructureId", spec.ddmStructureId());
+		}
+
+		if (spec.ddmTemplateId() != 0) {
+			_companyScopedIds.ddmTemplate(
+				companyId, "ddmTemplateId", spec.ddmTemplateId());
+		}
+
 		BatchSpec batch = spec.batch();
 		long[] groupIds = spec.groupIds();
 		long folderId = spec.folderId();
@@ -656,6 +676,9 @@ public class WebContentCreator {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		WebContentCreator.class);
+
+	@Reference
+	private CompanyScopedIds _companyScopedIds;
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;

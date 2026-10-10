@@ -28,6 +28,13 @@ public class DocumentCreator {
 			long userId, DocumentBatchSpec spec, ProgressCallback progress)
 		throws Throwable {
 
+		long companyId = _companyScopedIds.companyId(userId);
+		_companyScopedIds.group(companyId, "groupId", spec.groupId());
+
+		if (spec.folderId() != 0) {
+			_companyScopedIds.dlFolder(companyId, "folderId", spec.folderId());
+		}
+
 		long groupId = spec.groupId();
 		long folderId = spec.folderId();
 		String description = spec.description();
@@ -202,6 +209,9 @@ public class DocumentCreator {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DocumentCreator.class);
+
+	@Reference
+	private CompanyScopedIds _companyScopedIds;
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;

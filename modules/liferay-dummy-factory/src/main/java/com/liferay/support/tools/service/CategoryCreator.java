@@ -24,6 +24,10 @@ public class CategoryCreator {
 			ProgressCallback progress)
 		throws Throwable {
 
+		long companyId = _companyScopedIds.companyId(userId);
+		_companyScopedIds.group(companyId, "groupId", groupId);
+		_companyScopedIds.vocabulary(companyId, "vocabularyId", vocabularyId);
+
 		int count = batchSpec.count();
 
 		ServiceContext serviceContext = new ServiceContext();
@@ -54,5 +58,8 @@ public class CategoryCreator {
 
 	@Reference
 	private AssetCategoryLocalService _assetCategoryLocalService;
+
+	@Reference
+	private CompanyScopedIds _companyScopedIds;
 
 }

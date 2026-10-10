@@ -27,6 +27,9 @@ public class LayoutCreator {
 			ProgressCallback progress)
 		throws Throwable {
 
+		_companyScopedIds.group(
+			_companyScopedIds.companyId(userId), "groupId", groupId);
+
 		int count = batchSpec.count();
 		String baseName = batchSpec.baseName();
 
@@ -98,6 +101,9 @@ public class LayoutCreator {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(LayoutCreator.class);
+
+	@Reference
+	private CompanyScopedIds _companyScopedIds;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
