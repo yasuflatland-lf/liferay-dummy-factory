@@ -54,7 +54,53 @@ class WebContentCreateWorkflowOperationAdapterTest {
 		assertSame(ProgressCallback.NOOP, creator._progress);
 	}
 
+	@Test
+	void executeKeepsPerSiteErrorWhenCountDiffersFromItemsOnFailure()
+		throws Throwable {
+
+		_StubWebContentCreator creator = new _StubWebContentCreator(
+			new BatchResult<>(
+				false, 0, 2, 2,
+				List.of(
+					new WebContentPerSiteResult(
+						201L, "Site", 0, 2, "No DDMStructure exists")),
+				"No DDMStructure exists"));
+		WebContentCreateWorkflowOperationAdapter adapter =
+			new WebContentCreateWorkflowOperationAdapter(null, creator);
+
+		WorkflowStepResult result = adapter.execute(
+			new WorkflowExecutionContext(41L),
+			Map.of(
+				"count", 2, "baseName", "Article", "groupIds", List.of(201L),
+				"locales", List.of("en_US"), "createContentsType", 2,
+				"ddmStructureId", 999L, "ddmTemplateId", 999L, "folderId", 0));
+
+		assertFalse(result.success());
+		assertEquals(2, result.requested());
+		assertEquals(0, result.count());
+		assertEquals(2, result.skipped());
+		assertEquals("No DDMStructure exists", result.error());
+		assertEquals(1, result.items().size());
+		assertEquals(
+			Map.of(
+				"groupId", 201L, "siteName", "Site", "created", 0, "failed", 2,
+				"error", "No DDMStructure exists"),
+			result.items().get(0));
+	}
+
 	private static class _StubWebContentCreator extends WebContentCreator {
+
+		_StubWebContentCreator() {
+			this(
+				new BatchResult<>(
+					true, 3, 3, 0,
+					List.of(new WebContentPerSiteResult(201L, "Site", 3, 0, null)),
+					null));
+		}
+
+		_StubWebContentCreator(BatchResult<WebContentPerSiteResult> result) {
+			_result = result;
+		}
 
 		@Override
 		public BatchResult<WebContentPerSiteResult> create(
@@ -64,12 +110,11 @@ class WebContentCreateWorkflowOperationAdapterTest {
 			_spec = spec;
 			_progress = progress;
 
-			return new BatchResult<>(
-				true, 3, 3, 0,
-				List.of(new WebContentPerSiteResult(201L, "Site", 3, 0, null)), null);
+			return _result;
 		}
 
 		private ProgressCallback _progress;
+		private final BatchResult<WebContentPerSiteResult> _result;
 		private WebContentBatchSpec _spec;
 		private long _userId;
 

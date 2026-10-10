@@ -172,6 +172,59 @@ class WorkflowWebContentCountSpec extends BaseLiferaySpec {
 		assert articleCount == 5 : "article count ${articleCount}; ${payload}"
 	}
 
+	def 'operations endpoint reports the per-site error when web content creation fails'() {
+		given:
+		assert groupId != null && groupId > 0 :
+			'prior feature method did not populate groupId; @Stepwise ordering broken'
+		Map parameters = [
+			count: 2, groupIds: [groupId],
+			baseName: "WFWebContentFailedArticle${RUN_SUFFIX}",
+			createContentsType: 2, ddmStructureId: 999_999_999,
+			ddmTemplateId: 999_999_999, folderId: 0
+		]
+
+		when:
+		Map response = _rawRequest(
+			'POST', '/o/ldf-workflow/operations/webContent.create', basicAuthHeader(),
+			JsonOutput.toJson(parameters))
+
+		then:
+		assert response.status == 422 : "${response}"
+
+		when:
+		Map payload = new JsonSlurper().parseText(response.body as String) as Map
+		Map result = payload.result as Map
+
+		then:
+		assert payload.status == 'FAILED' : "${payload}"
+		assert result != null : "${payload}"
+		assert ['success', 'requested', 'count', 'skipped', 'items', 'error'].every {
+			result.containsKey(it)
+		} : "${payload}"
+		assert result.success == false : "${payload}"
+		assert result.requested == 2 : "${payload}"
+		assert result.count == 0 : "${payload}"
+		assert result.skipped == 2 : "${payload}"
+		assert result.items instanceof List : "${payload}"
+		assert result.items.size() == 1 : "${payload}"
+		assert result.items[0].groupId == groupId : "${payload}"
+		assert result.items[0].created == 0 : "${payload}"
+		assert result.items[0].failed == 2 : "${payload}"
+		assert (result.items[0].error as String)?.trim() : "${payload}"
+		assert result.error == result.items[0].error : "${payload}"
+		assert !(result.error as String).contains('count must match items size') :
+			"${payload}"
+		assert payload.error?.code == 'STEP_REPORTED_FAILURE' : "${payload}"
+		assert payload.error?.message == result.error : "${payload}"
+
+		when:
+		int articleCount = jsonwsGet(
+			"journal.journalarticle/get-articles-count/group-id/${groupId}/folder-id/0") as int
+
+		then:
+		assert articleCount == 5 : "article count ${articleCount}; ${payload}"
+	}
+
 	private Map _rawRequest(
 		String method, String path, String authorization, String jsonBody) {
 
