@@ -82,8 +82,13 @@ class DataCreationAuthorizationTest {
 		return (PermissionChecker)Proxy.newProxyInstance(
 			PermissionChecker.class.getClassLoader(),
 			new Class<?>[] {PermissionChecker.class},
-			(proxy, method, args) -> method.getName().equals("isCompanyAdmin") &&
-				companyAdmin);
+			(proxy, method, args) -> {
+				if (method.getReturnType() == long.class) {
+					return 42L;
+				}
+
+				return method.getName().equals("isCompanyAdmin") && companyAdmin;
+			});
 	}
 
 }
