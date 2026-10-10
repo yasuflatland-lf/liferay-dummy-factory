@@ -189,6 +189,15 @@ HTTP status contract:
 
 The [count cap](../architecture/backend.md#parameters-batchspec-and-batchspec) is checked during adapter execution, so `count: 0` and a count above the cap return 422, while an omitted required `count` returns 400.
 
+### `ldf` profile
+
+The dedicated profile `ldf` at `/o/mcp/ldf` is provisioned by `McpProfileProvisioner`, never by the bundle ([ADR-0010](../adr/0010-mcp-via-liferay-mcp-server.md)); run it with the [`setupMcpProfile` task](test-harness.md#mcp-profile-task-setupmcpprofile). It pins every `ldf-workflow` tool, so a tool with a request body takes it nested once under `body` (`{"body": {"count": 1, "baseName": "x"}}`), not twice as with the `default`-profile meta tool.
+
+- **Profile storage on the pinned DXP image (measured)**: `/o/mcp/server-profiles` has only `name`, `description` and a required `tools` text field with one `<toolSetName> <toolName>` line per pinned tool. There is no `profileStatus` picklist, no `instructions` field, and no `/o/mcp/server-profile-tools` object (HTTP 404); those exist only in later liferay-portal `master`. So instead of the create-inactive, upsert-tools, activate sequence planned in ADR-0010, the provisioner upserts the whole profile in one `PUT /o/mcp/server-profiles/by-external-reference-code/LDF_MCP_PROFILE`. Unknown fields in that body are silently ignored.
+- **Verification**: Liferay accepts a `tools` line naming a tool that does not exist without error, so the provisioner checks `tools/list` on `/o/mcp/ldf` against the discovered tool set.
+- **No restart needed**: a profile update is visible on the next `tools/list`.
+- **Regression guard**: `McpProfileSpec`.
+
 ## Limitations
 
 - Sequential execution only; `FAIL_FAST` only.

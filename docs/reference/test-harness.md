@@ -30,6 +30,25 @@ How the integration-test infrastructure works: the Gradle task graph, the DXP co
 
 A real run takes minutes; `BUILD SUCCESSFUL in` a few seconds means nothing ran.
 
+## MCP profile task (`setupMcpProfile`)
+
+`:integration-test:setupMcpProfile` creates or updates the `ldf` MCP profile on an already-running Liferay through `McpProfileProvisioner`, the same code `McpProfileSpec` runs. It does not start the container, and `integrationTest` does not depend on it. What the profile contains: [`ldf` profile](workflow-api.md#ldf-profile).
+
+| Property | Default |
+|---|---|
+| `-Pldf.baseUrl` | `http://localhost:8080` |
+| `-Pldf.user` | `test@liferay.com` |
+| `-Pldf.password` | `test` |
+
+Pass the current admin password ([Admin row](#the-container)). After the Playwright-based specs have run it has changed:
+
+```bash
+./gradlew :integration-test:setupMcpProfile \
+    -Pldf.baseUrl=http://localhost:8080 \
+    -Pldf.user=test@liferay.com \
+    -Pldf.password=Test12345
+```
+
 ## The container
 
 | Property | Value |
