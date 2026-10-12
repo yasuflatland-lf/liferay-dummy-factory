@@ -71,9 +71,9 @@ class CompanyFunctionalSpec extends BaseLiferaySpec {
 
 		then: 'success alert appears'
 		// addCompany runs the site initializers synchronously (about 10 s
-		// locally), so leave headroom for slower CI runners.
+		// locally, 40-70 s on CI runners), so leave headroom for slower ones.
 		page.locator('[data-testid="company-result"].alert-success').waitFor(
-			new Locator.WaitForOptions().setTimeout(90_000)
+			new Locator.WaitForOptions().setTimeout(120_000)
 		)
 		page.locator('[data-testid="company-result"].alert-success').isVisible()
 	}
