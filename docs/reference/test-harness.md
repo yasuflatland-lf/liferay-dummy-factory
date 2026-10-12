@@ -19,6 +19,16 @@ How the integration-test infrastructure works: the Gradle task graph, the DXP co
 - `integrationTest` passes `liferay.host`, `liferay.http.port`, `liferay.gogo.port`, `liferay.jacoco.port`, `liferay.container.name`, `liferay.admin.email`, `liferay.admin.password` and `project.root.dir` as system properties.
 - `integration-test/build.gradle` fails fast if the Workspace plugin did not register `:dockerDeploy` / `:createDockerContainer`.
 
+### Shard selection
+
+`integrationTest` accepts `-PshardIndex=<1..N>` and `-PshardTotal=<N>`. Supply both properties together; the total must be positive and the index must be within the total. With neither property, all specs run as before. An empty shard fails configuration rather than running every spec.
+
+At configuration time, sharding discovers every `src/test/groovy/**/*Spec.groovy` file and excludes files declaring an abstract class, including `BaseLiferaySpec`. Fully qualified class names come from the paths relative to `src/test/groovy`; no spec registration is needed.
+
+The longest processing time (LPT) assignment sorts specs by estimated seconds descending, then fully qualified class name ascending. Each spec goes to the shard with the lowest total estimate; ties go to the lowest shard index. Every discovered spec belongs to exactly one shard. The task filters by those class names, fails if no tests match, and logs the selected specs and total estimated seconds.
+
+`integration-test/spec-timings.properties` maps simple spec class names to measured seconds, used only to balance shards. Unknown specs have weight 10 seconds. A new spec is included automatically; add its measured timing later to improve balance.
+
 ### Incremental build trap
 
 `integrationTest` does not declare the frontend toolchain (`package.json`, `yarn.lock`) as inputs. After a JS dependency change Gradle may report it `UP-TO-DATE` and replay the previous green result. For any frontend-toolchain change:

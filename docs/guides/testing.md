@@ -34,6 +34,12 @@ One spec:
     --tests "com.liferay.support.tools.it.spec.DeploymentSpec"
 ```
 
+One shard locally (see [shard selection](../reference/test-harness.md#shard-selection) for assignment details):
+
+```bash
+./gradlew :integration-test:integrationTest -PshardIndex=1 -PshardTotal=3
+```
+
 Faster iteration: start the container once with `./gradlew startDockerContainer`, then run single specs repeatedly. Use `--info` for verbose output; `docker logs -f liferay-dummy-factory-liferay` for the portal log.
 
 Compile the specs without a container (note the task name — `compileGroovy` has no sources and always passes):
@@ -56,4 +62,4 @@ Compile the specs without a container (note the task name — `compileGroovy` ha
 
 ## CI
 
-`unit-test.yml` runs on every PR (Java + Vitest + docs check); `integration-test.yml` runs on PRs to `master` with the `LIFERAY_DXP_LICENSE_BASE64` secret. Both upload coverage to Codecov. On integration failure, download the `integration-test-report` artifact: it contains the test reports and the container log.
+`unit-test.yml` runs on every PR (Java + Vitest + docs check); `integration-test.yml` runs on PRs to `master` with the `LIFERAY_DXP_LICENSE_BASE64` secret across three shards. The aggregate `integration-test` check succeeds only when all shards succeed. Both workflows upload coverage to Codecov. On integration failure, download the affected shard's `integration-test-report-<n>` artifact: it contains the test reports and the container log.

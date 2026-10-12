@@ -191,6 +191,53 @@ tasks.register('integrationTest', Test) {
 	testClassesDirs = sourceSets.test.output.classesDirs
 	classpath = sourceSets.test.runtimeClasspath
 
+	def shardIndexProperty = project.findProperty('shardIndex')
+	def shardTotalProperty = project.findProperty('shardTotal')
+	if (shardIndexProperty != null || shardTotalProperty != null) {
+		if (shardIndexProperty == null || shardTotalProperty == null) {
+			throw new GradleException('Both -PshardIndex and -PshardTotal must be provided together.')
+		}
+		def shardIndexText = shardIndexProperty.toString()
+		def shardTotalText = shardTotalProperty.toString()
+		if (!shardIndexText.isInteger() || !shardTotalText.isInteger()) {
+			throw new GradleException('shardIndex and shardTotal must be integers (1 <= shardIndex <= shardTotal).')
+		}
+		int shardIndex = shardIndexText.toInteger()
+		int shardTotal = shardTotalText.toInteger()
+		if (shardTotal < 1 || shardIndex < 1 || shardIndex > shardTotal) {
+			throw new GradleException('Sharding requires shardTotal >= 1 and 1 <= shardIndex <= shardTotal.')
+		}
+
+		def timings = new Properties()
+		file('spec-timings.properties').withInputStream { timings.load(it) }
+		def specRoot = file('src/test/groovy').toPath()
+		def specs = fileTree('src/test/groovy').matching { include '**/*Spec.groovy' }
+			.findAll { !(it.text =~ /\babstract\s+class\b/).find() }
+			.collect { spec ->
+				def fqcn = specRoot.relativize(spec.toPath()).toString()
+					.replace(File.separator, '.').replaceAll(/\.groovy$/, '')
+				[fqcn: fqcn, weight: timings.getProperty(spec.name - '.groovy', '10').toInteger()]
+			}
+			.sort { a, b -> (b.weight <=> a.weight) ?: (a.fqcn <=> b.fqcn) }
+		def shards = (1..shardTotal).collect { [specs: [], seconds: 0] }
+		specs.each { spec ->
+			// indexOf keeps ties on the lowest shard index.
+			def totals = shards.collect { it.seconds }
+			def shard = shards[totals.indexOf(totals.min())]
+			shard.specs.add(spec.fqcn)
+			shard.seconds += spec.weight
+		}
+		def shard = shards[shardIndex - 1]
+		if (shard.specs.isEmpty()) {
+			throw new GradleException("Shard ${shardIndex}/${shardTotal} has no specs; reduce shardTotal.")
+		}
+		filter {
+			shard.specs.each { includeTestsMatching(it) }
+			failOnNoMatchingTests = true
+		}
+		logger.lifecycle("Integration test shard ${shardIndex}/${shardTotal}: ${shard.seconds} estimated seconds; specs: ${shard.specs.join(', ')}")
+	}
+
 	jvmArgs "-Xms${project.property('test.jvm.minHeap')}",
 			"-Xmx${project.property('test.jvm.maxHeap')}"
 	timeout = Duration.ofMinutes(30)
