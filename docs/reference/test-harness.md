@@ -29,6 +29,8 @@ The longest processing time (LPT) assignment sorts specs by estimated seconds de
 
 `integration-test/spec-timings.properties` maps simple spec class names to measured seconds, used only to balance shards. Unknown specs have weight 10 seconds. A new spec is included automatically; add its measured timing later to improve balance.
 
+Refresh the weights from the JUnit XML in the `integration-test-results-<n>` artifacts: use each spec's wall time, from its suite `timestamp` to the next suite's `timestamp`, which includes setup and teardown. Do not derive them from the console log. Gradle prints a spec's output only after the spec finishes, so console timestamps credit each spec with the time of the spec that follows it.
+
 ### Incremental build trap
 
 `integrationTest` does not declare the frontend toolchain (`package.json`, `yarn.lock`) as inputs. After a JS dependency change Gradle may report it `UP-TO-DATE` and replay the previous green result. For any frontend-toolchain change:

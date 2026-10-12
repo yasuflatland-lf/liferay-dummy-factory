@@ -43,7 +43,7 @@ class WorkflowHttpClient {
 			).setHeader(
 				'Content-Type', 'application/json'
 			).setTimeout(
-				60_000
+				_REQUEST_TIMEOUT_MS
 			).setData(
 				JsonOutput.toJson(requestBody ?: [:])))
 
@@ -76,7 +76,7 @@ class WorkflowHttpClient {
 			).setHeader(
 				'Accept', 'application/json'
 			).setTimeout(
-				60_000
+				_REQUEST_TIMEOUT_MS
 			))
 
 		int status = response.status()
@@ -97,6 +97,11 @@ class WorkflowHttpClient {
 	private String _authToken() {
 		return _page.evaluate('() => Liferay.authToken') as String
 	}
+
+	// company.create runs the site initializers synchronously and takes
+	// 40-65 s on CI runners; keep the same headroom as the other HTTP paths
+	// that create a company (WorkflowCompanyScopeSpec).
+	private static final int _REQUEST_TIMEOUT_MS = 120_000
 
 	private final String _baseUrl
 	private final Page _page
