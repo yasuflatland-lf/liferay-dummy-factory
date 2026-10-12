@@ -22,18 +22,43 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: "21"
 
       - name: Set up Node.js 20
         uses: actions/setup-node@v7
         with:
-          node-version: '24'
+          node-version: "24"
 
       - name: Enable Yarn via Corepack
         run: corepack enable
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
+
+      - name: Resolve Liferay base image
+        id: dxp-image
+        run: |
+          product=$(sed -n 's/^liferay\.workspace\.product=dxp-//p' gradle.properties)
+          echo "ref=liferay/dxp:${product}" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Liferay base image cache
+        id: dxp-image-cache
+        uses: actions/cache@v6
+        with:
+          path: /tmp/dxp-image.tar.zst
+          key: dxp-image-${{ steps.dxp-image.outputs.ref }}
+
+      - name: Load Liferay base image from cache
+        if: steps.dxp-image-cache.outputs.cache-hit == 'true'
+        run: zstd -dc /tmp/dxp-image.tar.zst | docker load
+
+      - name: Pull Liferay base image and save it for the cache
+        if: steps.dxp-image-cache.outputs.cache-hit != 'true'
+        env:
+          DXP_IMAGE: ${{ steps.dxp-image.outputs.ref }}
+        run: |
+          docker pull "${DXP_IMAGE}"
+          docker save "${DXP_IMAGE}" | zstd -T0 -3 -o /tmp/dxp-image.tar.zst
 
       - name: Provision DXP activation key (from base64 secret)
         env:
@@ -95,6 +120,14 @@ jobs:
           files: integration-test/build/reports/jacoco/integration/jacoco.xml
           flags: integration
           fail_ci_if_error: false
+
+      - name: Upload integration test results (XML)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: integration-test-results
+          path: integration-test/build/test-results/integrationTest/
+          retention-days: 14
 
       - name: Collect Liferay container diagnostics on failure
         if: failure()
