@@ -12,13 +12,13 @@ concurrency:
 
 jobs:
   integration-test-shard:
-    name: integration-test (shard ${{ matrix.shard }}/2)
+    name: integration-test (shard ${{ matrix.shard }}/3)
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2]
+        shard: [1, 2, 3]
 
     steps:
       - uses: actions/checkout@v7
@@ -27,12 +27,12 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: "21"
 
       - name: Set up Node.js 20
         uses: actions/setup-node@v7
         with:
-          node-version: '24'
+          node-version: "24"
 
       - name: Enable Yarn via Corepack
         run: corepack enable
@@ -81,7 +81,7 @@ jobs:
         env:
           LIFERAY_DXP_LICENSE_BASE64: ${{ secrets.LIFERAY_DXP_LICENSE_BASE64 }}
         run: |
-          ./gradlew :integration-test:integrationTest -PshardIndex=${{ matrix.shard }} -PshardTotal=2 --no-daemon --info
+          ./gradlew :integration-test:integrationTest -PshardIndex=${{ matrix.shard }} -PshardTotal=3 --no-daemon --info
 
       - name: Verify integration JaCoCo XML exists
         if: always()
@@ -100,6 +100,14 @@ jobs:
           files: integration-test/build/reports/jacoco/integration/jacoco.xml
           flags: integration
           fail_ci_if_error: false
+
+      - name: Upload integration test results (XML)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: integration-test-results-${{ matrix.shard }}
+          path: integration-test/build/test-results/integrationTest/
+          retention-days: 14
 
       - name: Collect Liferay container diagnostics on failure
         if: failure()
