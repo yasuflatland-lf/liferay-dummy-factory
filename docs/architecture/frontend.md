@@ -1,6 +1,6 @@
 # Frontend architecture
 
-The React UI that runs inside the Control Panel portlet. Coding rules for this area are in [`.claude/rules/frontend.md`](../../.claude/rules/frontend.md); unit-test specifics are in [`reference/vitest.md`](../reference/vitest.md).
+The React UI that runs inside the Control Panel portlet. Coding rules for this area are in [`src/main/resources/AGENTS.md`](../../modules/liferay-dummy-factory/src/main/resources/AGENTS.md); unit-test specifics are in [`reference/vitest.md`](../reference/vitest.md).
 
 ## Build: esbuild for the bundle, Vitest for tests
 
