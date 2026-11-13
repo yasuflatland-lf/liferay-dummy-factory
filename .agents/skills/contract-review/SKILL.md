@@ -5,7 +5,7 @@ description: Review a diff or pull request in this repository against its contra
 
 # Contract review
 
-Review against the checklist in `CONTRIBUTING.md` (section "Review checklist"), in its order: contract violations come before "does it work". For each finding, cite the file and line and the contract it breaks, linking the doc that defines it.
+Review against the checklist in `CONTRIBUTING.md` (section "Review checklist"), in its order: contract violations come before "does it work". Also check each changed file against the `AGENTS.md` files on its path. For each finding, cite the file and line and the contract it breaks, linking the doc that defines it.
 
 Also run, and report the result of:
 
