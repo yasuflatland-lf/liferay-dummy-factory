@@ -40,20 +40,14 @@ function _initValidator(): Promise<ValidateFunction | null> {
 		})
 		.then((doc) => {
 			if (!doc?.schema) {
-				throw new Error(
-					'Schema response missing .schema property'
-				);
+				throw new Error('Schema response missing .schema property');
 			}
 
 			return new Ajv2020({allErrors: true}).compile(doc.schema);
 		})
 		.catch((err: unknown) => {
-			_schemaError =
-				err instanceof Error ? err.message : String(err);
-			console.error(
-				'[workflowJsonSchema] Failed to load schema:',
-				err
-			);
+			_schemaError = err instanceof Error ? err.message : String(err);
+			console.error('[workflowJsonSchema] Failed to load schema:', err);
 
 			return null;
 		});

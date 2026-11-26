@@ -120,4 +120,3 @@ export interface WorkflowExecuteResponse {
 	errors: WorkflowValidationError[];
 	execution?: Record<string, unknown> | null;
 }
-

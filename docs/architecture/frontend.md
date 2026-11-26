@@ -11,9 +11,9 @@ Source lives in `src/main/resources/META-INF/resources/js/` (TypeScript + React,
 | Production bundle | esbuild via `modules/liferay-dummy-factory/scripts/build.mjs` | `yarn build` (run by the Workspace build) |
 | Unit tests | Vitest + jsdom | `yarn test` |
 
-`build.mjs` produces what Liferay's loader expects: an ESM bundle at `__liferay__/index.js` with `react`/`react-dom` redirected to the portal's shared copies, an AMD bridge `index.js` that calls `Liferay.Loader.define()`, and `package.json` / `manifest.json` (`{esModule: true, useESM: true}`). `bnd.bnd` `-includeresource` copies these into the JAR.
+`build.mjs` produces what Liferay's loader expects: an ESM bundle at `__liferay__/index.js` with `react`/`react-dom` redirected to the portal's shared copies, an AMD bridge `index.js` that calls `Liferay.Loader.define()`, and `package.json` / `manifest.json` (`{esModule: true, useESM: true}`). `bnd.bnd` `-includeresource` copies these into the JAR. The entry point comes from `modules/liferay-dummy-factory/node-scripts.config.js`, which the custom build reads directly.
 
-The two toolchains are deliberately not unified: the bundle must be AMD-compatible for Liferay's loader, while tests only evaluate ESM in jsdom. Moving the bundle to Vite would mean re-implementing the AMD bridge as Vite plugins. `@liferay/npm-scripts` is kept only for `format` / `checkFormat`. Why not `@liferay/npm-scripts` for the build: [ADR-0006](../adr/0006-custom-esbuild-over-npm-scripts.md).
+The two toolchains are deliberately not unified: the bundle must be AMD-compatible for Liferay's loader, while tests only evaluate ESM in jsdom. Moving the bundle to Vite would mean re-implementing the AMD bridge as Vite plugins. Formatting uses Prettier with the Liferay plugin ([configuration](../reference/dependencies.md#formatter)) via `format` / `checkFormat` ([ADR-0012](../adr/0012-replace-npm-scripts-format-with-prettier.md)). Why not `@liferay/npm-scripts` for the build: [ADR-0006](../adr/0006-custom-esbuild-over-npm-scripts.md).
 
 Consequences: no content-hashed filenames, no watch mode / HMR (rebuild the JAR and redeploy), and only `react`/`react-dom` are externalized — importing another portal-global package requires extending the esbuild plugin.
 

@@ -199,9 +199,7 @@ describe('validateWorkflowJsonText', () => {
 		const result = await validateWorkflowJsonText(
 			JSON.stringify({
 				schemaVersion: '1.0',
-				steps: [
-					{id: 'a', idempotencyKey: 'x', operation: 'noop'},
-				],
+				steps: [{id: 'a', idempotencyKey: 'x', operation: 'noop'}],
 			})
 		);
 

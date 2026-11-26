@@ -10,7 +10,10 @@
 		"target": "esnext",
 		"skipLibCheck": true,
 		"noEmit": true,
-		"typeRoots": ["./node_modules/@types", "./src/main/resources/META-INF/resources/js/types"]
+		"typeRoots": [
+			"./node_modules/@types",
+			"./src/main/resources/META-INF/resources/js/types"
+		]
 	},
 	"include": [
 		"src/main/resources/META-INF/resources/**/*.ts",

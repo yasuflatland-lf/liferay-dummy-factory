@@ -13,6 +13,7 @@ Facts and reasons: [`docs/reference/liferay-dxp-api.md`](../../docs/reference/li
 
 Facts: [`docs/reference/dependencies.md`](../../docs/reference/dependencies.md).
 
-- Production build is `modules/liferay-dummy-factory/scripts/build.mjs` (esbuild); do not move it to Vite or `@liferay/npm-scripts` ([ADR-0006](../../docs/adr/0006-custom-esbuild-over-npm-scripts.md)).
+- Production build is `modules/liferay-dummy-factory/scripts/build.mjs` (esbuild); keep bundling separate from Vitest and Prettier ([ADR-0006](../../docs/adr/0006-custom-esbuild-over-npm-scripts.md), [ADR-0012](../../docs/adr/0012-replace-npm-scripts-format-with-prettier.md)).
+- Install with Yarn classic so `yarn.lock` keeps its format ([package manager](../../docs/reference/dependencies.md#package-manager)).
 - Yarn only; exact versions for the Node-sensitive toolchain; respect the lockstep pairs.
 - After a toolchain change, prove it with a **clean** integration run (`:modules:liferay-dummy-factory:clean :integration-test:clean`, then `integrationTest`) — see the [incremental build trap](../../docs/reference/test-harness.md#incremental-build-trap).

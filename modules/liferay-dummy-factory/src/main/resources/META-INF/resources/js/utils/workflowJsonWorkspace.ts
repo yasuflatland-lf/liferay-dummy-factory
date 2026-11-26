@@ -6,9 +6,7 @@ import {
 } from '../types';
 import {postJsonResource} from './api';
 import {translate} from './i18n';
-import {
-	validateWorkflowJsonText as _schemaValidate,
-} from './workflowJsonSchema';
+import {validateWorkflowJsonText as _schemaValidate} from './workflowJsonSchema';
 
 export interface WorkflowJsonSample {
 	descriptionKey: string;
@@ -262,7 +260,8 @@ const _sampleDefinitions: Array<
 		titleKey: 'workflow-json-sample-documents-title',
 	},
 	{
-		descriptionKey: 'workflow-json-sample-blogs-and-web-content-description',
+		descriptionKey:
+			'workflow-json-sample-blogs-and-web-content-description',
 		id: 'blogs-and-web-content',
 		operations: ['site.create', 'blogs.create', 'webContent.create'],
 		request: {
@@ -428,9 +427,7 @@ async function _submitWorkflowJson<T>(
 	return postJsonResource<T>(resourceURL, result.value);
 }
 
-function getWorkflowJsonSample(
-	sampleId: string
-): WorkflowJsonSample | null {
+function getWorkflowJsonSample(sampleId: string): WorkflowJsonSample | null {
 	return (
 		getWorkflowJsonSamples().find((sample) => sample.id === sampleId) ??
 		null

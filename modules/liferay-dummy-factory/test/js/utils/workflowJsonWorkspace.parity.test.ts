@@ -14,7 +14,10 @@ describe('workflow-samples parity between TS and JSON fixtures', () => {
 		'$id matches the JSON fixture (deep equal)',
 		(sample) => {
 			const fixture = JSON.parse(
-				fs.readFileSync(path.join(FIXTURE_DIR, `${sample.id}.json`), 'utf8')
+				fs.readFileSync(
+					path.join(FIXTURE_DIR, `${sample.id}.json`),
+					'utf8'
+				)
 			);
 			const tsSample = JSON.parse(sample.json);
 

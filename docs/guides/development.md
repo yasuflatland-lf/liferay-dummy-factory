@@ -65,6 +65,8 @@ docker exec liferay-dummy-factory-liferay bash -c "(echo 'lb dummy.factory'; sle
 
 ## Format
 
+Prettier formats JS/TS/TSX/CSS/JSON under the module's `src/main/resources/META-INF/resources/js/`, `test/` and `scripts/`, plus module configuration files. Settings and exclusions are described in the [dependency reference](../reference/dependencies.md#formatter).
+
 ```bash
 cd modules/liferay-dummy-factory
 yarn format          # write

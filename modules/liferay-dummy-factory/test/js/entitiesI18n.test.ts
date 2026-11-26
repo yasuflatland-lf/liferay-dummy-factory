@@ -4,14 +4,11 @@ import {ENTITY_CONFIGS} from '../../src/main/resources/META-INF/resources/js/con
 import {ENTITY_TYPES} from '../../src/main/resources/META-INF/resources/js/config/constants';
 
 describe('tags field i18n', () => {
-	it.each(['tags'])(
-		'%s resolves via Language.properties',
-		(key) => {
-			const text = Liferay.Language.get(key);
-			expect(text).not.toBe(key);
-			expect(text.length).toBeGreaterThan(0);
-		}
-	);
+	it.each(['tags'])('%s resolves via Language.properties', (key) => {
+		const text = Liferay.Language.get(key);
+		expect(text).not.toBe(key);
+		expect(text.length).toBeGreaterThan(0);
+	});
 });
 
 describe('tags field presence in entity configs', () => {
