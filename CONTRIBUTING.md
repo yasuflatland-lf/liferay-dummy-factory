@@ -6,7 +6,7 @@ Thanks for helping. This page is the contributor workflow and the review checkli
 
 1. Set up and build: [development guide](docs/guides/development.md).
 2. Read the architecture page for the area you change: [overview](docs/architecture/overview.md), [backend](docs/architecture/backend.md), [frontend](docs/architecture/frontend.md). New entity type? Follow [adding an entity](docs/guides/adding-an-entity.md).
-3. Change code, tests and documentation together.
+3. Change code, tests and documentation together. For formatting, follow the [development guide](docs/guides/development.md#format).
 4. Run the checks locally:
 
    ```bash

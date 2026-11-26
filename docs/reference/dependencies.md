@@ -20,7 +20,7 @@ Java levels: the bundle compiles for Java 17 (`modules/liferay-dummy-factory/bui
 
 ## Package manager
 
-Yarn only. `yarn.lock` is the lockfile; `package-lock.json` is git-ignored and must never be committed. Never hand-edit `yarn.lock`: resolve a conflict by taking one side wholesale, then run `yarn install` and the tests.
+Yarn only. Use Yarn classic for installs to preserve the format of `yarn.lock`, even if a newer Yarn is on PATH. `package-lock.json` is git-ignored and must never be committed. Never hand-edit `yarn.lock`: resolve a conflict by taking one side wholesale, then run `yarn install` and the tests.
 
 ## Renovate guard-rails
 
@@ -53,9 +53,9 @@ Yarn only. `yarn.lock` is the lockfile; `package-lock.json` is git-ignored and m
 
 TypeScript 6 rejects `moduleResolution: "node"` and `baseUrl`; `tsconfig.json` uses `moduleResolution: "bundler"` without `baseUrl`.
 
-### Known harmless warning
+### Formatter
 
-`@liferay/npm-scripts` (kept for formatting) carries its own `@testing-library/react@14` with a React 18 peer, so installs warn about an incorrect React peer. The module's own Testing Library version wins for Vitest. Do not "fix" it with downgrades or `resolutions`.
+Prettier and `@liferay/prettier-plugin` are pinned exactly in the module's `package.json`. Keep the CLI's Prettier pin equal to the plugin's exact dependency so they share one copy. The module's `.prettierrc.js` mirrors liferay-portal's [modules/.prettierrc.js](https://github.com/liferay/liferay-portal/blob/master/modules/.prettierrc.js), with a two-space override for `package.json`. The plugin adds Liferay's comment spacing and block-statement newline rules; `.prettierignore` excludes build output, dependencies, coverage, generated files and non-frontend languages. Formatting commands and scope are in the [development guide](../guides/development.md#format).
 
 ## Upgrading the Liferay target
 

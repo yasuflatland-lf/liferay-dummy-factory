@@ -19,7 +19,7 @@ Explanations live in `docs/architecture/frontend.md`; Vitest specifics in `docs/
 - Form field reactions use only `dependsOn`, `visibleWhen` or `disabledWhen` — one per constraint. Toggle values are the strings `'true'`/`'false'`.
 - The workflow editor never adds client-only required fields; the schema comes from `GET /o/ldf-workflow/schema`. Keep `types/index.ts` `WorkflowRequestPayload` in step with `WorkflowResource._schemaDocument()`.
 - `data-testid` values follow the generated contract; reusable components take an optional `testId` prop. Do not invent ids.
-- Production build is `modules/liferay-dummy-factory/scripts/build.mjs` (esbuild); do not move it to Vite or `@liferay/npm-scripts`.
+- Production build is `modules/liferay-dummy-factory/scripts/build.mjs` (esbuild); keep bundling separate from Vitest and Prettier.
 
 ## Unit tests (Vitest)
 
