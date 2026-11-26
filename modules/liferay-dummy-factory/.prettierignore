@@ -1,0 +1,26 @@
+# Only frontend languages, including when an editor formats the module directory
+**/*
+!**/*/
+!**/*.js
+!**/*.jsx
+!**/*.mjs
+!**/*.cjs
+!**/*.ts
+!**/*.tsx
+!**/*.mts
+!**/*.cts
+!**/*.css
+!**/*.json
+
+# Build output and generated files
+**/node_modules/
+/build/
+/classes/
+/dist/
+/coverage/
+**/generated/
+**/__generated__/
+**/*.generated.*
+**/*.min.js
+**/*.map
+
