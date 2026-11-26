@@ -34,7 +34,8 @@ function _stringifyValue(value: unknown): string {
 
 	try {
 		return JSON.stringify(value, null, 2);
-	} catch {
+	}
+	catch {
 		return String(value);
 	}
 }
@@ -319,7 +320,8 @@ function WorkflowJsonEditor({
 				_getResponseBody(response.data),
 				_getResultTone(false, hasWarnings)
 			);
-		} catch (error) {
+		}
+		catch (error) {
 			console.error('Workflow action failed unexpectedly', error);
 
 			const message =
@@ -331,7 +333,8 @@ function WorkflowJsonEditor({
 				message || translate('workflow-json-no-details-returned'),
 				'danger'
 			);
-		} finally {
+		}
+		finally {
 			setBusyAction(null);
 		}
 	}
@@ -432,14 +435,16 @@ function WorkflowJsonEditor({
 						{selectedSample &&
 							selectedSample.operations.length > 0 && (
 								<div className="workflow-json-sample-operations">
-									{selectedSample.operations.map((operation) => (
-										<span
-											className="label label-secondary"
-											key={operation}
-										>
-											{operation}
-										</span>
-									))}
+									{selectedSample.operations.map(
+										(operation) => (
+											<span
+												className="label label-secondary"
+												key={operation}
+											>
+												{operation}
+											</span>
+										)
+									)}
 								</div>
 							)}
 					</div>
@@ -469,7 +474,9 @@ function WorkflowJsonEditor({
 							}`}
 							data-testid="workflow-json-textarea"
 							id="workflow-json-editor"
-							onChange={(event) => _applyValue(event.target.value)}
+							onChange={(event) =>
+								_applyValue(event.target.value)
+							}
 							placeholder={translate(
 								'workflow-json-editor-placeholder'
 							)}

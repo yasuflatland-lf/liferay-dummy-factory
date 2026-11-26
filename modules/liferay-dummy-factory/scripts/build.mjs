@@ -50,8 +50,7 @@ const liferayReactExternalsPlugin = {
 	name: 'liferay-react-externals',
 	setup(build) {
 		const externals = {
-			'react':
-				'../../frontend-js-react-web/__liferay__/exports/react.js',
+			'react': '../../frontend-js-react-web/__liferay__/exports/react.js',
 			'react-dom':
 				'../../frontend-js-react-web/__liferay__/exports/react-dom.js',
 		};

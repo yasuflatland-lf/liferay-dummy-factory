@@ -106,8 +106,12 @@ describe('workflowJsonWorkspace samples', () => {
 			'Create a vocabulary, then a category.'
 		);
 
-		const messageBoardsSample = samples.find((s) => s.id === 'message-boards')!;
-		const messageBoardsTitle = Liferay.Language.get(messageBoardsSample.titleKey);
+		const messageBoardsSample = samples.find(
+			(s) => s.id === 'message-boards'
+		)!;
+		const messageBoardsTitle = Liferay.Language.get(
+			messageBoardsSample.titleKey
+		);
 
 		expect(messageBoardsTitle).not.toBe(messageBoardsSample.titleKey);
 		expect(messageBoardsTitle).toBe('Message boards');
@@ -212,9 +216,7 @@ describe('workflowJsonWorkspace validation and actions', () => {
 			'/o/ldf-workflow/plan',
 			JSON.stringify({
 				schemaVersion: '1.0',
-				steps: [
-					{id: 'a', idempotencyKey: 'x', operation: 'noop'},
-				],
+				steps: [{id: 'a', idempotencyKey: 'x', operation: 'noop'}],
 			})
 		);
 
@@ -238,8 +240,13 @@ describe('workflowJsonWorkspace template contracts', () => {
 
 			for (const step of parsed.steps) {
 				for (const param of step.params ?? []) {
-					if (param.name === 'baseName' && typeof param.value === 'string') {
-						expect(param.value, `sample ${sample.id}`).toMatch(regex);
+					if (
+						param.name === 'baseName' &&
+						typeof param.value === 'string'
+					) {
+						expect(param.value, `sample ${sample.id}`).toMatch(
+							regex
+						);
 						baseNameParamsChecked++;
 					}
 				}

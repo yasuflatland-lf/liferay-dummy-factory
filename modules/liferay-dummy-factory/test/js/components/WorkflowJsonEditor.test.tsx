@@ -121,9 +121,8 @@ describe('WorkflowJsonEditor layout', () => {
 				.disabled
 		).toBe(true);
 		expect(
-			(
-				screen.getByTestId('workflow-json-execute') as HTMLButtonElement
-			).disabled
+			(screen.getByTestId('workflow-json-execute') as HTMLButtonElement)
+				.disabled
 		).toBe(true);
 	});
 
@@ -228,9 +227,8 @@ describe('WorkflowJsonEditor layout', () => {
 
 		await waitFor(() => {
 			expect(
-				(
-					screen.getByTestId('workflow-json-plan') as HTMLButtonElement
-				).disabled
+				(screen.getByTestId('workflow-json-plan') as HTMLButtonElement)
+					.disabled
 			).toBe(false);
 		});
 
@@ -351,7 +349,9 @@ describe('WorkflowJsonEditor layout', () => {
 		fireEvent.click(screen.getByTestId('workflow-json-execute'));
 
 		await waitFor(() => {
-			expect(screen.getByTestId('workflow-json-result-panel')).not.toBeNull();
+			expect(
+				screen.getByTestId('workflow-json-result-panel')
+			).not.toBeNull();
 		});
 
 		fireEvent.change(screen.getByTestId('workflow-json-textarea'), {
@@ -436,7 +436,8 @@ describe('WorkflowJsonEditor layout', () => {
 							errors: [
 								{
 									code: 'FORBIDDEN',
-									message: 'company.create requires an omniadmin.',
+									message:
+										'company.create requires an omniadmin.',
 									path: '/',
 								},
 							],
@@ -539,6 +540,7 @@ describe('WorkflowJsonEditor layout', () => {
 		const textarea = screen.getByTestId('workflow-json-textarea');
 
 		// Wait past the debounce window so liveValidity has settled to 'empty'.
+
 		await new Promise((resolve) => setTimeout(resolve, 400));
 
 		expect(textarea.className).not.toContain('is-invalid');
@@ -555,8 +557,7 @@ describe('WorkflowJsonEditor layout', () => {
 			vi.fn().mockImplementation((url: string) => {
 				if (url === '/o/ldf-workflow/schema') {
 					return Promise.resolve({
-						json: () =>
-							Promise.resolve({schema: VALID_SCHEMA}),
+						json: () => Promise.resolve({schema: VALID_SCHEMA}),
 						ok: true,
 					});
 				}
@@ -609,9 +610,7 @@ describe('WorkflowJsonEditor layout', () => {
 				.closest('[aria-busy]');
 
 			expect(workspace?.getAttribute('aria-busy')).toBe('true');
-			expect(workspace?.className).toContain(
-				'workflow-json-workspace'
-			);
+			expect(workspace?.className).toContain('workflow-json-workspace');
 		});
 
 		resolveFetch!({
@@ -657,9 +656,8 @@ describe('WorkflowJsonEditor layout', () => {
 
 		await waitFor(() => {
 			expect(
-				(
-					screen.getByTestId('workflow-json-plan') as HTMLButtonElement
-				).disabled
+				(screen.getByTestId('workflow-json-plan') as HTMLButtonElement)
+					.disabled
 			).toBe(true);
 			expect(
 				(
@@ -715,9 +713,7 @@ describe('WorkflowJsonEditor layout structure', () => {
 	it('does not render the legacy bottom action bar', () => {
 		const {container} = render(<WorkflowJsonEditor {...defaultProps} />);
 
-		expect(
-			container.querySelector('.workflow-json-action-bar')
-		).toBeNull();
+		expect(container.querySelector('.workflow-json-action-bar')).toBeNull();
 	});
 
 	it('renders a result-pane placeholder before the first action', () => {

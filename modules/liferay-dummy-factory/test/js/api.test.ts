@@ -80,7 +80,9 @@ describe.each([
 		['empty errors', JSON.stringify({errors: []})],
 		[
 			'unusable messages',
-			JSON.stringify({errors: [null, {}, {message: 42}, {message: ' \t '}]}),
+			JSON.stringify({
+				errors: [null, {}, {message: 42}, {message: ' \t '}],
+			}),
 		],
 		['non-array errors', JSON.stringify({errors: {message: 'Forbidden'}})],
 		['null JSON', 'null'],

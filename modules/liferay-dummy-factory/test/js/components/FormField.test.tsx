@@ -42,7 +42,9 @@ describe('FormField disabledWhen', () => {
 			type: 'text',
 		};
 
-		render(<FormField disabled={true} field={field} onChange={noop} value="" />);
+		render(
+			<FormField disabled={true} field={field} onChange={noop} value="" />
+		);
 
 		const input = screen.getByRole('textbox') as HTMLInputElement;
 
@@ -59,7 +61,12 @@ describe('FormField disabledWhen', () => {
 		};
 
 		render(
-			<FormField disabled={true} field={field} onChange={noop} value="false" />
+			<FormField
+				disabled={true}
+				field={field}
+				onChange={noop}
+				value="false"
+			/>
 		);
 
 		const checkbox = screen.getByRole('checkbox') as HTMLInputElement;
@@ -77,7 +84,9 @@ describe('FormField disabledWhen', () => {
 			type: 'select',
 		};
 
-		render(<FormField disabled={true} field={field} onChange={noop} value="" />);
+		render(
+			<FormField disabled={true} field={field} onChange={noop} value="" />
+		);
 
 		const select = screen.getByRole('combobox') as HTMLSelectElement;
 
@@ -94,7 +103,9 @@ describe('FormField disabledWhen', () => {
 			type: 'multiselect',
 		};
 
-		render(<FormField disabled={true} field={field} onChange={noop} value="" />);
+		render(
+			<FormField disabled={true} field={field} onChange={noop} value="" />
+		);
 
 		const select = screen.getByRole('listbox') as HTMLSelectElement;
 
@@ -110,7 +121,9 @@ describe('FormField disabledWhen', () => {
 			type: 'textarea',
 		};
 
-		render(<FormField disabled={true} field={field} onChange={noop} value="" />);
+		render(
+			<FormField disabled={true} field={field} onChange={noop} value="" />
+		);
 
 		const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
 
