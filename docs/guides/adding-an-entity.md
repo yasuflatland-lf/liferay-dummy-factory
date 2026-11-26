@@ -38,7 +38,7 @@ The end-to-end checklist for a new kind of dummy data (here: a hypothetical `Wid
 ## 5. Tests
 
 - [ ] JUnit for any new pure utility or value object (`src/test/java`, mandatory for `utils/`).
-- [ ] A `WidgetFunctionalSpec` extending `BaseLiferaySpec`: create through the resource command or workflow, verify through **JSONWS**, cover both branches of every new `if/else`, lock the response shape ([rules](../../.claude/rules/tests.md)).
+- [ ] A `WidgetFunctionalSpec` extending `BaseLiferaySpec`: create through the resource command or workflow, verify through **JSONWS**, cover both branches of every new `if/else`, lock the response shape ([rules](../../integration-test/AGENTS.md#what-to-test)).
 - [ ] Vitest for new components or config logic, with the i18n guard on localized strings.
 - [ ] Optional: a sample workflow under `integration-test/src/test/resources/workflow-samples/`, its TS copy, and the parity test.
 

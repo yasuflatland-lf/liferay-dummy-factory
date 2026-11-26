@@ -12,7 +12,12 @@ classes/
 .project
 bin/
 liferay-theme.json
+# Agent scratch space and personal agent instructions
+.agents/plan/
 .claude/plan/
+AGENTS.override.md
+CLAUDE.local.md
+.claude/settings.local.json
 .claude/scheduled_tasks.lock
 .superpowers/
 docs/plans/

@@ -1,4 +1,4 @@
-# ADR-0011: Replace `@liferay/npm-scripts` format with Prettier
+# ADR-0012: Replace `@liferay/npm-scripts` format with Prettier
 
 ## Status
 

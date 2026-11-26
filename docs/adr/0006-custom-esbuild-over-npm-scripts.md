@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted; decision 2 superseded by [ADR-0011](0011-replace-npm-scripts-format-with-prettier.md)
+Accepted; decision 2 superseded by [ADR-0012](0012-replace-npm-scripts-format-with-prettier.md)
 
 ## Date
 

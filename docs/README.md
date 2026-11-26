@@ -41,6 +41,7 @@ Organized by what you are trying to do ([Diátaxis](https://diataxis.fr/)): **gu
 | [Vitest](reference/vitest.md) | setup, i18n guard, mocking, parity tests |
 | [`data-testid` contract](reference/test-ids.md) | generated and fixed test ids |
 | [Dependencies](reference/dependencies.md) | where versions are pinned, constraints between pins, upgrades |
+| [Agent instructions](reference/agent-instructions.md) | `AGENTS.md` layout, Codex and Claude Code loading, skills, what the checker enforces |
 
 ## Decisions
 
@@ -48,6 +49,6 @@ Organized by what you are trying to do ([Diátaxis](https://diataxis.fr/)): **gu
 
 ## For AI agents
 
-[`CLAUDE.md`](../CLAUDE.md) is the entry point. Path-scoped rules in [`.claude/rules/`](../.claude/rules/) load automatically when matching files are touched; task procedures are skills in [`.claude/skills/`](../.claude/skills/). Rules stay short and link here for explanations.
+The root [`AGENTS.md`](../AGENTS.md) is the entry point for every agent (Codex, Claude Code, …). Directory-scoped `AGENTS.md` files, indexed there, hold the rules for their subtree; task procedures are skills in `.agents/skills/`. Each `CLAUDE.md` is a one-line import of its sibling `AGENTS.md`. Rules stay short and link here for explanations. Layout and loading: [agent instructions](reference/agent-instructions.md).
 
-Keeping docs correct: [`.claude/rules/documentation.md`](../.claude/rules/documentation.md) defines where things go; `node scripts/check-docs.mjs` (run in CI) verifies links, anchors, quoted paths, rule globs, the ADR index, and that no pinned version is copied into prose.
+Keeping docs correct: [`docs/AGENTS.md`](AGENTS.md) defines where things go; `node scripts/check-docs.mjs` (run in CI) verifies links, anchors, quoted paths, the ADR index, that no pinned version is copied into prose, and the agent-instruction layout.

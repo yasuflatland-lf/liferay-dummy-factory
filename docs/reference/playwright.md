@@ -1,6 +1,6 @@
 # Playwright reference
 
-Patterns and pitfalls for the browser specs in `integration-test/`. Selector ids are defined in [`test-ids.md`](test-ids.md). When to use Playwright at all: only when the assertion is about the DOM, client-side validation or navigation — database state is verified through JSONWS ([`.claude/rules/tests.md`](../../.claude/rules/tests.md)).
+Patterns and pitfalls for the browser specs in `integration-test/`. Selector ids are defined in [`test-ids.md`](test-ids.md). When to use Playwright at all: only when the assertion is about the DOM, client-side validation or navigation — database state is verified through JSONWS ([`integration-test/AGENTS.md`](../../integration-test/AGENTS.md)).
 
 ## Basics
 

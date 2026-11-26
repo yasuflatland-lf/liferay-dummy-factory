@@ -1,6 +1,6 @@
 # Running the tests
 
-Three suites, from fastest to slowest. How the harness works internally is in the [test harness reference](../reference/test-harness.md); how to write tests is in [`.claude/rules/tests.md`](../../.claude/rules/tests.md).
+Three suites, from fastest to slowest. How the harness works internally is in the [test harness reference](../reference/test-harness.md); how to write tests is in [`integration-test/AGENTS.md`](../../integration-test/AGENTS.md#what-to-test).
 
 | Suite | Command | Needs |
 |---|---|---|
