@@ -21,7 +21,7 @@ repositories {
 }
 
 jacoco {
-	toolVersion = '0.8.15'
+	toolVersion = '0.8.16'
 }
 
 def spockVersion = project.property('test.spock.version')
@@ -33,10 +33,10 @@ dependencies {
 	testImplementation "org.apache.groovy:groovy-json:${groovyVersion}"
 	testImplementation "org.spockframework:spock-core:${spockVersion}"
 	testImplementation "com.microsoft.playwright:playwright:${playwrightVersion}"
-	testImplementation 'ch.qos.logback:logback-classic:1.6.5'
+	testImplementation 'ch.qos.logback:logback-classic:1.6.7'
 	testImplementation 'commons-net:commons-net:3.13.0'
-	testImplementation 'org.jacoco:org.jacoco.core:0.8.15'
-	testImplementation 'org.jacoco:org.jacoco.agent:0.8.15:runtime'
+	testImplementation 'org.jacoco:org.jacoco.core:0.8.16'
+	testImplementation 'org.jacoco:org.jacoco.agent:0.8.16:runtime'
 }
 
 // ----- License resolution: env var -> configs/local/deploy/activation-key.xml -----
