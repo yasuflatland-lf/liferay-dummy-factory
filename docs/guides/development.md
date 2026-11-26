@@ -71,7 +71,7 @@ yarn format          # write
 yarn checkFormat     # verify
 ```
 
-Java follows Liferay conventions (tabs, `_` prefix for private members); see [`.claude/rules/backend-java.md`](../../.claude/rules/backend-java.md).
+Java follows Liferay conventions (tabs, `_` prefix for private members); see [`src/main/java/AGENTS.md`](../../modules/liferay-dummy-factory/src/main/java/AGENTS.md#java-conventions).
 
 ## Where to go next
 

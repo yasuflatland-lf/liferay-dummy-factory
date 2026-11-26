@@ -1,6 +1,6 @@
 # Backend architecture
 
-The Java side of the bundle: how a request becomes entities, and the contracts every Creator, resource command and workflow adapter must keep. Start with [`overview.md`](overview.md) for the big picture. Coding rules for this area are in [`.claude/rules/backend-java.md`](../../.claude/rules/backend-java.md); Liferay API facts are in [`reference/liferay-dxp-api.md`](../reference/liferay-dxp-api.md).
+The Java side of the bundle: how a request becomes entities, and the contracts every Creator, resource command and workflow adapter must keep. Start with [`overview.md`](overview.md) for the big picture. Coding rules for this area are in [`src/main/java/AGENTS.md`](../../modules/liferay-dummy-factory/src/main/java/AGENTS.md); Liferay API facts are in [`reference/liferay-dxp-api.md`](../reference/liferay-dxp-api.md).
 
 ## Layers
 
